@@ -147,7 +147,7 @@ const GeneralView = ({ localeProp, user }: GeneralViewProps) => {
             </Label>
             <Select<{ label: string; value: string }>
               className="capitalize"
-              options={localeOptions}
+              options={localeOptions.filter((l) => l.value === "es" || l.value === "en")}
               value={value}
               onChange={onChange}
             />

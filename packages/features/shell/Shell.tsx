@@ -56,15 +56,11 @@ import {
 import {
   ArrowLeft,
   ArrowRight,
-  BarChart,
   Calendar,
   ChevronDown,
   Clock,
-  Copy,
   Download,
   ExternalLink,
-  FileText,
-  Grid,
   HelpCircle,
   Link as LinkIcon,
   LogOut,
@@ -74,7 +70,6 @@ import {
   Settings,
   User as UserIcon,
   Users,
-  Zap,
 } from "@calcom/ui/components/icon";
 import { Discord } from "@calcom/ui/components/icon/Discord";
 
@@ -367,11 +362,11 @@ function UserDropdown({ small }: UserDropdownProps) {
           )}>
           <span
             className={classNames(
-              small ? "h-4 w-4" : "h-5 w-5 ltr:mr-2 rtl:ml-2",
+              small ? "h-4 w-4" : "h-8 w-8 ltr:mr-2 rtl:ml-2",
               "relative flex-shrink-0 rounded-full bg-gray-300"
             )}>
             <Avatar
-              size={small ? "xs" : "xsm"}
+              size={small ? "xs" : "md"}
               imageSrc={bookerUrl + "/" + user.username + "/avatar.png"}
               alt={user.username || "Nameless User"}
               className="overflow-hidden"
@@ -541,54 +536,54 @@ const navigation: NavigationItemType[] = [
     onlyDesktop: true,
     badge: <TeamInviteBadge />,
   },
-  {
-    name: "apps",
-    href: "/apps",
-    icon: Grid,
-    isCurrent: ({ pathname: path, item }) => {
-      // During Server rendering path is /v2/apps but on client it becomes /apps(weird..)
-      return path?.startsWith(item.href) && !path?.includes("routing-forms/");
-    },
-    child: [
-      {
-        name: "app_store",
-        href: "/apps",
-        isCurrent: ({ pathname: path, item }) => {
-          // During Server rendering path is /v2/apps but on client it becomes /apps(weird..)
-          return (
-            path?.startsWith(item.href) && !path?.includes("routing-forms/") && !path?.includes("/installed")
-          );
-        },
-      },
-      {
-        name: "installed_apps",
-        href: "/apps/installed/calendar",
-        isCurrent: ({ pathname: path }) =>
-          path?.startsWith("/apps/installed/") || path?.startsWith("/v2/apps/installed/"),
-      },
-    ],
-  },
+  // {
+  //   name: "apps",
+  //   href: "/apps",
+  //   icon: Grid,
+  //   isCurrent: ({ pathname: path, item }) => {
+  //     // During Server rendering path is /v2/apps but on client it becomes /apps(weird..)
+  //     return path?.startsWith(item.href) && !path?.includes("routing-forms/");
+  //   },
+  //   child: [
+  //     {
+  //       name: "app_store",
+  //       href: "/apps",
+  //       isCurrent: ({ pathname: path, item }) => {
+  //         // During Server rendering path is /v2/apps but on client it becomes /apps(weird..)
+  //         return (
+  //           path?.startsWith(item.href) && !path?.includes("routing-forms/") && !path?.includes("/installed")
+  //         );
+  //       },
+  //     },
+  //     {
+  //       name: "installed_apps",
+  //       href: "/apps/installed/calendar",
+  //       isCurrent: ({ pathname: path }) =>
+  //         path?.startsWith("/apps/installed/") || path?.startsWith("/v2/apps/installed/"),
+  //     },
+  //   ],
+  // },
   {
     name: MORE_SEPARATOR_NAME,
     href: "/more",
     icon: MoreHorizontal,
   },
-  {
-    name: "Routing Forms",
-    href: "/apps/routing-forms/forms",
-    icon: FileText,
-    isCurrent: ({ pathname }) => pathname?.startsWith("/apps/routing-forms/"),
-  },
-  {
-    name: "workflows",
-    href: "/workflows",
-    icon: Zap,
-  },
-  {
-    name: "insights",
-    href: "/insights",
-    icon: BarChart,
-  },
+  // {
+  //   name: "Routing Forms",
+  //   href: "/apps/routing-forms/forms",
+  //   icon: FileText,
+  //   isCurrent: ({ pathname }) => pathname?.startsWith("/apps/routing-forms/"),
+  // },
+  // {
+  //   name: "workflows",
+  //   href: "/workflows",
+  //   icon: Zap,
+  // },
+  // {
+  //   name: "insights",
+  //   href: "/insights",
+  //   icon: BarChart,
+  // },
 ];
 
 const moreSeparatorIndex = navigation.findIndex((item) => item.name === MORE_SEPARATOR_NAME);
@@ -611,10 +606,10 @@ const { desktopNavigationItems, mobileNavigationBottomItems, mobileNavigationMor
   { desktopNavigationItems: [], mobileNavigationBottomItems: [], mobileNavigationMoreItems: [] }
 );
 
-const Navigation = () => {
+const Navigation = ({ navItemsAdic }) => {
   return (
     <nav className="mt-2 flex-1 md:px-2 lg:mt-4 lg:px-0">
-      {desktopNavigationItems.map((item) => (
+      {[...desktopNavigationItems, ...navItemsAdic].map((item) => (
         <NavigationItem key={item.name} item={item} />
       ))}
       <div className="text-subtle mt-0.5 lg:hidden">
@@ -799,27 +794,30 @@ function SideBar({ bannersHeight, user }: SideBarProps) {
     return publicPageUrl;
   }, [orgBranding?.slug, user?.organizationId, user?.username]);
 
-  const bottomNavItems: NavigationItemType[] = [
+  const navItemsAdic: NavigationItemType[] = [
+    // {
+    //   name: "copy_public_page_link",
+    //   href: "",
+    //   onClick: (e: { preventDefault: () => void }) => {
+    //     e.preventDefault();
+    //     navigator.clipboard.writeText(publicPageUrl);
+    //     showToast(t("link_copied"), "success");
+    //   },
+    //   icon: Copy,
+    // },
+    {
+      name: "settings",
+      href: user?.organizationId ? `/settings/organizations/profile` : "/settings/my-account/profile",
+      icon: Settings,
+    },
+  ];
+
+  const bottomNavItems = [
     {
       name: "view_public_page",
       href: publicPageUrl,
       icon: ExternalLink,
       target: "__blank",
-    },
-    {
-      name: "copy_public_page_link",
-      href: "",
-      onClick: (e: { preventDefault: () => void }) => {
-        e.preventDefault();
-        navigator.clipboard.writeText(publicPageUrl);
-        showToast(t("link_copied"), "success");
-      },
-      icon: Copy,
-    },
-    {
-      name: "settings",
-      href: user?.organizationId ? `/settings/organizations/profile` : "/settings/my-account/profile",
-      icon: Settings,
     },
   ];
   return (
@@ -829,29 +827,7 @@ function SideBar({ bannersHeight, user }: SideBarProps) {
         className="desktop-transparent bg-muted border-muted fixed left-0 hidden h-full max-h-screen w-14 flex-col overflow-y-auto overflow-x-hidden border-r dark:bg-gradient-to-tr dark:from-[#2a2a2a] dark:to-[#1c1c1c] md:sticky md:flex lg:w-56 lg:px-3">
         <div className="flex h-full flex-col justify-between py-3 lg:pt-4">
           <header className="items-center justify-between md:hidden lg:flex">
-            {!isOrgBrandingDataFetched ? null : orgBranding ? (
-              <Link href="/settings/organizations/profile" className="px-1.5">
-                <div className="flex items-center gap-2 font-medium">
-                  <Avatar
-                    alt={`${orgBranding.name} logo`}
-                    imageSrc={getPlaceholderAvatar(orgBranding.logo, orgBranding.name)}
-                    size="xsm"
-                  />
-                  <p className="text line-clamp-1 text-sm">
-                    <span>{orgBranding.name}</span>
-                  </p>
-                </div>
-              </Link>
-            ) : (
-              <div data-testid="user-dropdown-trigger">
-                <span className="hidden lg:inline">
-                  <UserDropdown />
-                </span>
-                <span className="hidden md:inline lg:hidden">
-                  <UserDropdown small />
-                </span>
-              </div>
-            )}
+            <Logo />
             <div className="flex space-x-0.5 rtl:space-x-reverse">
               <button
                 color="minimal"
@@ -881,11 +857,10 @@ function SideBar({ bannersHeight, user }: SideBarProps) {
             <Logo small icon />
           </Link>
 
-          <Navigation />
+          <Navigation navItemsAdic={navItemsAdic} />
         </div>
-
+        <Tips />
         <div>
-          <Tips />
           {bottomNavItems.map(({ icon: Icon, ...item }, index) => (
             <Tooltip side="right" content={t(item.name)} className="lg:hidden" key={item.name}>
               <ButtonOrLink
@@ -920,6 +895,29 @@ function SideBar({ bannersHeight, user }: SideBarProps) {
               </ButtonOrLink>
             </Tooltip>
           ))}
+          {!isOrgBrandingDataFetched ? null : orgBranding ? (
+            <Link href="/settings/organizations/profile" className="px-1.5">
+              <div className="flex items-center gap-2 font-medium">
+                <Avatar
+                  alt={`${orgBranding.name} logo`}
+                  imageSrc={getPlaceholderAvatar(orgBranding.logo, orgBranding.name)}
+                  size="lg"
+                />
+                <p className="text line-clamp-1 text-sm">
+                  <span>{orgBranding.name}</span>
+                </p>
+              </div>
+            </Link>
+          ) : (
+            <div data-testid="user-dropdown-trigger">
+              <span className="hidden lg:inline">
+                <UserDropdown />
+              </span>
+              <span className="hidden md:inline lg:hidden">
+                <UserDropdown small />
+              </span>
+            </div>
+          )}
           <Credits />
         </div>
       </aside>

@@ -9,7 +9,7 @@ export async function defineConfig(env) {
   );
 
   return {
-    referenceLanguage: "en",
+    referenceLanguage: "es",
     plugins: [
       i18nextPlugin({
         pathPattern: "./apps/web/public/static/locales/{language}/common.json",
