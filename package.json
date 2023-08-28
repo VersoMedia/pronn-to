@@ -94,8 +94,11 @@
   },
   "dependencies": {
     "city-timezones": "^1.2.1",
+    "date-fns": "^2.30.0",
     "eslint": "^8.34.0",
     "lucide-react": "^0.171.0",
+    "moment": "^2.29.4",
+    "react-big-calendar": "^1.8.2",
     "turbo": "^1.10.1"
   },
   "resolutions": {

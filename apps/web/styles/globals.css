@@ -508,3 +508,14 @@ select:focus {
 .react-tel-input .flag-dropdown {
   @apply !border-r-default left-0.5 !border-y-0 !border-l-0;
 }
+
+.rbc-time-view {
+  border-radius: 6px;
+  font-family: var(--font-inter), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
+}
+.rbc-today {
+  background-color: rgba(229, 231, 235, .4) !important;
+}
+.rbc-allday-cell{
+  display: none !important;
+}
