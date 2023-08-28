@@ -9,6 +9,7 @@ import { Avatar } from "../../avatar";
 import { SkeletonText } from "../../skeleton";
 
 export type HorizontalTabItemProps = {
+  id?: string;
   name: string;
   disabled?: boolean;
   className?: string;
@@ -17,19 +18,57 @@ export type HorizontalTabItemProps = {
   linkScroll?: boolean;
   icon?: SVGComponent;
   avatar?: string;
+  onClick?: () => void;
+  isButton?: boolean;
+  views?: string;
 };
 
 const HorizontalTabItem = function ({
   name,
-  href,
+  href = "",
   linkShallow,
   linkScroll,
   avatar,
+  isButton,
+  views = "week",
+  id,
+  onClick,
   ...props
 }: HorizontalTabItemProps) {
   const { t, isLocaleReady } = useLocale();
-
   const isCurrent = useUrlMatchesCurrentUrl(href);
+
+  if (isButton)
+    return (
+      <div
+        key={name}
+        onClick={() => onClick()}
+        className={classNames(
+          views === id ? "bg-emphasis text-emphasis" : "hover:bg-subtle hover:text-emphasis text-default",
+          "cusor-pointer inline-flex items-center justify-center whitespace-nowrap rounded-[6px] p-2 text-sm font-medium leading-4 md:mb-0",
+          props.disabled && "pointer-events-none !opacity-30",
+          props.className
+        )}>
+        {props.icon && (
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          //@ts-ignore
+          <props.icon
+            className={classNames(
+              views === id ? "text-emphasis" : "group-hover:text-subtle text-muted",
+              "-ml-0.5 hidden h-4 w-4 ltr:mr-2 rtl:ml-2 sm:inline-block"
+            )}
+            aria-hidden="true"
+          />
+        )}
+        {isLocaleReady ? (
+          <div className="flex items-center gap-x-2">
+            {avatar && <Avatar size="sm" imageSrc={avatar} alt="avatar" />} {t(name)}
+          </div>
+        ) : (
+          <SkeletonText className="h-4 w-24" />
+        )}
+      </div>
+    );
 
   return (
     <Link

@@ -7,7 +7,7 @@ import startOfWeek from "date-fns/startOfWeek";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import moment from "moment";
 import type { GetStaticPaths, GetStaticProps } from "next";
-import { Fragment, useState } from "react";
+import { Fragment, useCallback, useState } from "react";
 import React from "react";
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
@@ -17,14 +17,14 @@ import { z } from "zod";
 
 import { getLayout } from "@calcom/features/MainLayout";
 import { FiltersContainer } from "@calcom/features/bookings/components/FiltersContainer";
-import type { filterQuerySchema } from "@calcom/features/bookings/lib/useFilterQuery";
+//import type { filterQuerySchema } from "@calcom/features/bookings/lib/useFilterQuery";
 import { useFilterQuery } from "@calcom/features/bookings/lib/useFilterQuery";
 import { ShellMain } from "@calcom/features/shell/Shell";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { useParamsWithFallback } from "@calcom/lib/hooks/useParamsWithFallback";
 import type { RouterOutputs } from "@calcom/trpc/react";
 import { trpc } from "@calcom/trpc/react";
-import { HorizontalTabs } from "@calcom/ui";
+import { Button, HorizontalTabs, Switch } from "@calcom/ui";
 import type { VerticalTabItemProps, HorizontalTabItemProps } from "@calcom/ui";
 import { Alert } from "@calcom/ui";
 
@@ -32,11 +32,14 @@ import { Alert } from "@calcom/ui";
 import { useInViewObserver } from "@lib/hooks/useInViewObserver";
 
 import PageWrapper from "@components/PageWrapper";
+import BookingListItem from "@components/booking/BookingListItem";
 import SkeletonLoader from "@components/booking/SkeletonLoader";
 
 import { ssgInit } from "@server/lib/ssg";
 
-type BookingListingStatus = z.infer<NonNullable<typeof filterQuerySchema>>["status"];
+import { WipeMyCalActionButton } from "../../../../packages/app-store/wipemycalother/components";
+
+//type BookingListingStatus = z.infer<NonNullable<typeof filterQuerySchema>>["status"];
 type BookingOutput = RouterOutputs["viewer"]["bookings"]["get"]["bookings"][0];
 
 type RecurringInfo = {
@@ -70,13 +73,13 @@ const tabs: (VerticalTabItemProps | HorizontalTabItemProps)[] = [
 ];
 const validStatuses = ["upcoming", "recurring", "past", "cancelled", "unconfirmed"] as const;
 
-const descriptionByStatus: Record<NonNullable<BookingListingStatus>, string> = {
-  upcoming: "upcoming_bookings",
-  recurring: "recurring_bookings",
-  past: "past_bookings",
-  cancelled: "cancelled_bookings",
-  unconfirmed: "unconfirmed_bookings",
-};
+// const descriptionByStatus: Record<NonNullable<BookingListingStatus>, string> = {
+//   upcoming: "upcoming_bookings",
+//   recurring: "recurring_bookings",
+//   past: "past_bookings",
+//   cancelled: "cancelled_bookings",
+//   unconfirmed: "unconfirmed_bookings",
+// };
 
 const querySchema = z.object({
   status: z.enum(validStatuses),
@@ -101,6 +104,28 @@ export default function Bookings() {
   const { status } = params ? querySchema.parse(params) : { status: "upcoming" as const };
   const { t } = useLocale();
   const [today, setToday] = useState(new Date());
+  const [views, setViews] = useState("week");
+  const [typeView, setTypeView] = useState(true);
+
+  const onView = useCallback((newView) => setViews(newView), [setViews]);
+
+  const tabsViewsCalendar = [
+    {
+      id: "month",
+      name: "Mes",
+      onClick: () => setViews("month"),
+    },
+    {
+      name: "Semana",
+      id: "week",
+      onClick: () => setViews("week"),
+    },
+    {
+      name: "Día",
+      id: "day",
+      onClick: () => setViews("day"),
+    },
+  ];
 
   const query = trpc.viewer.bookings.get.useInfiniteQuery(
     {
@@ -162,12 +187,28 @@ export default function Bookings() {
   const [animationParentRef] = useAutoAnimate<HTMLDivElement>();
 
   const onClickPreviousWeek = () => {
-    const currentToday = moment(today).add(-7, "days");
+    let currentToday = moment();
+    if (views === "week") {
+      currentToday = moment(today).add(-7, "days");
+    } else if (views === "month") {
+      currentToday = moment(today).add(-1, "month");
+    } else {
+      currentToday = moment(today).add(-1, "day");
+    }
+
     setToday(currentToday);
   };
 
   const onClickNextWeek = () => {
-    const currentToday = moment(today).add(7, "days");
+    let currentToday = moment();
+    if (views === "week") {
+      currentToday = moment(today).add(7, "days");
+    } else if (views === "month") {
+      currentToday = moment(today).add(1, "month");
+    } else {
+      currentToday = moment(today).add(1, "day");
+    }
+
     setToday(currentToday);
   };
 
@@ -176,43 +217,57 @@ export default function Bookings() {
   };
 
   const appointments =
-    query.data?.pages.map((page, index) => page.bookings.map((booking: BookingOutput) => booking))[0] || [];
+    query.data?.pages.map((page) => page.bookings.map((booking: BookingOutput) => booking))[0] || [];
 
   return (
     <ShellMain hideHeadingOnMobile heading={t("bookings")} subtitle={t("bookings_description")}>
-      <div className="flex flex-col">
-        <HorizontalTabs tabs={tabs} />
+      <div className="flex w-full flex-col">
+        <div className="flex w-full items-center justify-between">
+          <HorizontalTabs tabs={tabs} />
+          <div className="flex h-9">
+            <label className="text-emphasis mr-2 ms-2 align-text-top text-sm font-medium">Lista</label>
+            <Switch checked={typeView} onClick={() => setTypeView(!typeView)} style={{ marginTop: -12 }} />
+            <label className="text-emphasis ms-2 align-text-top text-sm font-medium">Calendario</label>
+          </div>
+        </div>
         <div className="flex flex-col flex-wrap lg:flex-row">
-          <header className="flex justify-between">
-            <h1 className="h-9 pt-2 text-base font-semibold leading-6 text-gray-900 md:w-[140px]">
-              {moment(today).format("MMMM-YYYY").charAt(0).toUpperCase() +
-                moment(today).format("MMMM YYYY").slice(1)}
-            </h1>
-            <div className="relative flex items-center rounded-sm bg-neutral-100 bg-white md:items-stretch">
-              <div className="pointer-events-none absolute inset-0 rounded-sm " aria-hidden="true" />
-              <button
-                type="button"
-                className="flex h-9 items-center justify-center rounded-l-sm  py-1.5 pl-3 pr-4 text-gray-400 hover:text-gray-500 focus:relative md:w-9 md:px-2"
-                onClick={onClickPreviousWeek}>
-                <span className="sr-only">Previous period</span>
-                <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" color="#000" />
-              </button>
-              <button
-                type="button"
-                className="h-9 rounded-[4px] px-3.5 py-1.5 text-sm font-normal text-gray-900 ring-1 ring-inset ring-[#262626] hover:bg-gray-50 focus:relative md:py-0"
-                onClick={onClickToDay}>
-                Hoy
-              </button>
-              <span className="relative -mx-px h-5 w-px bg-gray-300 md:hidden" />
-              <button
-                type="button"
-                className="flex h-9 items-center justify-center rounded-r-sm py-1.5 pl-4 pr-3 text-gray-400 hover:text-gray-500 focus:relative md:w-9 md:px-2"
-                onClick={onClickNextWeek}>
-                <span className="sr-only">Next period</span>
-                <ChevronRightIcon className="h-5 w-5" aria-hidden="true" color="#000" />
-              </button>
-            </div>
-          </header>
+          {typeView ? (
+            <header className="flex justify-between">
+              <HorizontalTabs tabs={tabsViewsCalendar} isButton views={views} />
+              <h1 className="ml-4 h-9 pt-2 text-base font-semibold leading-6 text-gray-900 md:w-[140px]">
+                {views === "day"
+                  ? moment(today).format("DD MMMM YYYY")
+                  : moment(today).format("MMMM-YYYY").charAt(0).toUpperCase() +
+                    moment(today).format("MMMM YYYY").slice(1)}
+              </h1>
+              <div className="relative flex items-center rounded-sm bg-neutral-100 bg-white md:items-stretch">
+                <div className="pointer-events-none absolute inset-0 rounded-sm " aria-hidden="true" />
+                <button
+                  type="button"
+                  className="flex h-9 items-center justify-center rounded-l-sm  py-1.5 pl-3 pr-4 text-gray-400 hover:text-gray-500 focus:relative md:w-9 md:px-2"
+                  onClick={onClickPreviousWeek}>
+                  <span className="sr-only">Previous period</span>
+                  <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" color="#000" />
+                </button>
+                <button
+                  type="button"
+                  className="h-9 rounded-[4px] px-3.5 py-1.5 text-sm font-normal text-gray-900 ring-1 ring-inset ring-[#262626] hover:bg-gray-50 focus:relative md:py-0"
+                  onClick={onClickToDay}>
+                  Hoy
+                </button>
+                <span className="relative -mx-px h-5 w-px bg-gray-300 md:hidden" />
+                <button
+                  type="button"
+                  className="flex h-9 items-center justify-center rounded-r-sm py-1.5 pl-4 pr-3 text-gray-400 hover:text-gray-500 focus:relative md:w-9 md:px-2"
+                  onClick={onClickNextWeek}>
+                  <span className="sr-only">Next period</span>
+                  <ChevronRightIcon className="h-5 w-5" aria-hidden="true" color="#000" />
+                </button>
+              </div>
+            </header>
+          ) : (
+            <div />
+          )}
           <div className="max-w-full overflow-x-auto xl:ml-auto">
             <FiltersContainer />
           </div>
@@ -223,15 +278,17 @@ export default function Bookings() {
               <Alert severity="error" title={t("something_went_wrong")} message={query.error.message} />
             )}
             {(query.status === "loading" || query.isPaused) && <SkeletonLoader />}
-            {query.status === "success" && !isEmpty && (
-              <>
+            {query.status !== "loading" && typeView && (
+              <div className="flex hidden h-[100vh] flex-col bg-white lg:block">
                 <DnDCalendar
                   culture="es"
                   localizer={localizer}
                   defaultDate={new Date()}
                   date={today}
-                  defaultView="week"
-                  drilldownView="week"
+                  defaultView={views}
+                  drilldownView={views}
+                  onView={onView}
+                  view={views}
                   toolbar={false}
                   events={appointments
                     .filter((ap) => ap.status !== "CANCELLED")
@@ -248,7 +305,11 @@ export default function Bookings() {
                   popup
                   resizable
                 />
-                {/* {!!bookingsToday.length && status === "upcoming" && (
+              </div>
+            )}
+            {!typeView && (
+              <>
+                {!!bookingsToday.length && status === "upcoming" && (
                   <div className="mb-6 pt-2 xl:pt-0">
                     <WipeMyCalActionButton bookingStatus={status} bookingsEmpty={isEmpty} />
                     <p className="text-subtle mb-2 text-xs font-medium uppercase leading-4">{t("today")}</p>
@@ -269,12 +330,12 @@ export default function Bookings() {
                       </table>
                     </div>
                   </div>
-                )} */}
-                {/* <div className="pt-2 xl:pt-0">
+                )}
+                <div className="pt-2 xl:pt-0">
                   <div className="border-subtle overflow-hidden rounded-md border">
                     <table className="w-full max-w-full table-fixed">
                       <tbody className="bg-default divide-subtle divide-y" data-testid="bookings">
-                        {query.data.pages.map((page, index) => (
+                        {query?.data.pages.map((page, index) => (
                           <Fragment key={index}>
                             {page.bookings.filter(filterBookings).map((booking: BookingOutput) => {
                               const recurringInfo = page.recurringInfo.find(
@@ -303,7 +364,7 @@ export default function Bookings() {
                       {query.hasNextPage ? t("load_more_results") : t("no_more_results")}
                     </Button>
                   </div>
-                </div> */}
+                </div>
               </>
             )}
             {/* {query.status === "success" && isEmpty && (

@@ -6,9 +6,19 @@ export interface NavTabProps {
   linkShallow?: boolean;
   linkScroll?: boolean;
   actions?: JSX.Element;
+  isButton?: boolean;
+  views?: string;
 }
 
-const HorizontalTabs = function ({ tabs, linkShallow, linkScroll, actions, ...props }: NavTabProps) {
+const HorizontalTabs = function ({
+  tabs,
+  linkShallow,
+  linkScroll,
+  isButton = false,
+  views = "week",
+  actions,
+  ...props
+}: NavTabProps) {
   return (
     <div className="mb-4 h-9 max-w-full lg:mb-5">
       <nav
@@ -20,6 +30,8 @@ const HorizontalTabs = function ({ tabs, linkShallow, linkScroll, actions, ...pr
             className="px-4 py-2.5"
             {...tab}
             key={idx}
+            views={views}
+            isButton={isButton}
             linkShallow={linkShallow}
             linkScroll={linkScroll}
           />
