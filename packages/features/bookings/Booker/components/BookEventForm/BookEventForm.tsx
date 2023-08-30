@@ -329,6 +329,7 @@ export const BookEventFormChild = ({
         mapRecurringBookingToMutationInput(bookingInput, recurringEventCount)
       );
     } else {
+      console.log("maps booking create ", bookingInput, mapBookingToMutationInput(bookingInput));
       createBookingMutation.mutate(mapBookingToMutationInput(bookingInput));
     }
   };

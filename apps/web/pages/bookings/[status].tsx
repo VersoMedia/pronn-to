@@ -24,6 +24,7 @@ import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { useParamsWithFallback } from "@calcom/lib/hooks/useParamsWithFallback";
 import type { RouterOutputs } from "@calcom/trpc/react";
 import { trpc } from "@calcom/trpc/react";
+import { Dialog, DialogContent } from "@calcom/ui";
 import { Button, HorizontalTabs, Switch } from "@calcom/ui";
 import type { VerticalTabItemProps, HorizontalTabItemProps } from "@calcom/ui";
 import { Alert } from "@calcom/ui";
@@ -106,6 +107,7 @@ export default function Bookings() {
   const [today, setToday] = useState(new Date());
   const [views, setViews] = useState("week");
   const [typeView, setTypeView] = useState(true);
+  const [visible, setVisible] = useState(false);
 
   const onView = useCallback((newView) => setViews(newView), [setViews]);
 
@@ -113,16 +115,19 @@ export default function Bookings() {
     {
       id: "month",
       name: "Mes",
+      href: "",
       onClick: () => setViews("month"),
     },
     {
       name: "Semana",
       id: "week",
+      href: "",
       onClick: () => setViews("week"),
     },
     {
       name: "Día",
       id: "day",
+      href: "",
       onClick: () => setViews("day"),
     },
   ];
@@ -196,7 +201,7 @@ export default function Bookings() {
       currentToday = moment(today).add(-1, "day");
     }
 
-    setToday(currentToday);
+    setToday(new Date(currentToday));
   };
 
   const onClickNextWeek = () => {
@@ -209,12 +214,20 @@ export default function Bookings() {
       currentToday = moment(today).add(1, "day");
     }
 
-    setToday(currentToday);
+    setToday(new Date(currentToday));
   };
 
   const onClickToDay = () => {
     setToday(new Date());
   };
+  const filters = {};
+  const eventsTypes = trpc.viewer.eventTypes.getByViewer.useQuery(filters && { filters }, {
+    refetchOnWindowFocus: false,
+    cacheTime: 1 * 60 * 60 * 1000,
+    staleTime: 1 * 60 * 60 * 1000,
+  });
+
+  console.log(eventsTypes.data, "estos son los event types");
 
   const appointments =
     query.data?.pages.map((page) => page.bookings.map((booking: BookingOutput) => booking))[0] || [];
@@ -268,7 +281,10 @@ export default function Bookings() {
           ) : (
             <div />
           )}
-          <div className="max-w-full overflow-x-auto xl:ml-auto">
+          <div className="flex max-w-full overflow-x-auto xl:ml-auto">
+            <Button onClick={() => setVisible(true)} className="mr-2">
+              Crear cita
+            </Button>
             <FiltersContainer />
           </div>
         </div>
@@ -382,6 +398,13 @@ export default function Bookings() {
           </div>
         </main>
       </div>
+      <Dialog open={visible} onOpenChange={setVisible}>
+        <DialogContent
+          type={undefined}
+          enableOverflow
+          className="[&_.modalsticky]:border-t-subtle [&_.modalsticky]:bg-default max-h-[80vh] pb-0 [&_.modalsticky]:sticky [&_.modalsticky]:bottom-0 [&_.modalsticky]:left-0 [&_.modalsticky]:right-0 [&_.modalsticky]:-mx-8 [&_.modalsticky]:border-t [&_.modalsticky]:px-8 [&_.modalsticky]:py-4"
+        />
+      </Dialog>
     </ShellMain>
   );
 }
