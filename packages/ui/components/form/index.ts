@@ -25,6 +25,7 @@ export type { ITimezone, ITimezoneOption } from "./timezone-select";
 export { DateRangePickerLazy as DateRangePicker } from "./date-range-picker";
 export { BooleanToggleGroup, BooleanToggleGroupField, ToggleGroup } from "./toggleGroup";
 export { DatePicker } from "./datepicker";
+export { DateTimePicker } from "./datetime-picker";
 export { FormStep, Steps, Stepper } from "./step";
 export { WizardForm } from "./wizard";
 export { default as ColorPicker } from "./color-picker/colorpicker";

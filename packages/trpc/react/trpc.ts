@@ -25,6 +25,7 @@ const ENDPOINTS = [
   "availability",
   "bookings",
   "deploymentSetup",
+  "attendees",
   "eventTypes",
   "features",
   "insights",

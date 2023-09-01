@@ -19,12 +19,13 @@ import { getLayout } from "@calcom/features/MainLayout";
 import { FiltersContainer } from "@calcom/features/bookings/components/FiltersContainer";
 //import type { filterQuerySchema } from "@calcom/features/bookings/lib/useFilterQuery";
 import { useFilterQuery } from "@calcom/features/bookings/lib/useFilterQuery";
+import { CreateBookingTypeDialog } from "@calcom/features/eventtypes/components";
 import { ShellMain } from "@calcom/features/shell/Shell";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { useParamsWithFallback } from "@calcom/lib/hooks/useParamsWithFallback";
 import type { RouterOutputs } from "@calcom/trpc/react";
 import { trpc } from "@calcom/trpc/react";
-import { Dialog, DialogContent } from "@calcom/ui";
+import { CreateButton, Dialog, DialogContent } from "@calcom/ui";
 import { Button, HorizontalTabs, Switch } from "@calcom/ui";
 import type { VerticalTabItemProps, HorizontalTabItemProps } from "@calcom/ui";
 import { Alert } from "@calcom/ui";
@@ -42,6 +43,7 @@ import { WipeMyCalActionButton } from "../../../../packages/app-store/wipemycalo
 
 //type BookingListingStatus = z.infer<NonNullable<typeof filterQuerySchema>>["status"];
 type BookingOutput = RouterOutputs["viewer"]["bookings"]["get"]["bookings"][0];
+type GetByViewerResponse = RouterOutputs["viewer"]["eventTypes"]["getByViewer"] | undefined;
 
 type RecurringInfo = {
   recurringEventId: string | null;
@@ -98,6 +100,44 @@ const localizer = dateFnsLocalizer({
   getDay,
   locales,
 });
+
+const CTA = ({
+  data,
+  eventsTypes,
+  refetch,
+}: {
+  data: GetByViewerRespons;
+  eventsTypes: any;
+  refetch: () => void;
+}) => {
+  const { t } = useLocale();
+
+  if (!data) return null;
+
+  const profileOptions = data.profiles
+    .filter((profile) => !profile.readOnly)
+    .map((profile) => {
+      return {
+        teamId: profile.teamId,
+        label: profile.name || profile.slug,
+        image: profile.image,
+        membershipRole: profile.membershipRole,
+        slug: profile.slug,
+      };
+    });
+
+  return (
+    <CreateButton
+      data-testid="new-event-type"
+      buttonText="Crear cita"
+      subtitle={t("create_event_on").toUpperCase()}
+      options={profileOptions}
+      createDialog={() => (
+        <CreateBookingTypeDialog events={eventsTypes} profileOptions={profileOptions} refetch={refetch} />
+      )}
+    />
+  );
+};
 
 export default function Bookings() {
   const params = useParamsWithFallback();
@@ -220,20 +260,25 @@ export default function Bookings() {
   const onClickToDay = () => {
     setToday(new Date());
   };
-  const filters = {};
-  const eventsTypes = trpc.viewer.eventTypes.getByViewer.useQuery(filters && { filters }, {
-    refetchOnWindowFocus: false,
-    cacheTime: 1 * 60 * 60 * 1000,
-    staleTime: 1 * 60 * 60 * 1000,
-  });
 
-  console.log(eventsTypes.data, "estos son los event types");
+  const eventsTypes = trpc.viewer.eventTypes.getByViewer.useQuery(
+    {},
+    {
+      refetchOnWindowFocus: false,
+    }
+  );
 
   const appointments =
     query.data?.pages.map((page) => page.bookings.map((booking: BookingOutput) => booking))[0] || [];
 
   return (
-    <ShellMain hideHeadingOnMobile heading={t("bookings")} subtitle={t("bookings_description")}>
+    <ShellMain
+      hideHeadingOnMobile
+      heading={t("bookings")}
+      subtitle={t("bookings_description")}
+      CTA={
+        <CTA data={eventsTypes.data} eventsTypes={eventsTypes.data} refetch={() => eventsTypes.refetch()} />
+      }>
       <div className="flex w-full flex-col">
         <div className="flex w-full items-center justify-between">
           <HorizontalTabs tabs={tabs} />
@@ -282,9 +327,9 @@ export default function Bookings() {
             <div />
           )}
           <div className="flex max-w-full overflow-x-auto xl:ml-auto">
-            <Button onClick={() => setVisible(true)} className="mr-2">
+            {/* <Button onClick={() => setVisible(true)} className="mr-2">
               Crear cita
-            </Button>
+            </Button> */}
             <FiltersContainer />
           </div>
         </div>

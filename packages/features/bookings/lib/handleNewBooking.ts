@@ -425,7 +425,7 @@ async function ensureAvailableUsers(
     }
   }
   if (!availableUsers.length) {
-    throw new Error("No available users found.");
+    throw new Error("Conflict with to busy time.");
   }
   return availableUsers;
 }

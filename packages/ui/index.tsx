@@ -32,6 +32,7 @@ export {
   BooleanToggleGroupField,
   DatePicker,
   DateRangePicker,
+  DateTimePicker,
   MultiSelectCheckbox,
   ToggleGroup,
   getReactSelectProps,

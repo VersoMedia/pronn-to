@@ -9,6 +9,7 @@ import { publicViewerRouter } from "../publicViewer/_router";
 import { adminRouter } from "./admin/_router";
 import { apiKeysRouter } from "./apiKeys/_router";
 import { appsRouter } from "./apps/_router";
+import { attendeesRouter } from "./attendees/_router";
 import { authRouter } from "./auth/_router";
 import { availabilityRouter } from "./availability/_router";
 import { bookingsRouter } from "./bookings/_router";
@@ -33,6 +34,7 @@ export const viewerRouter = mergeRouters(
     deploymentSetup: deploymentSetupRouter,
     bookings: bookingsRouter,
     eventTypes: eventTypesRouter,
+    attendees: attendeesRouter,
     availability: availabilityRouter,
     teams: viewerTeamsRouter,
     organizations: viewerOrganizationsRouter,
