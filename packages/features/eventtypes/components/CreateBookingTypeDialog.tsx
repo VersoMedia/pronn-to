@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { isValidPhoneNumber } from "libphonenumber-js";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
@@ -78,6 +79,7 @@ export default function CreateBookingTypeDialog({
 }) {
   const { t } = useLocale();
   const [addNewClient, setAddNewClient] = useState(false);
+  const [options, setOptions] = useState(false);
   const router = useRouter();
 
   const {
@@ -276,7 +278,7 @@ export default function CreateBookingTypeDialog({
                   <Label className="mb-2">Completa los datos de tu cliente</Label>
                   <TextField
                     placeholder="Nombre"
-                    {...register("attendee.name")}
+                    value={form.getValues("attendee.name")}
                     onChange={(e) => {
                       form.setValue("attendee.name", e?.target.value);
                     }}
@@ -284,7 +286,7 @@ export default function CreateBookingTypeDialog({
 
                   <TextField
                     placeholder="Correo electronico"
-                    {...register("attendee.email")}
+                    value={form.getValues("attendee.email")}
                     onChange={(e) => {
                       form.setValue("attendee.email", e?.target.value);
                     }}
@@ -292,7 +294,7 @@ export default function CreateBookingTypeDialog({
 
                   <TextField
                     placeholder="Teléfono"
-                    {...register("attendee.phone")}
+                    value={form.getValues("attendee.phone")}
                     onChange={(e) => {
                       form.setValue("attendee.phone", e?.target.value);
                     }}
@@ -308,20 +310,31 @@ export default function CreateBookingTypeDialog({
               </div>
             </div>
 
-            <div>
-              <Label className="mb-2">Selecciona una zona horaria</Label>
-              <Controller
-                control={control}
-                name="timeZone"
-                render={({ field }) => (
-                  <TimezoneSelect
-                    value={field.value}
-                    onChange={({ value }) => field.onChange(value)}
-                    className="mt-2 w-full rounded-md text-sm"
-                  />
-                )}
-              />
+            <div className="flex flex-row">
+              <div
+                className="text-muted my-1 flex cursor-pointer text-sm"
+                onClick={() => setOptions(!options)}>
+                <span>{!options ? "Opciones avanzadas" : "Esconder opciones avanzadas"}</span>
+                {!options ? <ChevronDown /> : <ChevronUp />}
+              </div>
             </div>
+
+            {options && (
+              <div>
+                <Label className="mb-2">Selecciona una zona horaria para tu cliente</Label>
+                <Controller
+                  control={control}
+                  name="timeZone"
+                  render={({ field }) => (
+                    <TimezoneSelect
+                      value={field.value}
+                      onChange={({ value }) => field.onChange(value)}
+                      className="mt-2 w-full rounded-md text-sm"
+                    />
+                  )}
+                />
+              </div>
+            )}
 
             {/* {teamId && (
               <TextField

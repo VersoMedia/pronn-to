@@ -327,9 +327,6 @@ export default function Bookings() {
             <div />
           )}
           <div className="flex max-w-full overflow-x-auto xl:ml-auto">
-            {/* <Button onClick={() => setVisible(true)} className="mr-2">
-              Crear cita
-            </Button> */}
             <FiltersContainer />
           </div>
         </div>
