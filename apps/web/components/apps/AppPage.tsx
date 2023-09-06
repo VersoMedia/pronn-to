@@ -25,7 +25,7 @@ export type AppPageProps = {
   variant: string;
   body: React.ReactNode;
   categories: string[];
-  author: string;
+  author?: string;
   pro?: boolean;
   price?: number;
   commission?: number;
@@ -52,7 +52,6 @@ export const AppPage = ({
   variant,
   body,
   categories,
-  author,
   price = 0,
   commission,
   isGlobal = false,
@@ -68,6 +67,7 @@ export const AppPage = ({
   dependencies,
   concurrentMeetings,
 }: AppPageProps) => {
+  const author = "Verso";
   const { t, i18n } = useLocale();
   const hasDescriptionItems = descriptionItems && descriptionItems.length > 0;
 
