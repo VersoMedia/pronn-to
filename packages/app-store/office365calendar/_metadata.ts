@@ -14,8 +14,8 @@ export const metadata = {
   publisher: "Cal.com",
   slug: "office365-calendar",
   dirName: "office365calendar",
-  url: "https://cal.com/",
-  email: "help@cal.com",
+  url: "https://verso.is",
+  email: "help@verso.ai",
 } as AppMeta;
 
 export default metadata;

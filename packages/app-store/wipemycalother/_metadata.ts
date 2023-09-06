@@ -16,7 +16,7 @@ export const metadata = {
   type: "wipemycal_other",
   url: "https://cal.com/apps/wipe-my-cal",
   variant: "other",
-  email: "help@cal.com",
+  email: "help@verso.ai",
   dirName: "wipemycalother",
 } as AppMeta;
 

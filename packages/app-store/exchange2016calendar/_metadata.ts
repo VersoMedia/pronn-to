@@ -15,8 +15,8 @@ export const metadata = {
   logo: "icon.svg",
   publisher: "Cal.com",
   slug: "exchange2016-calendar",
-  url: "https://cal.com/",
-  email: "help@cal.com",
+  url: "https://verso.is",
+  email: "help@verso.ai",
   dirName: "exchange2016calendar",
 } as AppMeta;
 

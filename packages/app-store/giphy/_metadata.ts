@@ -15,7 +15,7 @@ export const metadata = {
   url: "https://cal.com/apps/giphy",
   variant: "other",
   extendsFeature: "EventType",
-  email: "help@cal.com",
+  email: "help@verso.ai",
   dirName: "giphy",
 } as AppMeta;
 

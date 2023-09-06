@@ -15,7 +15,7 @@ export const metadata = {
   category: "conferencing",
   slug: "zoom",
   title: "Zoom Video",
-  email: "help@cal.com",
+  email: "help@verso.ai",
   appData: {
     location: {
       default: false,

@@ -15,7 +15,7 @@ export const metadata = {
   label: "HubSpot CRM",
   slug: "hubspot",
   title: "HubSpot CRM",
-  email: "help@cal.com",
+  email: "help@verso.ai",
   dirName: "hubspot",
 } as AppMeta;
 

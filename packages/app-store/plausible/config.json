@@ -4,11 +4,11 @@
   "slug": "plausible",
   "type": "plausible_analytics",
   "logo": "icon.svg",
-  "url": "https://cal.com/",
+  "url": "https://verso.is",
   "variant": "analytics",
   "categories": ["analytics"],
   "publisher": "Cal.com, Inc.",
-  "email": "help@cal.com",
+  "email": "help@verso.ai",
   "extendsFeature": "EventType",
   "appData": {
     "tag": {

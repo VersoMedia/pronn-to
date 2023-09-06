@@ -17,11 +17,11 @@ export const metadata = {
   publisher: "Cal.com",
   title: "Stripe",
   type: "stripe_payment",
-  url: "https://cal.com/",
+  url: "https://verso.is",
   docsUrl: "https://stripe.com/docs",
   variant: "payment",
   extendsFeature: "EventType",
-  email: "help@cal.com",
+  email: "help@verso.ai",
   dirName: "stripepayment",
 } as AppMeta;
 

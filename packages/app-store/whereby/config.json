@@ -5,11 +5,11 @@
   "slug": "whereby",
   "type": "whereby_video",
   "logo": "icon-dark.svg",
-  "url": "https://cal.com/",
+  "url": "https://verso.is",
   "variant": "conferencing",
   "categories": ["conferencing"],
   "publisher": "Cal.com, Inc.",
-  "email": "help@cal.com",
+  "email": "help@verso.ai",
   "description": "Whereby makes it super simple for collaborating teams to jump on a video call.",
   "__createdUsingCli": true,
   "appData": {

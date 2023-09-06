@@ -15,7 +15,7 @@ export const metadata = {
   slug: "jitsi",
   title: "Jitsi Meet",
   isGlobal: false,
-  email: "help@cal.com",
+  email: "help@verso.ai",
   appData: {
     location: {
       linkType: "dynamic",

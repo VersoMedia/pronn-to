@@ -4,7 +4,7 @@
   "description": "Public API for Cal.com",
   "main": "index.ts",
   "repository": "git@github.com:calcom/api.git",
-  "author": "Cal.com Inc.",
+  "author": "Verso.is Inc.",
   "private": true,
   "scripts": {
     "build": "next build",

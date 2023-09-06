@@ -13,8 +13,8 @@ export const _SBApps: App[] = [
     logo: "/api/app-store/googlecalendar/icon.svg",
     publisher: "Cal.com",
     slug: "google-calendar",
-    url: "https://cal.com/",
-    email: "help@cal.com",
+    url: "https://verso.is",
+    email: "help@verso.ai",
     dirName: "googlecalendar",
   },
   {
@@ -29,7 +29,7 @@ export const _SBApps: App[] = [
     category: "video",
     slug: "zoom",
     title: "Zoom Video",
-    email: "help@cal.com",
+    email: "help@verso.ai",
     appData: {
       location: {
         default: false,

@@ -36,7 +36,7 @@ export const KYCVerificationDialog = (props: {
               }}
               values={{
                 supportEmail:
-                  SUPPORT_MAIL_ADDRESS === "help@cal.com" ? "support@cal.com" : SUPPORT_MAIL_ADDRESS,
+                  SUPPORT_MAIL_ADDRESS === "help@verso.ai" ? "support@cal.com" : SUPPORT_MAIL_ADDRESS,
                 teamOrAccount: isTeamString || "account",
               }}
             />

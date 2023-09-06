@@ -14,8 +14,8 @@ export const metadata = {
   logo: "icon.svg",
   publisher: "Cal.com",
   slug: "caldav-calendar",
-  url: "https://cal.com/",
-  email: "help@cal.com",
+  url: "https://verso.is",
+  email: "help@verso.ai",
   dirName: "caldavcalendar",
 } as App;
 

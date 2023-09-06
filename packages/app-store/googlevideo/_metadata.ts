@@ -15,9 +15,9 @@ export const metadata = {
   variant: "conferencing",
   logo: "logo.webp",
   publisher: "Cal.com",
-  url: "https://cal.com/",
+  url: "https://verso.is",
   isGlobal: false,
-  email: "help@cal.com",
+  email: "help@verso.ai",
   appData: {
     location: {
       linkType: "dynamic",

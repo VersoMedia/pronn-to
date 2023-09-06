@@ -4,7 +4,7 @@
   "slug": "qr_code",
   "type": "qr_code_other",
   "logo": "icon.svg",
-  "url": "https://cal.com/",
+  "url": "https://verso.is",
   "variant": "other",
   "categories": ["other"],
   "extendsFeature": "EventType",

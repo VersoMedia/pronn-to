@@ -67,6 +67,7 @@ export default function CreateBookingTypeDialog({
   profileOptions,
   events,
   refetch,
+  selectedDay,
 }: {
   profileOptions: {
     teamId: number | null | undefined;
@@ -76,6 +77,7 @@ export default function CreateBookingTypeDialog({
   }[];
   events: any;
   refetch: () => void;
+  selectedDay: Date;
 }) {
   const { t } = useLocale();
   const [addNewClient, setAddNewClient] = useState(false);
@@ -90,7 +92,7 @@ export default function CreateBookingTypeDialog({
   const form = useForm({
     defaultValues: {
       timeZone: dayjs.tz.guess(),
-      startTime: new Date(),
+      startTime: selectedDay,
     },
   });
 
@@ -470,7 +472,7 @@ export default function CreateBookingTypeDialog({
           <DialogFooter showDivider>
             <DialogClose />
             <Button type="submit" loading={createBookingMutation.isLoading}>
-              {t("continue")}
+              {t("submit")}
             </Button>
           </DialogFooter>
         </Form>

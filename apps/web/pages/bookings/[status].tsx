@@ -7,6 +7,7 @@ import startOfWeek from "date-fns/startOfWeek";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import moment from "moment";
 import type { GetStaticPaths, GetStaticProps } from "next";
+import { useRouter } from "next/router";
 import { Fragment, useCallback, useState } from "react";
 import React from "react";
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
@@ -105,10 +106,12 @@ const CTA = ({
   data,
   eventsTypes,
   refetch,
+  selectedDay,
 }: {
   data: GetByViewerRespons;
   eventsTypes: any;
   refetch: () => void;
+  selectedDay: Date;
 }) => {
   const { t } = useLocale();
 
@@ -133,13 +136,19 @@ const CTA = ({
       subtitle={t("create_event_on").toUpperCase()}
       options={profileOptions}
       createDialog={() => (
-        <CreateBookingTypeDialog events={eventsTypes} profileOptions={profileOptions} refetch={refetch} />
+        <CreateBookingTypeDialog
+          events={eventsTypes}
+          selectedDay={selectedDay}
+          profileOptions={profileOptions}
+          refetch={refetch}
+        />
       )}
     />
   );
 };
 
 export default function Bookings() {
+  const router = useRouter();
   const params = useParamsWithFallback();
   const { data: filterQuery } = useFilterQuery();
   const { status } = params ? querySchema.parse(params) : { status: "upcoming" as const };
@@ -148,6 +157,7 @@ export default function Bookings() {
   const [views, setViews] = useState("week");
   const [typeView, setTypeView] = useState(true);
   const [visible, setVisible] = useState(false);
+  const [selectedDay, setSelectedDay] = useState(new Date());
 
   const onView = useCallback((newView) => setViews(newView), [setViews]);
 
@@ -277,7 +287,12 @@ export default function Bookings() {
       heading={t("bookings")}
       subtitle={t("bookings_description")}
       CTA={
-        <CTA data={eventsTypes.data} eventsTypes={eventsTypes.data} refetch={() => eventsTypes.refetch()} />
+        <CTA
+          data={eventsTypes.data}
+          eventsTypes={eventsTypes.data}
+          selectedDay={selectedDay}
+          refetch={() => eventsTypes.refetch()}
+        />
       }>
       <div className="flex w-full flex-col">
         <div className="flex w-full items-center justify-between">
@@ -358,6 +373,11 @@ export default function Bookings() {
                   formats={{
                     timeGutterFormat: (date, culture, localizer) => localizer.format(date, "hh a", culture),
                     dayFormat: (date, culture, localizer) => localizer.format(date, "eeee d", culture),
+                  }}
+                  onSelectSlot={(slot) => {
+                    const start = moment(slot.start);
+                    setSelectedDay(new Date(start.toISOString()));
+                    router.push(window.location.href + `&dialog=new`);
                   }}
                   selectable
                   popup
