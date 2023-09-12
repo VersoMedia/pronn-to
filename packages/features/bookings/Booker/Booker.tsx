@@ -289,6 +289,7 @@ const BookerComponent = ({
               {...fadeInLeft}>
               <AvailableTimeSlots
                 extraDays={extraDays}
+                layout={layout}
                 limitHeight={layout === BookerLayouts.MONTH_VIEW}
                 seatsPerTimeSlot={event.data?.seatsPerTimeSlot}
               />

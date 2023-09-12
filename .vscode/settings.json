@@ -5,7 +5,7 @@
     "source.fixAll.eslint": true
   },
   "typescript.preferences.importModuleSpecifier": "non-relative",
-  "spellright.language": ["en"],
+  "spellright.language": ["es", "en"],
   "spellright.documentTypes": ["markdown", "typescript", "typescriptreact"],
   "tailwindCSS.experimental.classRegex": [["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]]
 }

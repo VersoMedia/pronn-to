@@ -1,12 +1,14 @@
-import { useMemo, useRef, useEffect } from "react";
+import { useMemo, useRef, useEffect, useState } from "react";
 
 import dayjs from "@calcom/dayjs";
 import { useIsEmbed } from "@calcom/embed-core/embed-iframe";
 import { AvailableTimes, AvailableTimesSkeleton } from "@calcom/features/bookings";
 import { useSlotsForMultipleDates } from "@calcom/features/schedules/lib/use-schedule/useSlotsForDate";
 import { classNames } from "@calcom/lib";
+import { get } from "@calcom/lib/fetch-wrapper";
 import useMediaQuery from "@calcom/lib/hooks/useMediaQuery";
 
+import { useTimePreferences } from "../../lib";
 import { useBookerStore } from "../store";
 import { useEvent, useScheduleForEvent } from "../utils/event";
 
@@ -14,6 +16,7 @@ type AvailableTimeSlotsProps = {
   extraDays?: number;
   limitHeight?: boolean;
   seatsPerTimeSlot?: number | null;
+  layout: string;
 };
 
 /**
@@ -23,15 +26,24 @@ type AvailableTimeSlotsProps = {
  * will also fetch the next `extraDays` days and show multiple days
  * in columns next to each other.
  */
-export const AvailableTimeSlots = ({ extraDays, limitHeight, seatsPerTimeSlot }: AvailableTimeSlotsProps) => {
+export const AvailableTimeSlots = ({
+  extraDays,
+  limitHeight,
+  seatsPerTimeSlot,
+  layout,
+}: AvailableTimeSlotsProps) => {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const selectedDate = useBookerStore((state) => state.selectedDate);
   const setSelectedTimeslot = useBookerStore((state) => state.setSelectedTimeslot);
   const setSeatedEventData = useBookerStore((state) => state.setSeatedEventData);
+  const timezone = useTimePreferences((state) => state.timezone);
+  const username = useBookerStore((store) => store.username);
+  const eventSlug = useBookerStore((store) => store.eventSlug);
   const isEmbed = useIsEmbed();
   const event = useEvent();
   const date = selectedDate || dayjs().format("YYYY-MM-DD");
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const [loadingSlots, setLoadingSlots] = useState(false);
 
   const onTimeSelect = (
     time: string,
@@ -82,6 +94,34 @@ export const AvailableTimeSlots = ({ extraDays, limitHeight, seatsPerTimeSlot }:
   const slotsPerDay = useSlotsForMultipleDates(dates, schedule?.data?.slots);
 
   useEffect(() => {
+    (async () => {
+      setLoadingSlots(true);
+      const eventsCalendar = await get(
+        `/api/book/calendar-events?username=${username}&eventSlug=${eventSlug}&date=${date}`
+      );
+      if (eventsCalendar.data) {
+        for (let i = 0; i < slotsPerDay.length; i++) {
+          let slotsFilter = slotsPerDay[i].slots;
+          for (let k = 0; k < slotsPerDay[i].slots.length; k++) {
+            for (let j = 0; j < eventsCalendar.data.length; j++) {
+              const time = dayjs(slotsPerDay[i].slots[k].time).tz(timezone).format();
+
+              const start = dayjs(eventsCalendar.data[j]?.start?.dateTime).subtract(1, "minute").format();
+              const end = dayjs(eventsCalendar.data[j]?.end?.dateTime).add(1, "minute").format();
+
+              if (dayjs(time).isBetween(start, end, "minute", "[]")) {
+                slotsFilter = slotsFilter.filter((slt) => dayjs(slt.time).tz(timezone).format() !== time);
+              }
+            }
+          }
+          slotsPerDay[i].slots = slotsFilter;
+        }
+      }
+      setLoadingSlots(false);
+    })();
+  }, [date, layout]);
+
+  useEffect(() => {
     if (isEmbed) return;
     if (containerRef.current && !schedule.isLoading && isMobile) {
       containerRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -95,7 +135,7 @@ export const AvailableTimeSlots = ({ extraDays, limitHeight, seatsPerTimeSlot }:
         limitHeight && "flex-grow md:h-[400px]",
         !limitHeight && "flex h-full w-full flex-row gap-4"
       )}>
-      {schedule.isLoading
+      {schedule.isLoading || loadingSlots
         ? // Shows exact amount of days as skeleton.
           Array.from({ length: 1 + (extraDays ?? 0) }).map((_, i) => <AvailableTimesSkeleton key={i} />)
         : slotsPerDay.length > 0 &&

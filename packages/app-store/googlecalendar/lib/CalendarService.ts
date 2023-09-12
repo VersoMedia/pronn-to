@@ -330,6 +330,33 @@ export default class GoogleCalendarService implements Calendar {
     });
   }
 
+  async getEvents(dateMin: Date): Promise<any> {
+    return new Promise(async (resolve, reject) => {
+      const myGoogleAuth = await this.auth.getToken();
+      const calendar = google.calendar({
+        version: "v3",
+        auth: myGoogleAuth,
+      });
+
+      const res = await calendar.events.list({
+        calendarId: "primary",
+        timeMin: dateMin.toISOString(),
+        showDeleted: false,
+        singleEvents: true,
+        maxResults: 60,
+        orderBy: "startTime",
+      });
+
+      const events = res.data.items;
+      if (!events || events.length === 0) {
+        console.log("No upcoming events found.");
+        return;
+      }
+
+      resolve(events);
+    });
+  }
+
   async getAvailability(
     dateFrom: string,
     dateTo: string,
