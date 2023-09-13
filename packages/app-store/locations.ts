@@ -81,19 +81,19 @@ export enum DefaultEventLocationTypeEnum {
 }
 
 export const defaultLocations: DefaultEventLocationType[] = [
-  {
-    default: true,
-    type: DefaultEventLocationTypeEnum.AttendeeInPerson,
-    label: "in_person_attendee_address",
-    variable: "address",
-    organizerInputType: null,
-    messageForOrganizer: "Cal will ask your invitee to enter an address before scheduling.",
-    attendeeInputType: "attendeeAddress",
-    attendeeInputPlaceholder: "enter_address",
-    defaultValueVariable: "attendeeAddress",
-    iconUrl: "/map-pin.svg",
-    category: "in person",
-  },
+  // {
+  //   default: true,
+  //   type: DefaultEventLocationTypeEnum.AttendeeInPerson,
+  //   label: "in_person_attendee_address",
+  //   variable: "address",
+  //   organizerInputType: null,
+  //   messageForOrganizer: "Cal will ask your invitee to enter an address before scheduling.",
+  //   attendeeInputType: "attendeeAddress",
+  //   attendeeInputPlaceholder: "enter_address",
+  //   defaultValueVariable: "attendeeAddress",
+  //   iconUrl: "/map-pin.svg",
+  //   category: "in person",
+  // },
   {
     default: true,
     type: DefaultEventLocationTypeEnum.InPerson,
@@ -282,7 +282,7 @@ export const getMessageForOrganizer = (location: string, t: TFunction) => {
     return t(defaultLocation.messageForOrganizer);
   }
   if (videoLocation && videoLocation.linkType !== "static" && videoLocation.type !== "integrations:zoom") {
-    return t(`Cal will provide a ${videoLocation.label} URL.`);
+    return t(`Verso will provide a ${videoLocation.label} URL.`);
   }
   return "";
 };

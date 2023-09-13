@@ -351,7 +351,10 @@ export const EditLocationDialog = (props: ISetLocationDialog) => {
                             maxMenuHeight={300}
                             name="location"
                             defaultValue={selection}
-                            options={locationOptions}
+                            options={locationOptions.map((lc) => ({
+                              ...lc,
+                              options: lc.options.filter((op) => op.value !== "integrations:daily"),
+                            }))}
                             isSearchable
                             onChange={(val) => {
                               if (val) {

@@ -1,4 +1,3 @@
-import { Webhook as TbWebhook } from "lucide-react";
 import type { TFunction } from "next-i18next";
 import { Trans } from "next-i18next";
 import { useRouter } from "next/navigation";
@@ -43,7 +42,6 @@ import {
   Sliders,
   Repeat,
   Grid,
-  Zap,
   Users,
   ExternalLink,
   Code,
@@ -112,12 +110,12 @@ function getNavigation(props: {
       //TODO: Handle proper translation with count handling
       info: `${installedAppsNumber} apps, ${enabledAppsNumber} ${t("active")}`,
     },
-    {
-      name: "workflows",
-      href: `/event-types/${eventType.id}?tabName=workflows`,
-      icon: Zap,
-      info: `${enabledWorkflowsNumber} ${t("active")}`,
-    },
+    // {
+    //   name: "workflows",
+    //   href: `/event-types/${eventType.id}?tabName=workflows`,
+    //   icon: Zap,
+    //   info: `${enabledWorkflowsNumber} ${t("active")}`,
+    // },
   ];
 }
 
@@ -211,12 +209,12 @@ function EventTypeSingleLayout({
     }
     const showWebhooks = !(isManagedEventType || isChildrenManagedEventType);
     if (showWebhooks) {
-      navigation.push({
-        name: "webhooks",
-        href: `/event-types/${eventType.id}?tabName=webhooks`,
-        icon: TbWebhook,
-        info: `${eventType.webhooks.filter((webhook) => webhook.active).length} ${t("active")}`,
-      });
+      // navigation.push({
+      //   name: "webhooks",
+      //   href: `/event-types/${eventType.id}?tabName=webhooks`,
+      //   icon: TbWebhook,
+      //   info: `${eventType.webhooks.filter((webhook) => webhook.active).length} ${t("active")}`,
+      // });
     }
     return navigation;
   }, [

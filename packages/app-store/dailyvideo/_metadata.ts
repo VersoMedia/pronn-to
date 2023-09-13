@@ -1,27 +1,25 @@
 import type { AppMeta } from "@calcom/types/App";
 
-import _package from "./package.json";
-
 export const metadata = {
-  name: "Cal Video",
-  description: _package.description,
-  installed: !!process.env.DAILY_API_KEY,
+  name: "Video",
+  description: "",
+  installed: false,
   type: "daily_video",
-  variant: "conferencing",
+  variant: "",
   url: "https://daily.co",
-  categories: ["conferencing"],
+  categories: [""],
   logo: "icon.svg",
-  publisher: "Cal.com",
-  category: "conferencing",
+  publisher: "Verso",
+  category: "",
   slug: "daily-video",
-  title: "Cal Video",
+  title: "Verso Video",
   isGlobal: true,
   email: "help@verso.ai",
   appData: {
     location: {
       linkType: "dynamic",
       type: "integrations:daily",
-      label: "Cal Video",
+      label: "Video",
     },
   },
   key: { apikey: process.env.DAILY_API_KEY },
