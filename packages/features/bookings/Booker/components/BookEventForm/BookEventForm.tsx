@@ -173,6 +173,10 @@ export const BookEventFormChild = ({
   });
   const createBookingMutation = useMutation(createBooking, {
     onSuccess: (responseData) => {
+      console.log(responseData, "data response booking", bookingForm, "values");
+
+      const type_ = ["GENERAL_BOOKING_MEMBER", "GENERAL_BOOKING_CUSTOMER"];
+
       const { uid, paymentUid } = responseData;
       const fullName = getFullName(bookingForm.getValues("responses.name"));
       if (paymentUid) {
@@ -191,6 +195,33 @@ export const BookEventFormChild = ({
         console.error("No uid returned from createBookingMutation");
         return;
       }
+
+      const userTimezone = responseData.user?.timeZone;
+      const types = ["GENERAL_BOOKING_MEMBER", "GENERAL_BOOKING_CUSTOMER"];
+
+      // for(let i = 0; i < types.length; i++){
+      //   const payload = {
+      //     member_email: responseData.user?.email,
+      //     member_phone: responseData.user?.phone,
+      //     member_name: responseData.user?.name,
+      //     customer_name: responseData.responses?.name,
+      //     customer_email: responseData.responses?.email,
+      //     customer_phone: responseData.responses?.phone,
+      //     service_name: responseData.title,
+      //     type_: types[i],
+      //     date: dayjs(responseData.startTime).format("DD-MM-YYYY"),
+      //     hour: dayjs(responseData.startTime).format("hh:mm A"),
+      //   }
+
+      //   if(types[i].includes("MEMBER")){
+      //     payload.date = dayjs(responseData.startTime).tz(userTimezone).format("DD-MM-YYYY");
+      //     payload.hour = dayjs(responseData.startTime).tz(userTimezone).format("hh:mm A");
+      //   }
+
+      //   (async () => {
+      //     await sendNotification(payload);
+      //   })()
+      // }
 
       const query = {
         isSuccessBookingPage: true,

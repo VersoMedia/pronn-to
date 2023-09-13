@@ -4,7 +4,7 @@ import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import type { CSSProperties } from "react";
 import type { SubmitHandler } from "react-hook-form";
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 
 import { checkPremiumUsername } from "@calcom/features/ee/common/lib/checkPremiumUsername";
@@ -17,7 +17,7 @@ import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { collectPageParameters, telemetryEventTypes, useTelemetry } from "@calcom/lib/telemetry";
 import { teamMetadataSchema } from "@calcom/prisma/zod-utils";
 import type { inferSSRProps } from "@calcom/types/inferSSRProps";
-import { Alert, Button, EmailField, HeadSeo, PasswordField, TextField } from "@calcom/ui";
+import { Alert, Button, EmailField, HeadSeo, PasswordField, TextField, PhoneInput, Label } from "@calcom/ui";
 
 import PageWrapper from "@components/PageWrapper";
 
@@ -29,6 +29,10 @@ const signupSchema = z.object({
     message: "String should not contain a plus symbol (+).",
   }),
   email: z.string().email(),
+  phone: z
+    .string()
+    .min(10, { message: "Must be a valid mobile number" })
+    .max(14, { message: "Must be a valid mobile number" }),
   password: z.string().min(7),
   language: z.string().optional(),
   token: z.string().optional(),
@@ -141,6 +145,24 @@ export default function Signup({ prepopulateFormValues, token, orgSlug }: Signup
                     disabled={prepopulateFormValues?.email}
                     className="disabled:bg-emphasis disabled:hover:cursor-not-allowed"
                   />
+                  <div>
+                    <Label>{t("phone_number")}</Label>
+                    <Controller
+                      control={methods.control}
+                      name="phone"
+                      render={({ field: { value, onChange } }) => (
+                        <PhoneInput
+                          className="rounded-md"
+                          placeholder={t("enter_phone_number")}
+                          id="phone"
+                          required
+                          value={value}
+                          onChange={onChange}
+                        />
+                      )}
+                    />
+                  </div>
+
                   <PasswordField
                     labelProps={{
                       className: "block text-sm font-medium text-default",

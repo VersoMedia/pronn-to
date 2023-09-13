@@ -17,6 +17,10 @@ const signupSchema = z.object({
   username: z.string().refine((value) => !value.includes("+"), {
     message: "String should not contain a plus symbol (+).",
   }),
+  phone: z
+    .string()
+    .min(10, { message: "Must be a valid mobile number" })
+    .max(14, { message: "Must be a valid mobile number" }),
   email: z.string().email(),
   password: z.string().min(7),
   language: z.string().optional(),
@@ -34,7 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const data = req.body;
-  const { email, password, language, token } = signupSchema.parse(data);
+  const { email, password, language, token, phone } = signupSchema.parse(data);
 
   const username = slugify(data.username);
   const userEmail = email.toLowerCase();
@@ -121,7 +125,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           // This signup page is ONLY meant for team invites and local setup. Not for every day users.
           // In singup redesign/refactor coming up @sean will tackle this to make them the same API/page instead of two.
           return res.status(422).json({
-            message: "Sign up from https://cal.com/signup to claim your premium username",
+            message: "Sign up from https://verso.ai to claim your premium username",
           });
         }
       }
@@ -130,12 +134,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         where: { email: userEmail },
         update: {
           username,
+          phone,
           password: hashedPassword,
           emailVerified: new Date(Date.now()),
           identityProvider: IdentityProvider.CAL,
         },
         create: {
           username,
+          phone,
           email: userEmail,
           password: hashedPassword,
           identityProvider: IdentityProvider.CAL,
@@ -216,7 +222,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const checkUsername = await checkPremiumUsername(username);
       if (checkUsername.premium) {
         res.status(422).json({
-          message: "Sign up from https://cal.com/signup to claim your premium username",
+          message: "Sign up from https://verso.ai to claim your premium username",
         });
         return;
       }
@@ -225,12 +231,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       where: { email: userEmail },
       update: {
         username,
+        phone,
         password: hashedPassword,
         emailVerified: new Date(Date.now()),
         identityProvider: IdentityProvider.CAL,
       },
       create: {
         username,
+        phone,
         email: userEmail,
         password: hashedPassword,
         identityProvider: IdentityProvider.CAL,

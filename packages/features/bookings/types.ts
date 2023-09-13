@@ -30,3 +30,16 @@ export type RecurringBookingCreateBody = BookingCreateBody & {
 export type BookingResponse = Awaited<
   ReturnType<typeof import("@calcom/features/bookings/lib/handleNewBooking").default>
 >;
+
+export type BookingNotification = {
+  type_: string;
+  customer_email?: string;
+  customer_name: string;
+  customer_phone: string;
+  member_name: string;
+  member_email?: string;
+  member_phone: string;
+  date: string;
+  hour: string;
+  service_name?: string;
+};

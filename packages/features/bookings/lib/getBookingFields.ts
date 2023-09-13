@@ -183,6 +183,22 @@ export const ensureBookingInputsHaveSystemFields = ({
       ],
     },
     {
+      type: "phone",
+      // This is the `name` of the main field
+      name: "phone",
+      editable: "system",
+      // This Label is used in Email only as of now.
+      defaultLabel: "phone_number",
+      required: true,
+      sources: [
+        {
+          label: "Default",
+          id: "default",
+          type: "default",
+        },
+      ],
+    },
+    {
       defaultLabel: "location",
       type: "radioInput",
       name: "location",

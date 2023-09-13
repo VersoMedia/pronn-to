@@ -5,7 +5,7 @@ import { APP_NAME, WEBAPP_URL } from "@calcom/lib/constants";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { trpc } from "@calcom/trpc/react";
 import { Alert, Button, ButtonGroup, EmptyScreen, Label, showToast } from "@calcom/ui";
-import { EyeOff, Mail, RefreshCcw, UserPlus, Users, Video } from "@calcom/ui/components/icon";
+import { EyeOff, Mail, RefreshCcw, UserPlus, Users } from "@calcom/ui/components/icon";
 
 import { UpgradeTip } from "../../../tips";
 import SkeletonLoaderTeamList from "./SkeletonloaderTeamList";
@@ -67,11 +67,11 @@ export function TeamsListing() {
       title: t("sms_attendee_action"),
       description: t("make_it_easy_to_book"),
     },
-    {
-      icon: <Video className="h-5 w-5 text-purple-500" />,
-      title: "Cal Video" + " " + t("recordings_title"),
-      description: t("upgrade_to_access_recordings_description"),
-    },
+    // {
+    //   icon: <Video className="h-5 w-5 text-purple-500" />,
+    //   title: "Cal Video" + " " + t("recordings_title"),
+    //   description: t("upgrade_to_access_recordings_description"),
+    // },
     {
       icon: <EyeOff className="h-5 w-5 text-indigo-500" />,
       title: t("disable_cal_branding", { appName: APP_NAME }),

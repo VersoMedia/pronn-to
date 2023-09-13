@@ -315,6 +315,7 @@ const getEventTypesFromDB = async (eventTypeId: number) => {
           isFixed: true,
           user: {
             select: {
+              phone: true,
               credentials: true,
               ...userSelect.select,
               organization: {
@@ -453,6 +454,7 @@ async function getOriginalRescheduledBooking(uid: string, seatsEventType?: boole
           id: true,
           name: true,
           email: true,
+          phone: true,
           locale: true,
           timeZone: true,
         },
@@ -731,6 +733,7 @@ async function handler(
           },
           select: {
             ...userSelect.select,
+            phone: true,
             credentials: true, // Don't leak to client
             metadata: true,
             organization: {
@@ -771,6 +774,7 @@ async function handler(
       select: {
         credentials: true, // Don't leak to client
         ...userSelect.select,
+        phone: true,
       },
     });
     if (!eventTypeUser) {
@@ -1874,7 +1878,7 @@ async function handler(
     const createBookingObj = {
       include: {
         user: {
-          select: { email: true, name: true, timeZone: true },
+          select: { email: true, name: true, timeZone: true, phone: true },
         },
         attendees: true,
         payment: true,
@@ -1924,7 +1928,7 @@ async function handler(
     await syncServicesUpdateWebUser(
       await prisma.user.findFirst({
         where: { id: userId },
-        select: { id: true, email: true, name: true, username: true, createdDate: true },
+        select: { id: true, email: true, name: true, username: true, phone: true, createdDate: true },
       })
     );
     evt.uid = booking?.uid ?? null;
@@ -2428,6 +2432,7 @@ const findBookingQuery = async (bookingId: number) => {
         select: {
           name: true,
           email: true,
+          phone: true,
           timeZone: true,
         },
       },

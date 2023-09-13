@@ -64,7 +64,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const calendarService = new GoogleService(credential);
         const availability = await calendarService.getEvents(new Date(req.query?.date));
         res.status(200).json({ data: availability });
+        return;
       }
+
+      res.status(200).json({ data: availability });
+      return;
+    } else {
+      res.status(200).json({ data: [] });
+      return;
     }
   }
 }
