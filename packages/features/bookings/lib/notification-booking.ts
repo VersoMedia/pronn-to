@@ -2,19 +2,10 @@ import { post } from "@calcom/lib/fetch-wrapper";
 
 import type { BookingNotification } from "../types";
 
-const API_NOTIFICATION = "https://wln1iu02ph.execute-api.us-west-2.amazonaws.com/production";
+const API_NOTIFICATION = "https://hnbi9gne20.execute-api.us-west-2.amazonaws.com/dev/v1/notifications";
 
 export const sendNotification = async (data: BookingNotification) => {
-  await post(`${API_NOTIFICATION}?channel=whatsapp`, {
-    requestContext: {
-      connectionId: "ZigQieifPHcCGRw=",
-    },
-    body: {
-      action: "sendNotification",
-      channel: "WHATSAPP",
-      payload: {
-        ...data,
-      },
-    },
+  await post(`${API_NOTIFICATION}?channel=WHATSAPP`, {
+    ...data,
   });
 };
