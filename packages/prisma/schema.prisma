@@ -239,6 +239,7 @@ model User {
   //linkedByUserId       Int?
   //linkedBy             User?                   @relation("linked_account", fields: [linkedByUserId], references: [id], onDelete: Cascade)
   //linkedUsers          User[]                  @relation("linked_account")*/
+  notificationSettings NotificationSettings?
 
   @@unique([email])
   @@unique([email, username])
@@ -247,6 +248,30 @@ model User {
   @@index([identityProvider])
   @@index([identityProviderId])
   @@map(name: "users")
+}
+
+model NotificationSettings {
+  id                Int     @id @default(autoincrement())
+  customerWhats     Boolean @default(false)
+  customerEmail     Boolean @default(false)
+  customerSms       Boolean @default(false)
+  memberWhats       Boolean @default(false)
+  memberEmail       Boolean @default(false)
+  memberSms         Boolean @default(false)
+  userId            Int     @unique
+  oneDay            Boolean @default(true)
+  oneHour           Boolean @default(true)
+  sixHours          Boolean @default(false)
+  twelveHours       Boolean @default(false)
+  twoDays           Boolean @default(false)
+  textOneDays       String? @default("")
+  textOneHours      String? @default("")
+  textSixHours      String? @default("")
+  textTwelveHours   String? @default("")
+  textTwoDays       String? @default("")
+  textThirtyMinutes String? @default("")
+  thirtyMinutes     Boolean @default(false)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Team {
@@ -367,12 +392,12 @@ enum BookingStatus {
 }
 
 model Booking {
-  id                    Int                  @id @default(autoincrement())
-  uid                   String               @unique
-  user                  User?                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                    Int                   @id @default(autoincrement())
+  uid                   String                @unique
+  user                  User?                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId                Int?
   references            BookingReference[]
-  eventType             EventType?           @relation(fields: [eventTypeId], references: [id])
+  eventType             EventType?            @relation(fields: [eventTypeId], references: [id])
   eventTypeId           Int?
   title                 String
   description           String?
@@ -383,12 +408,12 @@ model Booking {
   endTime               DateTime
   attendees             Attendee[]
   location              String?
-  createdAt             DateTime             @default(now())
+  createdAt             DateTime              @default(now())
   updatedAt             DateTime?
-  status                BookingStatus        @default(ACCEPTED)
-  paid                  Boolean              @default(false)
+  status                BookingStatus         @default(ACCEPTED)
+  paid                  Boolean               @default(false)
   payment               Payment[]
-  destinationCalendar   DestinationCalendar? @relation(fields: [destinationCalendarId], references: [id])
+  destinationCalendar   DestinationCalendar?  @relation(fields: [destinationCalendarId], references: [id])
   destinationCalendarId Int?
   cancellationReason    String?
   rejectionReason       String?
@@ -403,7 +428,8 @@ model Booking {
   seatsReferences       BookingSeat[]
   /// @zod.custom(imports.bookingMetadataSchema)
   metadata              Json?
-  isRecorded            Boolean              @default(false)
+  isRecorded            Boolean               @default(false)
+  BookingNotifications  BookingNotifications?
 
   @@index([eventTypeId])
   @@index([userId])
@@ -411,6 +437,24 @@ model Booking {
   @@index([recurringEventId])
   @@index([uid])
   @@index([status])
+}
+
+model BookingNotifications {
+  id                                 Int     @id @default(autoincrement())
+  bookingId                          Int     @unique
+  whatsConfirmationSent              Boolean @default(false)
+  whatsCustomerConfirmationAnswered  Boolean @default(false)
+  whatsCustomerConfirmationTrackId   String?
+  whatsCustomerDayReminderAnswered   Boolean @default(false)
+  whatsCustomerDayReminderSent       Boolean @default(false)
+  whatsCustomerDayReminderTrackId    String?
+  whatsCustomerMemberDayReminderSent Boolean @default(false)
+  whatsMemberDayReminderAnswered     Boolean @default(false)
+  whatsMemberDayReminderTrackId      String?
+  whatsMemberHourReminderAnswered    Boolean @default(false)
+  whatsMemberHourReminderSent        Boolean @default(false)
+  whatsMemberHourReminderTrackId     String?
+  booking                            Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 }
 
 model Schedule {

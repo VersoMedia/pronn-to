@@ -174,7 +174,7 @@ export const BookEventFormChild = ({
   });
   const createBookingMutation = useMutation(createBooking, {
     onSuccess: (responseData) => {
-      const type_ = ["GENERAL_BOOKING_MEMBER", "GENERAL_BOOKING_CUSTOMER"];
+      console.log(responseData, "responseData");
 
       const { uid, paymentUid } = responseData;
       const fullName = getFullName(bookingForm.getValues("responses.name"));
@@ -196,7 +196,13 @@ export const BookEventFormChild = ({
       }
 
       const userTimezone = responseData.user?.timeZone;
-      const types = ["GENERAL_BOOKING_MEMBER", "GENERAL_BOOKING_CUSTOMER"];
+      let types = [];
+
+      if (isRescheduling) {
+        types = ["", ""];
+      } else {
+        types = ["GENERAL_BOOKING_MEMBER", "GENERAL_BOOKING_CUSTOMER"];
+      }
 
       for (let i = 0; i < types.length; i++) {
         const payload = {
