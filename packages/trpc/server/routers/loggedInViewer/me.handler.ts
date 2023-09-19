@@ -15,6 +15,8 @@ export const meHandler = async ({ ctx }: MeOptions) => {
   return {
     id: user.id,
     name: user.name,
+    notificationSettings: user.notificationSettings,
+    phone: user.phone,
     username: user.username,
     email: user.email,
     emailMd5: crypto.createHash("md5").update(user.email).digest("hex"),

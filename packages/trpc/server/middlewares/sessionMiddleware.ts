@@ -22,6 +22,8 @@ export async function getUserFromSession(ctx: TRPCContextInner, session: Maybe<S
     },
     select: {
       id: true,
+      notificationSettings: true,
+      phone: true,
       username: true,
       name: true,
       email: true,
