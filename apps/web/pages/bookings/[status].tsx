@@ -42,8 +42,8 @@ import {
 import { Button, HorizontalTabs, Switch } from "@calcom/ui";
 import type { VerticalTabItemProps, HorizontalTabItemProps } from "@calcom/ui";
 import { Alert } from "@calcom/ui";
+import { Calendar as CalendarIcon } from "@calcom/ui/components/icon";
 
-//import { Calendar } from "@calcom/ui/components/icon";
 import { useInViewObserver } from "@lib/hooks/useInViewObserver";
 import useMediaQuery from "@lib/hooks/useMediaQuery";
 
@@ -55,7 +55,7 @@ import { ssgInit } from "@server/lib/ssg";
 
 import { WipeMyCalActionButton } from "../../../../packages/app-store/wipemycalother/components";
 
-//type BookingListingStatus = z.infer<NonNullable<typeof filterQuerySchema>>["status"];
+type BookingListingStatus = z.infer<NonNullable<typeof filterQuerySchema>>["status"];
 type BookingOutput = RouterOutputs["viewer"]["bookings"]["get"]["bookings"][0];
 //type GetByViewerResponse = RouterOutputs["viewer"]["eventTypes"]["getByViewer"] | undefined;
 
@@ -571,7 +571,7 @@ export default function Bookings() {
             {query.status === "success" && isEmpty && (
               <div className="flex items-center justify-center pt-2 lg:hidden xl:pt-0">
                 <EmptyScreen
-                  Icon={Calendar}
+                  Icon={CalendarIcon}
                   headline={t("no_status_bookings_yet", { status: t(status).toLowerCase() })}
                   description={t("no_status_bookings_yet_description", {
                     status: t(status).toLowerCase(),
