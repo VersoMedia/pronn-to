@@ -38,6 +38,7 @@
   "cancellation_reason_placeholder": "Why are you cancelling?",
   "rejection_reason": "Reason for rejecting",
   "rejection_reason_title": "Reject the booking request?",
+  "event_details_title": "Event details",
   "rejection_reason_description": "Are you sure you want to reject the booking? We'll let the person who tried to book know. You can provide a reason below.",
   "rejection_confirmation": "Reject the booking",
   "manage_this_event": "Manage this event",

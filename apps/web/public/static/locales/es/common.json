@@ -32,6 +32,7 @@
   "cancellation_reason_placeholder": "¿Por qué razón está cancelando?",
   "rejection_reason": "Motivo del rechazo",
   "rejection_reason_title": "¿Rechazar la solicitud de reserva?",
+  "event_details_title": "Detalles del evento",
   "rejection_reason_description": "¿Estás seguro de que deseas rechazar la reserva? Le haremos saber a la persona que ha intentado reservar. Puedes indicar una razón a continuación.",
   "rejection_confirmation": "Rechazar la reserva",
   "manage_this_event": "Administrar este evento",

@@ -1,6 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@import url('https://fonts.cdnfonts.com/css/open-sauce-one');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+* {
+    font-family: 'Open Sauce One', sans-serif;
+}
 /**
 * Add css variables here as well for light mode in addition to tailwind.config to avoid FOUC
 */
@@ -518,4 +525,73 @@ select:focus {
 }
 .rbc-allday-cell{
   display: none !important;
+}
+.rbc-time-gutter > .rbc-timeslot-group > .rbc-time-slot{
+  width: 56px !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.rbc-time-gutter > .rbc-timeslot-group > .rbc-time-slot > .rbc-label {
+  text-align: center;
+  font-family: 'Open Sauce One', sans-serif !important;
+  color: rgb(82 82 82) !important;
+  line-height: 1.25rem !important;
+  font-size: .75rem !important;
+}
+.rbc-time-header-gutter{
+  width: 56px !important;
+  max-width: 56px !important;
+}
+.rbc-timeslot-group > .rbc-time-slot:nth-child(2){
+  display: none !important;
+}
+.rbc-calendar{
+  border-color: rgb(236 239 242) !important;
+}
+.rbc-current-time-indicator{
+  border: 1px solid red !important;
+  background-color: transparent !important;
+}
+
+.rbc-header + .rbc-today{
+  background-color: rgb(236 239 242) !important;
+}
+.rbc-time-content {
+  border-top: none !important;
+}
+.rbc-allday-cell{
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1) !important;
+}
+.rbc-header{
+  font-weight: 400 !important;
+}
+.rbc-event, .rbc-day-slot .rbc-background-event {
+  padding: 0px !important;
+}
+.rbc-event-label{
+  display: none !important;
+}
+.rbc-addons-dnd .rbc-addons-dnd-resize-ns-anchor .rbc-addons-dnd-resize-ns-icon {
+  border-top: 1px double gray !important;
+}
+.rbc-button-link{
+  cursor: default !important;
+  touch-action: none !important;
+}
+.rbc-time-view {
+  border: none !important;
+}
+
+@media only screen and (max-width: 768px) {
+  .rbc-header{
+      width: 20px !important;
+      white-space: inherit !important;
+      height: 45px !important;
+      background-color: #FFF !important;
+  }
+}
+.rbc-day-slot .rbc-event, .rbc-day-slot .rbc-background-event {
+  border: none !important;
 }
