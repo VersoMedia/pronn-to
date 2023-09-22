@@ -656,23 +656,27 @@ export default function Bookings() {
           </div>
 
           <DialogFooter className="!relative mt-4">
-            <Button
-              data-testid="rechedule-booking"
-              onClick={() => {
-                setVisible(false);
-                setRecheduleModal(true);
-              }}>
-              {t("booking_rescheduled")}
-            </Button>
-            <Button
-              data-testid="cancel-booking"
-              onClick={() => {
-                setVisible(false);
-                setDeleteAppModal(true);
-              }}>
-              {t("booking_cancelled")}
-            </Button>
-            <DialogClose color="secondary" />
+            <div className="flex w-full flex-col space-y-2 pb-8 pt-4 rtl:space-x-reverse lg:w-auto lg:flex-row lg:justify-end lg:space-x-2 lg:space-y-0">
+              <Button
+                data-testid="rechedule-booking"
+                className="w-full text-center"
+                onClick={() => {
+                  setVisible(false);
+                  setRecheduleModal(true);
+                }}>
+                {t("booking_rescheduled")}
+              </Button>
+              <Button
+                data-testid="cancel-booking"
+                className="w-full text-center"
+                onClick={() => {
+                  setVisible(false);
+                  setDeleteAppModal(true);
+                }}>
+                {t("booking_cancelled")}
+              </Button>
+              <DialogClose color="secondary" className="w-full text-center" />
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
