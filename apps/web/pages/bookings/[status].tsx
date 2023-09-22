@@ -9,12 +9,13 @@ import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import moment from "moment";
 import type { GetStaticPaths, GetStaticProps } from "next";
 import { useRouter } from "next/router";
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useState } from "react";
 import React from "react";
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 
 import dayjs from "@calcom/dayjs";
@@ -26,6 +27,7 @@ import { useFilterQuery } from "@calcom/features/bookings/lib/useFilterQuery";
 import { CreateBookingTypeDialog } from "@calcom/features/eventtypes/components";
 import { ShellMain } from "@calcom/features/shell/Shell";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
+import useMediaQuery from "@calcom/lib/hooks/useMediaQuery";
 import { useParamsWithFallback } from "@calcom/lib/hooks/useParamsWithFallback";
 import type { RouterOutputs } from "@calcom/trpc/react";
 import { trpc } from "@calcom/trpc/react";
@@ -37,15 +39,16 @@ import {
   DialogFooter,
   DialogClose,
   showToast,
-  EmptyScreen,
+  DateTimePicker,
+  Form,
+  Label,
 } from "@calcom/ui";
 import { Button, HorizontalTabs, Switch } from "@calcom/ui";
 import type { VerticalTabItemProps, HorizontalTabItemProps } from "@calcom/ui";
 import { Alert } from "@calcom/ui";
-import { Calendar as CalendarIcon } from "@calcom/ui/components/icon";
+import { AlertCircle } from "@calcom/ui/components/icon";
 
 import { useInViewObserver } from "@lib/hooks/useInViewObserver";
-import useMediaQuery from "@lib/hooks/useMediaQuery";
 
 import PageWrapper from "@components/PageWrapper";
 import BookingListItem from "@components/booking/BookingListItem";
@@ -55,7 +58,6 @@ import { ssgInit } from "@server/lib/ssg";
 
 import { WipeMyCalActionButton } from "../../../../packages/app-store/wipemycalother/components";
 
-type BookingListingStatus = z.infer<NonNullable<typeof filterQuerySchema>>["status"];
 type BookingOutput = RouterOutputs["viewer"]["bookings"]["get"]["bookings"][0];
 //type GetByViewerResponse = RouterOutputs["viewer"]["eventTypes"]["getByViewer"] | undefined;
 
@@ -89,14 +91,6 @@ const tabs: (VerticalTabItemProps | HorizontalTabItemProps)[] = [
   },
 ];
 const validStatuses = ["upcoming", "recurring", "past", "cancelled", "unconfirmed"] as const;
-
-const descriptionByStatus: Record<NonNullable<BookingListingStatus>, string> = {
-  upcoming: "upcoming_bookings",
-  recurring: "recurring_bookings",
-  past: "past_bookings",
-  cancelled: "cancelled_bookings",
-  unconfirmed: "unconfirmed_bookings",
-};
 
 const querySchema = z.object({
   status: z.enum(validStatuses),
@@ -193,7 +187,7 @@ const CustomCardAppointment = ({ title, event }: { title: string; event: any }) 
         </p>
       </div>
       <p className="pl-1" style={{ fontSize: 10, color: StatusColor[status] }}>
-        {dayjs(event.startTime).format("hh:mm A")}
+        {dayjs(event?.resource?.startTime).format("hh:mm A")}
       </p>
     </div>
   );
@@ -209,16 +203,19 @@ export default function Bookings() {
   const [views, setViews] = useState("week");
   const [typeView, setTypeView] = useState(true);
   const [visible, setVisible] = useState(false);
+  const [deleteAppModal, setDeleteAppModal] = useState(false);
+  const [recheduleModal, setRecheduleModal] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [selectedDay, setSelectedDay] = useState(new Date());
   const [currentAppointment, setCurrentAppointment] = useState(null);
   const onView = useCallback((newView) => setViews(newView), [setViews]);
-  const isMobile = useMediaQuery("(max-width: 768px)");
 
-  useEffect(() => {
-    if (isMobile) {
-      setTypeView(false);
-    }
-  }, [isMobile]);
+  const form = useForm({
+    defaultValues: {
+      startTime: selectedDay,
+    },
+  });
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   const tabsViewsCalendar = [
     {
@@ -313,10 +310,14 @@ export default function Bookings() {
     setToday(new Date(currentToday));
   };
 
-  const onClickNextWeek = () => {
+  const onClickNextWeek = (date = "") => {
     let currentToday = moment();
     if (views === "week") {
       currentToday = moment(today).add(7, "days");
+
+      if (date) {
+        currentToday = moment(date);
+      }
     } else if (views === "month") {
       currentToday = moment(today).add(1, "month");
     } else {
@@ -348,9 +349,16 @@ export default function Bookings() {
   const updateBookingMutation = useMutation(createBooking, {
     onSuccess: () => {
       query.refetch();
+      if (recheduleModal) {
+        showToast(t("event_has_been_rescheduled"), "success");
+        setRecheduleModal(false);
+        return;
+      }
+
       showToast(t("availability_updated_successfully", { scheduleName: "" }), "success");
     },
     onError: () => {
+      showToast(t("unexpected_error_try_again"), "error");
       console.log("Server internal error");
       //errorRef && errorRef.current?.scrollIntoView({ behavior: "smooth" });
     },
@@ -394,6 +402,16 @@ export default function Bookings() {
     updateBookingMutation.mutate(payload);
   }, []);
 
+  const getWeek = (date) => {
+    const curr = date;
+    const first = curr.getDate() - curr.getDay();
+    const dates = Array.from({ length: 6 }).map((_, i) => first + (i + 1));
+    return [
+      new Date(curr.setDate(first)).toUTCString(),
+      ...dates.map((d) => new Date(curr.setDate(d)).toUTCString()),
+    ];
+  };
+
   return (
     <ShellMain
       hideHeadingOnMobile
@@ -404,7 +422,7 @@ export default function Bookings() {
           data={eventsTypes.data}
           eventsTypes={eventsTypes.data}
           selectedDay={selectedDay}
-          refetch={() => eventsTypes.refetch()}
+          refetch={() => query.refetch()}
         />
       }>
       <div className="flex w-full flex-col">
@@ -418,48 +436,51 @@ export default function Bookings() {
             </div>
           </div>
         </div>
-        <div className="hidden lg:block">
+        <div className="">
           <div className="flex flex-col flex-wrap lg:flex-row">
             {typeView ? (
-              <header className="flex justify-between">
-                <HorizontalTabs tabs={tabsViewsCalendar} isButton views={views} />
-                <h1 className="ml-4 h-9 pt-2 text-base font-semibold leading-6 text-gray-900 md:w-[140px]">
-                  {views === "day"
-                    ? moment(today).format("DD MMMM YYYY")
-                    : moment(today).format("MMMM-YYYY").charAt(0).toUpperCase() +
-                      moment(today).format("MMMM YYYY").slice(1)}
-                </h1>
-                <div className="relative flex items-center rounded-sm bg-neutral-100 bg-white md:items-stretch">
-                  <div className="pointer-events-none absolute inset-0 rounded-sm " aria-hidden="true" />
-                  <button
-                    type="button"
-                    className="flex h-9 items-center justify-center rounded-l-sm  py-1.5 pl-3 pr-4 text-gray-400 hover:text-gray-500 focus:relative md:w-9 md:px-2"
-                    onClick={onClickPreviousWeek}>
-                    <span className="sr-only">Previous period</span>
-                    <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" color="#000" />
-                  </button>
-                  <button
-                    type="button"
-                    className="h-9 rounded-[4px] px-3.5 py-1.5 text-sm font-normal text-gray-900 ring-1 ring-inset ring-[#262626] hover:bg-gray-50 focus:relative md:py-0"
-                    onClick={onClickToDay}>
-                    Hoy
-                  </button>
-                  <span className="relative -mx-px h-5 w-px bg-gray-300 md:hidden" />
-                  <button
-                    type="button"
-                    className="flex h-9 items-center justify-center rounded-r-sm py-1.5 pl-4 pr-3 text-gray-400 hover:text-gray-500 focus:relative md:w-9 md:px-2"
-                    onClick={onClickNextWeek}>
-                    <span className="sr-only">Next period</span>
-                    <ChevronRightIcon className="h-5 w-5" aria-hidden="true" color="#000" />
-                  </button>
+              <header className="flex w-full flex-col justify-between md:my-0 lg:flex-row">
+                <div className="lg-mb-0 mb-3 flex flex-col justify-between lg:flex-row">
+                  <HorizontalTabs tabs={tabsViewsCalendar} isButton views={views} />
+                  <div className="relative flex items-center rounded-sm bg-neutral-100 bg-white md:items-stretch">
+                    <h1 className="h-9 pt-2 text-base font-semibold leading-6 text-gray-900 lg:ml-4">
+                      {views === "day"
+                        ? moment(today).format("DD MMMM YYYY")
+                        : moment(today).format("MMMM-YYYY").charAt(0).toUpperCase() +
+                          moment(today).format("MMMM YYYY").slice(1)}
+                    </h1>
+                    <div className="pointer-events-none absolute inset-0 rounded-sm " aria-hidden="true" />
+                    <button
+                      type="button"
+                      className="flex h-9 items-center justify-center rounded-l-sm  py-1.5 pl-3 pr-4 text-gray-400 hover:text-gray-500 focus:relative md:w-9 md:px-2"
+                      onClick={onClickPreviousWeek}>
+                      <span className="sr-only">Previous period</span>
+                      <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" color="#000" />
+                    </button>
+                    <button
+                      type="button"
+                      className="h-9 rounded-[4px] px-3.5 py-1.5 text-sm font-normal text-gray-900 ring-1 ring-inset ring-[#262626] hover:bg-gray-50 focus:relative md:py-0"
+                      onClick={onClickToDay}>
+                      Hoy
+                    </button>
+                    <button
+                      type="button"
+                      className="flex h-9 items-center justify-center rounded-r-sm py-1.5 pl-4 pr-3 text-gray-400 hover:text-gray-500 focus:relative md:w-9 md:px-2"
+                      onClick={onClickNextWeek}>
+                      <span className="sr-only">Next period</span>
+                      <ChevronRightIcon className="h-5 w-5" aria-hidden="true" color="#000" />
+                    </button>
+                  </div>
+                </div>
+                <div className="hidden lg:block">
+                  <div className="flex max-w-full overflow-x-auto xl:ml-auto">
+                    <FiltersContainer />
+                  </div>
                 </div>
               </header>
             ) : (
               <div />
             )}
-            <div className="flex max-w-full overflow-x-auto xl:ml-auto">
-              <FiltersContainer />
-            </div>
           </div>
         </div>
         <main className="w-full">
@@ -470,15 +491,34 @@ export default function Bookings() {
             {(query.status === "loading" || query.isPaused) && <SkeletonLoader />}
             {query.status !== "loading" && typeView && (
               <div className="flex h-[100vh] flex-col bg-white">
+                {isMobile && views === "week" && (
+                  <div
+                    className="flex h-[60px] w-full border border-x-0 border-t-0 border-[#ddd] pl-[56px]"
+                    style={{ boxShadow: "0px 15px 10px -15px #ddd" }}>
+                    {getWeek(new Date(today.toISOString())).map((date) => (
+                      <div
+                        key={date}
+                        onClick={() => onClickNextWeek(date)}
+                        className="flex flex-col items-center justify-center border border-y-0 border-l-0 border-[#ddd] py-1"
+                        style={{ width: "14.28%" }}>
+                        <p>{dayjs(date).format("ddd")}</p>
+                        <p>{dayjs(date).format("DD")}</p>
+                        {dayjs(date).isSame(today, "day") && (
+                          <div className="h-1 w-1 rounded-sm bg-indigo-700" />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <DnDCalendar
                   culture="es"
                   localizer={localizer}
                   defaultDate={new Date()}
                   date={today}
-                  defaultView={views}
-                  drilldownView={views}
+                  defaultView={isMobile && views === "week" ? "day" : views}
+                  drilldownView={isMobile && views === "week" ? "day" : views}
                   onView={onView}
-                  view={views}
+                  view={isMobile && views === "week" ? "day" : views}
                   toolbar={false}
                   events={appointments
                     .filter((ap) => ap.status !== "CANCELLED")
@@ -490,12 +530,17 @@ export default function Bookings() {
                     }))}
                   formats={{
                     timeGutterFormat: (date, culture, localizer) => localizer.format(date, "hh a", culture),
-                    dayFormat: (date, culture, localizer) => localizer.format(date, "eeee d", culture),
+                    dayFormat: (date, culture, localizer) =>
+                      localizer.format(date, isMobile ? "eee d" : "eeee d", culture),
                   }}
                   onSelectSlot={(slot) => {
                     const start = moment(slot.start);
                     setSelectedDay(new Date(start.toISOString()));
-                    router.push(window.location.href + `&dialog=new`);
+                    if (window.location.href)
+                      router.push(
+                        window.location.href?.split("?")[0] +
+                          `?status=upcoming&dialog=new&eventPage=${eventsTypes.data?.profiles[0]?.slug}`
+                      );
                   }}
                   components={{
                     event: ({ event, title }) => <CustomCardAppointment event={event} title={title} />,
@@ -536,7 +581,7 @@ export default function Bookings() {
                   <div className="border-subtle overflow-hidden rounded-md border">
                     <table className="w-full max-w-full table-fixed">
                       <tbody className="bg-default divide-subtle divide-y" data-testid="bookings">
-                        {query?.data.pages.map((page, index) => (
+                        {query?.data?.pages?.map((page, index) => (
                           <Fragment key={index}>
                             {page.bookings.filter(filterBookings).map((booking: BookingOutput) => {
                               const recurringInfo = page.recurringInfo.find(
@@ -567,18 +612,6 @@ export default function Bookings() {
                   </div>
                 </div>
               </>
-            )}
-            {query.status === "success" && isEmpty && (
-              <div className="flex items-center justify-center pt-2 lg:hidden xl:pt-0">
-                <EmptyScreen
-                  Icon={CalendarIcon}
-                  headline={t("no_status_bookings_yet", { status: t(status).toLowerCase() })}
-                  description={t("no_status_bookings_yet_description", {
-                    status: t(status).toLowerCase(),
-                    description: t(descriptionByStatus[status]),
-                  })}
-                />
-              </div>
             )}
           </div>
         </main>
@@ -611,20 +644,130 @@ export default function Bookings() {
                   <p className="text-subtle">Location: {currentAppointment?.event?.resource?.location}</p>
                 )}
                 <p className="mt-2 text-[16px]">Attendees</p>
-                {currentAppointment?.event?.resource?.attendees.map((att) => (
+                {currentAppointment?.event?.resource?.responses && (
                   <>
-                    <p className="text-subtle mt-1">{att.name}</p>
-                    <p className="text-subtle">{att.email}</p>
-                    <p className="text-subtle">{att.phone}</p>
+                    <p className="text-subtle mt-1">{currentAppointment?.event?.resource?.responses?.name}</p>
+                    <p className="text-subtle">{currentAppointment?.event?.resource?.responses?.email}</p>
+                    <p className="text-subtle">{currentAppointment?.event?.resource?.responses?.phone}</p>
                   </>
-                ))}
+                )}
               </div>
             </div>
           </div>
 
           <DialogFooter className="!relative mt-4">
+            <Button
+              data-testid="rechedule-booking"
+              onClick={() => {
+                setVisible(false);
+                setRecheduleModal(true);
+              }}>
+              {t("booking_rescheduled")}
+            </Button>
+            <Button
+              data-testid="cancel-booking"
+              onClick={() => {
+                setVisible(false);
+                setDeleteAppModal(true);
+              }}>
+              {t("booking_cancelled")}
+            </Button>
+            <DialogClose color="secondary" />
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={deleteAppModal} onOpenChange={setDeleteAppModal}>
+        <DialogContent
+          title={t("cancel_booking")}
+          description={t("are_you_sure_you_want_to_remove_this_booking")}
+          type="confirmation"
+          Icon={AlertCircle}>
+          <DialogFooter>
+            <Button
+              color="primary"
+              disabled={loading}
+              onClick={async () => {
+                setLoading(true);
+                const res = await fetch("/api/cancel", {
+                  body: JSON.stringify({
+                    uid: currentAppointment?.event?.resource?.uid,
+                    allRemainingBookings: false,
+                    seatReferenceUid: undefined,
+                  }),
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  method: "POST",
+                });
+
+                if (res.status >= 200 && res.status < 300) {
+                  query.refetch();
+                  setDeleteAppModal(false);
+                } else {
+                  showToast(
+                    `${t("error_with_status_code_occured", { status: res.status })} ${t("please_try_again")}`,
+                    "error"
+                  );
+                }
+                setLoading(false);
+              }}>
+              {t("yes_cancel_booking")}
+            </Button>
             <DialogClose />
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={recheduleModal} onOpenChange={setRecheduleModal}>
+        <DialogContent title={t("reschedule_booking")}>
+          <Form
+            form={form}
+            handleSubmit={(values) => {
+              const diff = dayjs(currentAppointment?.event?.resource?.endTime).diff(
+                dayjs(currentAppointment?.event?.resource?.startTime),
+                "minutes"
+              );
+              const payload = {
+                responses: currentAppointment?.event?.resource?.responses,
+                rescheduleUid: currentAppointment?.event?.resource?.uid || undefined,
+                user: currentAppointment?.event?.resource?.user?.username,
+                start: dayjs(values.startTime).format(),
+                end: dayjs(values.startTime).add(diff, "minutes").format(),
+                eventTypeId: currentAppointment?.event?.resource?.eventType?.id,
+                eventTypeSlug: currentAppointment?.event?.resource?.eventType?.slug,
+                timeZone: currentAppointment?.event?.resource?.user?.timeZone,
+                language: "es",
+                metadata: {},
+                hasHashedBookingLink: false,
+              };
+
+              updateBookingMutation.mutate(payload);
+            }}>
+            <div className="mt-3 space-y-6 pb-11">
+              <div>
+                <Label>Selecciona una fecha y hora</Label>
+                <Controller
+                  control={form.control}
+                  name="startTime"
+                  render={({ field }) => (
+                    <DateTimePicker
+                      value={field.value}
+                      onDatesChange={(newDate) => {
+                        field.onChange(newDate);
+                      }}
+                    />
+                  )}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="submit" loading={updateBookingMutation.isLoading}>
+                {t("confirm")}
+              </Button>
+              <DialogClose />
+            </DialogFooter>
+          </Form>
         </DialogContent>
       </Dialog>
     </ShellMain>
