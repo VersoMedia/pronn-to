@@ -6,7 +6,7 @@ import { baseApiParams } from "./baseApiParams";
 // Extracted out as utility function so can be reused
 // at different endpoints that require this validation.
 export const schemaQueryAttendeeEmail = baseApiParams.extend({
-  attendeeEmail: z.string().email(),
+  attendeeEmail: z.string().email().optional(),
 });
 
 export const schemaQuerySingleOrMultipleAttendeeEmails = z.object({

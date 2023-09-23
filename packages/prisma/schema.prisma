@@ -372,8 +372,9 @@ model BookingReference {
 
 model Attendee {
   id          Int          @id @default(autoincrement())
-  email       String
+  email       String?
   name        String
+  phone       String?
   timeZone    String
   locale      String?      @default("en")
   booking     Booking?     @relation(fields: [bookingId], references: [id], onDelete: Cascade)

@@ -184,7 +184,7 @@ export const BookEventFormChild = ({
             paymentUid,
             date: timeslot,
             name: fullName,
-            email: bookingForm.getValues("responses.email"),
+            email: bookingForm.getValues("responses.email") ?? "",
             absolute: false,
           })
         );
@@ -230,7 +230,7 @@ export const BookEventFormChild = ({
 
       const query = {
         isSuccessBookingPage: true,
-        email: bookingForm.getValues("responses.email"),
+        email: bookingForm.getValues("responses.email") || "",
         eventTypeSlug: eventSlug,
         seatReferenceUid: "seatReferenceUid" in responseData ? responseData.seatReferenceUid : null,
         formerTime:
@@ -260,7 +260,7 @@ export const BookEventFormChild = ({
       const query = {
         isSuccessBookingPage: true,
         allRemainingBookings: true,
-        email: bookingForm.getValues("responses.email"),
+        email: bookingForm.getValues("responses.email") || "",
         eventTypeSlug: eventSlug,
         formerTime:
           isRescheduling && bookingData?.startTime ? dayjs(bookingData.startTime).toString() : undefined,
@@ -275,7 +275,7 @@ export const BookEventFormChild = ({
   });
 
   const [isEmailVerificationModalVisible, setEmailVerificationModalVisible] = useState(false);
-  const email = bookingForm.watch("responses.email");
+  const email = bookingForm.watch("responses.email") || null;
 
   const sendEmailVerificationByCodeMutation = trpc.viewer.auth.sendVerifyEmailCode.useMutation({
     onSuccess() {

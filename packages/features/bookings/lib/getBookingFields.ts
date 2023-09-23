@@ -168,20 +168,20 @@ export const ensureBookingInputsHaveSystemFields = ({
         },
       ],
     },
-    {
-      defaultLabel: "email_address",
-      type: "email",
-      name: "email",
-      required: true,
-      editable: "system",
-      sources: [
-        {
-          label: "Default",
-          id: "default",
-          type: "default",
-        },
-      ],
-    },
+    // {
+    //   defaultLabel: "email_address",
+    //   type: "email",
+    //   name: "email",
+    //   required: false,
+    //   editable: "system",
+    //   sources: [
+    //     {
+    //       label: "Default",
+    //       id: "default",
+    //       type: "default",
+    //     },
+    //   ],
+    // },
     {
       type: "phone",
       // This is the `name` of the main field

@@ -130,7 +130,7 @@ export default function Success(props: SuccessProps) {
 
   const attendees = props?.bookingInfo?.attendees;
 
-  const isGmail = !!attendees.find((attendee) => attendee.email.includes("gmail.com"));
+  const isGmail = !!attendees.find((attendee) => attendee.email && attendee.email?.includes("gmail.com"));
 
   const [is24h, setIs24h] = useState(isBrowserLocale24h());
   const { data: session } = useSession();

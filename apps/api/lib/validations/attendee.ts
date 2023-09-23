@@ -8,13 +8,15 @@ export const schemaAttendeeBaseBodyParams = Attendee.pick({
   bookingId: true,
   email: true,
   name: true,
+  phone: true,
   timeZone: true,
 });
 
 const schemaAttendeeCreateParams = z
   .object({
     bookingId: z.number().int(),
-    email: z.string().email(),
+    email: z.string().email().optional(),
+    phone: z.string().optional(),
     name: z.string(),
     timeZone: timeZone,
   })
@@ -23,6 +25,7 @@ const schemaAttendeeCreateParams = z
 const schemaAttendeeEditParams = z
   .object({
     name: z.string().optional(),
+    phone: z.string().optional(),
     email: z.string().email().optional(),
     timeZone: timeZone.optional(),
   })
