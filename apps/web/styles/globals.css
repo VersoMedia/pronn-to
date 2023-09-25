@@ -576,9 +576,8 @@ select:focus {
 .rbc-addons-dnd .rbc-addons-dnd-resize-ns-anchor .rbc-addons-dnd-resize-ns-icon {
   border-top: 1px double gray !important;
 }
-.rbc-button-link{
-  cursor: default !important;
-  touch-action: none !important;
+.rbc-event, .rbc-day-slot .rbc-background-event {
+  background-color: transparent !important;
 }
 .rbc-time-view {
   border: none !important;

@@ -209,6 +209,7 @@ export default function Bookings() {
   const [selectedDay, setSelectedDay] = useState(new Date());
   const [currentAppointment, setCurrentAppointment] = useState(null);
   const onView = useCallback((newView) => setViews(newView), [setViews]);
+  const [viewSlots, setViewSlots] = useState(null);
 
   const form = useForm({
     defaultValues: {
@@ -441,7 +442,11 @@ export default function Bookings() {
             {typeView ? (
               <header className="flex w-full flex-col justify-between md:my-0 lg:flex-row">
                 <div className="lg-mb-0 mb-3 flex flex-col justify-between lg:flex-row">
-                  <HorizontalTabs tabs={tabsViewsCalendar} isButton views={views} />
+                  <HorizontalTabs
+                    tabs={tabsViewsCalendar.filter((tb) => (tb.id !== "day" && isMobile) || !isMobile)}
+                    isButton
+                    views={views}
+                  />
                   <div className="relative flex items-center rounded-sm bg-neutral-100 bg-white md:items-stretch">
                     <h1 className="h-9 pt-2 text-base font-semibold leading-6 text-gray-900 lg:ml-4">
                       {views === "day"
@@ -490,7 +495,7 @@ export default function Bookings() {
             )}
             {(query.status === "loading" || query.isPaused) && <SkeletonLoader />}
             {query.status !== "loading" && typeView && (
-              <div className="flex h-[100vh] flex-col bg-white">
+              <div className={`flex flex-col bg-white ${isMobile ? "h-[50vh]" : "h-[100vh]"}`}>
                 {isMobile && views === "week" && (
                   <div
                     className="flex h-[60px] w-full border border-x-0 border-t-0 border-[#ddd] pl-[56px]"
@@ -532,8 +537,14 @@ export default function Bookings() {
                     timeGutterFormat: (date, culture, localizer) => localizer.format(date, "hh a", culture),
                     dayFormat: (date, culture, localizer) =>
                       localizer.format(date, isMobile ? "eee d" : "eeee d", culture),
+                    monthHeaderFormat: (date, culture, localizer) =>
+                      localizer.format(date, isMobile ? "eee d" : "eeee d", culture),
                   }}
                   onSelectSlot={(slot) => {
+                    if (isMobile) {
+                      setViewSlots(dayjs(slot).format());
+                      return;
+                    }
                     const start = moment(slot.start);
                     setSelectedDay(new Date(start.toISOString()));
                     if (window.location.href)
@@ -543,17 +554,25 @@ export default function Bookings() {
                       );
                   }}
                   components={{
-                    event: ({ event, title }) => <CustomCardAppointment event={event} title={title} />,
+                    event: ({ event, title }) =>
+                      isMobile && views === "month" ? (
+                        <div
+                          className="h-[10px] w-[10px] rounded-md bg-indigo-300"
+                          style={{ touchAction: "none" }}
+                        />
+                      ) : (
+                        <CustomCardAppointment event={event} title={title} />
+                      ),
                   }}
                   onEventDrop={moveEvent}
                   onEventResize={resizeEvent}
                   selectable
                   popup
-                  resizable
+                  resizable={!isMobile}
                 />
               </div>
             )}
-            {!typeView && (
+            {(!typeView || (viewSlots && isMobile)) && (
               <>
                 {!!bookingsToday.length && status === "upcoming" && (
                   <div className="mb-6 pt-2 xl:pt-0">
@@ -563,14 +582,19 @@ export default function Bookings() {
                       <table className="w-full max-w-full table-fixed">
                         <tbody className="bg-default divide-subtle divide-y" data-testid="today-bookings">
                           <Fragment>
-                            {bookingsToday.map((booking: BookingOutput) => (
-                              <BookingListItem
-                                key={booking.id}
-                                listingStatus={status}
-                                recurringInfo={recurringInfoToday}
-                                {...booking}
-                              />
-                            ))}
+                            {bookingsToday
+                              .filter(
+                                (bk) =>
+                                  (dayjs(bk.startTime).isSame(viewSlots, "day") && isMobile) || !isMobile
+                              )
+                              .map((booking: BookingOutput) => (
+                                <BookingListItem
+                                  key={booking.id}
+                                  listingStatus={status}
+                                  recurringInfo={recurringInfoToday}
+                                  {...booking}
+                                />
+                              ))}
                           </Fragment>
                         </tbody>
                       </table>
@@ -583,19 +607,25 @@ export default function Bookings() {
                       <tbody className="bg-default divide-subtle divide-y" data-testid="bookings">
                         {query?.data?.pages?.map((page, index) => (
                           <Fragment key={index}>
-                            {page.bookings.filter(filterBookings).map((booking: BookingOutput) => {
-                              const recurringInfo = page.recurringInfo.find(
-                                (info) => info.recurringEventId === booking.recurringEventId
-                              );
-                              return (
-                                <BookingListItem
-                                  key={booking.id}
-                                  listingStatus={status}
-                                  recurringInfo={recurringInfo}
-                                  {...booking}
-                                />
-                              );
-                            })}
+                            {page.bookings
+                              .filter(filterBookings)
+                              .filter(
+                                (bk) =>
+                                  (dayjs(bk.startTime).isSame(viewSlots, "day") && isMobile) || !isMobile
+                              )
+                              .map((booking: BookingOutput) => {
+                                const recurringInfo = page.recurringInfo.find(
+                                  (info) => info.recurringEventId === booking.recurringEventId
+                                );
+                                return (
+                                  <BookingListItem
+                                    key={booking.id}
+                                    listingStatus={status}
+                                    recurringInfo={recurringInfo}
+                                    {...booking}
+                                  />
+                                );
+                              })}
                           </Fragment>
                         ))}
                       </tbody>

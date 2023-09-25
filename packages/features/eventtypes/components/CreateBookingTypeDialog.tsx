@@ -25,6 +25,7 @@ import {
   Label,
   DateTimePicker,
   TimezoneSelect,
+  PhoneInput,
 } from "@calcom/ui";
 
 // this describes the uniform data needed to create a new event type on Profile or Team
@@ -287,19 +288,33 @@ export default function CreateBookingTypeDialog({
                   />
 
                   <TextField
-                    placeholder="Correo electronico"
+                    placeholder="Correo electronico (optional)"
                     value={form.getValues("attendee.email")}
                     onChange={(e) => {
                       form.setValue("attendee.email", e?.target.value);
                     }}
                   />
 
-                  <TextField
+                  {/* <TextField
                     placeholder="Teléfono"
                     value={form.getValues("attendee.phone")}
                     onChange={(e) => {
                       form.setValue("attendee.phone", e?.target.value);
                     }}
+                  /> */}
+                  <Controller
+                    control={form.control}
+                    name="attendee.phone"
+                    render={({ field: { value, onChange } }) => (
+                      <PhoneInput
+                        className="rounded-md"
+                        placeholder={t("enter_phone_number")}
+                        id="phone"
+                        required
+                        value={value}
+                        onChange={onChange}
+                      />
+                    )}
                   />
                 </>
               )}
