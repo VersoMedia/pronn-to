@@ -34,6 +34,10 @@ function App() {
             "cal-border-booker": "red",
             "cal-border-booker-width": "5px",
           },
+          dark: {
+            "cal-border-booker": "red",
+            "cal-border-booker-width": "5px",
+          },
         },
       });
     });
