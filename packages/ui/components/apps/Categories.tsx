@@ -37,13 +37,13 @@ export function AppStoreCategories({
             data-testid={`app-store-category-${category.name}`}
             className="relative flex rounded-md"
             style={{ background: "radial-gradient(farthest-side at top right, #a2abbe 0%, #E3E3E3 100%)" }}>
-            <div className="dark:bg-muted light:bg-[url('/noise.svg')] dark:from-subtle dark:to-muted w-full self-center bg-cover bg-center bg-no-repeat px-6 py-4 dark:bg-gradient-to-tr">
+            <div className="darked:bg-muted light:bg-[url('/noise.svg')] darked:from-subtle darked:to-muted darked:bg-gradient-to-tr w-full self-center bg-cover bg-center bg-no-repeat px-6 py-4">
               <Image
                 src={"/app-categories/" + category.name + ".svg"}
                 width={100}
                 height={100}
                 alt={category.name}
-                className="dark:invert"
+                className="darked:invert"
               />
               {isLocaleReady ? (
                 <h3 className="text-emphasis text-sm font-semibold capitalize">{category.name}</h3>

@@ -5,6 +5,6 @@
 @import "../../../packages/ui/styles/shared-globals.css";
 
 :root {
-  --font-inter: "Inter var";
-  --font-cal: "Cal Sans";
+  --font-inter: "Inter var" !important;
+  --font-cal: "Cal Sans" !important;
 }

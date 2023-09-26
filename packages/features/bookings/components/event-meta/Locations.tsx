@@ -46,9 +46,9 @@ export const EventLocations = ({ event }: { event: PublicEvent }) => {
                         <img
                           src={getEventLocationType(location.type)?.iconUrl}
                           className={classNames(
-                            "h-3 w-3 opacity-70 ltr:mr-[10px] rtl:ml-[10px] dark:opacity-100 ",
+                            "darked:opacity-100 h-3 w-3 opacity-70 ltr:mr-[10px] rtl:ml-[10px] ",
                             !getEventLocationType(location.type)?.iconUrl?.startsWith("/app-store")
-                              ? "dark:invert-[.65]"
+                              ? "darked:invert-[.65]"
                               : ""
                           )}
                           alt={`${getEventLocationType(location.type)?.label} icon`}

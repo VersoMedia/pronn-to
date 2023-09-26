@@ -5,7 +5,7 @@ export function BlockedTimeCell() {
     <div
       className={classNames(
         "group absolute inset-0 flex h-full flex-col  hover:cursor-not-allowed",
-        "[--disabled-gradient-background:#E5E7EB] [--disabled-gradient-foreground:#D1D5DB] dark:[--disabled-gradient-background:#262626] dark:[--disabled-gradient-foreground:#393939]"
+        "darked:[--disabled-gradient-background:#262626] darked:[--disabled-gradient-foreground:#393939] [--disabled-gradient-background:#E5E7EB] [--disabled-gradient-foreground:#D1D5DB]"
       )}
       style={{
         backgroundColor: "#D1D5DB",

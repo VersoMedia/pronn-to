@@ -79,7 +79,7 @@ const CustomEventTypeModalForm: FC<CustomEventTypeModalFormProps> = (props) => {
         </div>
         <h1 className="mb-2 text-[14px] font-medium leading-4">{t("preview")}</h1>
         <div
-          className="flex h-[212px] w-full rounded-md border-y bg-cover bg-center dark:invert"
+          className="darked:invert flex h-[212px] w-full rounded-md border-y bg-cover bg-center"
           style={{
             backgroundImage: "url(/calendar-preview.svg)",
           }}>

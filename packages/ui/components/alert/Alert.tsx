@@ -28,9 +28,9 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>((props, ref) => {
       className={classNames(
         "rounded-md  p-3",
         props.className,
-        severity === "error" && "bg-red-100 text-red-900 dark:bg-red-900 dark:text-red-200",
-        severity === "warning" && "text-attention bg-attention dark:bg-orange-900 dark:text-orange-200",
-        severity === "info" && "bg-blue-100 text-blue-900 dark:bg-blue-900 dark:text-blue-200",
+        severity === "error" && "darked:bg-red-900 darked:text-red-200 bg-red-100 text-red-900",
+        severity === "warning" && "text-attention bg-attention darked:bg-orange-900 darked:text-orange-200",
+        severity === "info" && "darked:bg-blue-900 darked:text-blue-200 bg-blue-100 text-blue-900",
         severity === "success" && "bg-inverted text-inverted",
         severity === "neutral" && "bg-subtle text-default"
       )}>
@@ -48,21 +48,21 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>((props, ref) => {
             {severity === "error" && (
               <XCircle
                 data-testid="x-circle"
-                className={classNames("h-5 w-5 text-red-900 dark:text-red-200", iconClassName)}
+                className={classNames("darked:text-red-200 h-5 w-5 text-red-900", iconClassName)}
                 aria-hidden="true"
               />
             )}
             {severity === "warning" && (
               <AlertTriangle
                 data-testid="alert-triangle"
-                className={classNames("text-attention h-5 w-5 dark:text-orange-200", iconClassName)}
+                className={classNames("text-attention darked:text-orange-200 h-5 w-5", iconClassName)}
                 aria-hidden="true"
               />
             )}
             {severity === "info" && (
               <Info
                 data-testid="info"
-                className={classNames("h-5 w-5 text-blue-900 dark:text-blue-200", iconClassName)}
+                className={classNames("darked:text-blue-200 h-5 w-5 text-blue-900", iconClassName)}
                 aria-hidden="true"
               />
             )}

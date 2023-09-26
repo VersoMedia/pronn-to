@@ -306,7 +306,7 @@ export const EventSetupTab = (
                           // invert all the icons except app icons
                           eventLocationType.iconUrl &&
                             !eventLocationType.iconUrl.startsWith("/app-store") &&
-                            "dark:invert"
+                            "darked:invert"
                         )}
                         alt={`${eventLocationType.label} logo`}
                       />

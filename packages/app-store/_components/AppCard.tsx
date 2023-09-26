@@ -50,7 +50,7 @@ export default function AppCard({
             className={classNames(app?.isInstalled ? "mr-[11px]" : "mr-3", "h-auto w-10 rounded-sm")}>
             <img
               className={classNames(
-                app?.logo.includes("-dark") && "dark:invert",
+                app?.logo.includes("-dark") && "darked:invert",
                 app?.isInstalled ? "min-w-[42px]" : "min-w-[40px]",
                 "w-full"
               )}

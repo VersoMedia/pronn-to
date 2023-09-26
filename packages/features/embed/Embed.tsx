@@ -120,7 +120,7 @@ const ChooseEmbedTypesDialogContent = ({ types }: { types: EmbedTypes }) => {
                 embedType: embed.type,
               });
             }}>
-            <div className="bg-default order-none box-border flex-none rounded-md border border-solid dark:bg-transparent dark:invert">
+            <div className="bg-default darked:bg-transparent darked:invert order-none box-border flex-none rounded-md border border-solid">
               {embed.illustration}
             </div>
             <div className="text-emphasis mt-4 font-semibold">{embed.title}</div>

@@ -49,7 +49,7 @@ export const AvailableTimes = ({
 
   return (
     <div className={classNames("text-default flex flex-col", className)}>
-      <header className="bg-default before:bg-default dark:bg-muted dark:before:bg-muted mb-3 flex w-full flex-row items-center font-medium">
+      <header className="bg-default before:bg-default darked:bg-muted darked:before:bg-muted mb-3 flex w-full flex-row items-center font-medium">
         <span
           className={classNames(
             isColumnView && "w-full text-center",
@@ -76,7 +76,7 @@ export const AvailableTimes = ({
       </header>
       <div className="h-full pb-4">
         {!slots.length && (
-          <div className="bg-subtle border-subtle flex h-full flex-col items-center rounded-md border p-6 dark:bg-transparent">
+          <div className="bg-subtle border-subtle darked:bg-transparent flex h-full flex-col items-center rounded-md border p-6">
             <CalendarX2 className="text-muted mb-2 h-4 w-4" />
             <p className={classNames("text-muted", showTimeFormatToggle ? "-mt-1 text-lg" : "text-sm")}>
               {t("all_booked_today")}

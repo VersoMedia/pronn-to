@@ -1,44 +1,45 @@
 :root {
   /* background */
 
-  --cal-bg-emphasis: #e5e7eb;
-  --cal-bg: white;
-  --cal-bg-subtle: #f3f4f6;
-  --cal-bg-muted: #f9fafb;
-  --cal-bg-inverted: #111827;
+  --cal-bg-emphasis: #e5e7eb !important;
+    --cal-bg: white !important;
+    --cal-bg-subtle: #f3f4f6 !important;
+    --cal-bg-muted: #f9fafb !important; 
+    --cal-bg-inverted: #111827 !important;
 
-  /* background -> components*/
-  --cal-bg-info: #dee9fc;
-  --cal-bg-success: #e2fbe8;
-  --cal-bg-attention: #fceed8;
-  --cal-bg-error: #f9e3e2;
-  --cal-bg-dark-error: #752522;
+    /* background -> components*/
+    --cal-bg-info: #dee9fc !important;
+    --cal-bg-success: #e2fbe8 !important;
+    --cal-bg-attention: #fceed8 !important;
+    --cal-bg-error: #f9e3e2 !important;
+    --cal-bg-dark-error: #752522 !important;
 
-  /* Borders */
-  --cal-border-emphasis: #9ca3af;
-  --cal-border: #d1d5db;
-  --cal-border-subtle: #e5e7eb;
-  --cal-border-muted: #f3f4f6;
-  --cal-border-error: #aa2e26;
+    /* Borders */
+    --cal-border-emphasis: #9ca3af !important;
+    --cal-border: #d1d5db !important;
+    --cal-border-subtle: #e5e7eb !important;
+    --cal-border-muted: #f3f4f6 !important;
+    --cal-border-error: #aa2e26 !important;
 
-  /* Content/Text */
-  --cal-text-emphasis: #111827;
-  --cal-text: #374151;
-  --cal-text-subtle: #6b7280;
-  --cal-text-muted: #9ca3af;
-  --cal-text-inverted: white;
+    /* Content/Text */
+    --cal-text-emphasis: #111827 !important;
+    --cal-text: #374151 !important;
+    --cal-text-subtle: #6b7280 !important;
+    --cal-text-muted: #9ca3af !important;
+    --cal-text-inverted: white !important;
 
-  /* Content/Text -> components */
-  --cal-text-info: #253985;
-  --cal-text-success: #285231;
-  --cal-text-attention: #73321b;
-  --cal-text-error: #752522;
+    /* Content/Text -> components */
+    --cal-text-info: #253985 !important;
+    --cal-text-success: #285231 !important;
+    --cal-text-attention: #73321b !important;
+    --cal-text-error: #752522 !important;
 
-  /* Brand shenanigans
-    -> These will be computed for the users theme at runtime.
-  */
-  --cal-brand: #111827;
-  --cal-brand-emphasis: #101010;
+    /* Brand shinanigans
+      -> These will be computed for the users theme at runtime.
+    */
+    --cal-brand: #111827 !important;
+    --cal-brand-emphasis: #101010 !important;
+    --cal-brand-text: white !important;
 }
 
 /* Darkmode Colors  -- TODO: WIP*/

@@ -149,7 +149,7 @@ export const SearchDialog = (props: ISearchDialog) => {
               {isLoading ? (
                 <div className="flex h-[200px] w-full items-center justify-center bg-gray-400 pb-3 pt-3">
                   <svg
-                    className={classNames("mx-4 h-5 w-5 animate-spin", "text-inverted dark:text-emphasis")}
+                    className={classNames("mx-4 h-5 w-5 animate-spin", "text-inverted darked:text-emphasis")}
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24">

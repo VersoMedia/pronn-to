@@ -98,7 +98,7 @@ const PaymentPage: FC<PaymentPageProps> = (props) => {
                     <h3 className="text-emphasis text-2xl font-semibold leading-6" id="modal-headline">
                       {paymentAppData.paymentOption === "HOLD" ? t("complete_your_booking") : t("payment")}
                     </h3>
-                    <div className="text-default mt-4 grid grid-cols-3 border-b border-t py-4 text-left dark:border-gray-900 dark:text-gray-300">
+                    <div className="text-default darked:border-gray-900 darked:text-gray-300 mt-4 grid grid-cols-3 border-b border-t py-4 text-left">
                       <div className="font-medium">{t("what")}</div>
                       <div className="col-span-2 mb-6">{eventName}</div>
                       <div className="font-medium">{t("when")}</div>
@@ -130,7 +130,7 @@ const PaymentPage: FC<PaymentPageProps> = (props) => {
                 </div>
                 <div>
                   {props.payment.success && !props.payment.refunded && (
-                    <div className="text-default mt-4 text-center dark:text-gray-300">{t("paid")}</div>
+                    <div className="text-default darked:text-gray-300 mt-4 text-center">{t("paid")}</div>
                   )}
                   {props.payment.appId === "stripe" && !props.payment.success && (
                     <StripePaymentComponent
@@ -147,11 +147,11 @@ const PaymentPage: FC<PaymentPageProps> = (props) => {
                     <PaypalPaymentComponent payment={props.payment} />
                   )}
                   {props.payment.refunded && (
-                    <div className="text-default mt-4 text-center dark:text-gray-300">{t("refunded")}</div>
+                    <div className="text-default darked:text-gray-300 mt-4 text-center">{t("refunded")}</div>
                   )}
                 </div>
                 {!props.profile.hideBranding && (
-                  <div className="text-muted dark:text-inverted mt-4 border-t pt-4 text-center text-xs dark:border-gray-900">
+                  <div className="text-muted darked:text-inverted darked:border-gray-900 mt-4 border-t pt-4 text-center text-xs">
                     <a href={`${WEBSITE_URL}/signup`}>
                       {t("create_booking_link_with_calcom", { appName: APP_NAME })}
                     </a>

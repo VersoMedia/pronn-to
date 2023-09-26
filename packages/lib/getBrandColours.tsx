@@ -14,7 +14,7 @@ type Rgb = {
  * and if it does, return the hex code for that color. Otherwise,
  * return the default brand color.
  */
-export function fallBackHex(val: string | null, dark: boolean): string {
+export function fallBackHex(val: string | null, darked: boolean): string {
   if (val && isValidHexCode(val)) {
     return val;
   }
@@ -81,7 +81,7 @@ function darken(hex: string, intensity: number): string {
   return rgbToHex(r, g, b);
 }
 
-function normalizeHexCode(hex: string | null, dark: boolean) {
+function normalizeHexCode(hex: string | null, darked: boolean) {
   if (!hex) {
     return !dark ? BRAND_COLOR : DARK_BRAND_COLOR;
   }
@@ -185,7 +185,7 @@ const useGetBrandingColours = ({
       "cal-brand-text": getWCAGContrastColor(lightColourMap["500"]),
       "cal-brand-accent": getWCAGContrastColor(lightColourMap["500"]),
     },
-    dark: {
+    darked: {
       "cal-brand": darkColourMap["500"],
       "cal-brand-emphasis": darkColourMap["600"],
       "cal-brand-subtle": darkColourMap["800"],

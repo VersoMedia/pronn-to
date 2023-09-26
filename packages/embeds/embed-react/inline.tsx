@@ -30,7 +30,7 @@ function App() {
             "cal-border-booker": "red",
             "cal-border-booker-width": "20px",
           },
-          dark: {
+          darked: {
             "cal-border-booker": "red",
             "cal-border-booker-width": "5px",
           },

@@ -311,7 +311,7 @@ export default function Success(props: SuccessProps) {
         <div className="-mb-4 ml-4 mt-2">
           <Link
             href={allRemainingBookings ? "/bookings/recurring" : "/bookings/upcoming"}
-            className="hover:bg-subtle text-subtle hover:text-default mt-2 inline-flex px-1 py-2 text-sm dark:hover:bg-transparent">
+            className="hover:bg-subtle text-subtle hover:text-default darked:hover:bg-transparent mt-2 inline-flex px-1 py-2 text-sm">
             <ChevronLeft className="h-5 w-5 rtl:rotate-180" /> {t("back_to_bookings")}
           </Link>
         </div>
@@ -331,7 +331,7 @@ export default function Success(props: SuccessProps) {
               <div
                 className={classNames(
                   "main inline-block transform overflow-hidden rounded-lg border sm:my-8 sm:max-w-xl",
-                  !isBackgroundTransparent && " bg-default dark:bg-muted border-booker border-booker-width",
+                  !isBackgroundTransparent && " bg-default darked:bg-muted border-booker border-booker-width",
                   "px-8 pb-4 pt-5 text-left align-bottom transition-all sm:w-full sm:py-8 sm:align-middle"
                 )}
                 role="dialog"
@@ -502,7 +502,7 @@ export default function Success(props: SuccessProps) {
                       </>
                     )}
                   </div>
-                  <div className="text-bookingdark dark:border-darkgray-200 mt-8 text-left dark:text-gray-300">
+                  <div className="text-bookingdark darked:border-darkgray-200 darked:text-gray-300 mt-8 text-left">
                     {Object.entries(bookingInfo.responses).map(([name, response]) => {
                       const field = eventType.bookingFields.find((field) => field.name === name);
                       // We show location in the "where" section
@@ -743,7 +743,7 @@ export default function Success(props: SuccessProps) {
                     </div>
                   }
                   CustomIcon={AlertCircle}
-                  customIconColor="text-attention dark:text-orange-200"
+                  customIconColor="text-attention darked:text-orange-200"
                 />
               )}
             </div>

@@ -87,7 +87,7 @@ export const buttonClasses = cva(
         loading: true,
         color: "destructive",
         className:
-          "text-red-700/30 dark:text-red-700/30 hover:text-red-700/30  border border-default text-emphasis",
+          "text-red-700/30 darked:text-red-700/30 hover:text-red-700/30  border border-default text-emphasis",
       },
       {
         variant: "icon",
