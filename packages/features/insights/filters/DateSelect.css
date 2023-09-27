@@ -22,7 +22,7 @@
 
 .tremor-DateRangePicker-calendarModal,
 .tremor-DateRangePicker-dropdownModal {
-  @apply darked:invert;
+  @apply dark:invert;
 }
 
 .tremor-Card-root {
