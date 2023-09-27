@@ -95,7 +95,6 @@ export default function CancelBooking(props: Props) {
                     },
                     method: "POST",
                   });
-                  console.log(booking);
 
                   if (res.status >= 200 && res.status < 300) {
                     const types = [

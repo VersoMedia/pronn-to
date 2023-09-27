@@ -349,7 +349,29 @@ export default function Bookings() {
   };
 
   const updateBookingMutation = useMutation(createBooking, {
-    onSuccess: () => {
+    onSuccess: (responsedata) => {
+      const data = currentAppointment?.event?.resource;
+      const types = ["MEMBER_BOOKING_RESCHEDULE_MEMBER", "MEMBER_BOOKING_RESCHEDULE_CUSTOMER"];
+      for (let i = 0; i < types.length; i++) {
+        const payload = {
+          member_email: data?.user?.email,
+          member_phone: data?.user?.phone,
+          member_name: data?.user?.name,
+          customer_name: data?.responses?.name,
+          customer_email: data?.responses?.email,
+          customer_phone: data?.responses?.phone,
+          service_name: data?.title,
+          type_: types[i],
+          old_date: dayjs(data?.startTime).format("DD-MM-YYYY"),
+          old_hour: dayjs(data?.startTime).format("hh:mm A"),
+          date: dayjs(responsedata.startTime).format("DD-MM-YYYY"),
+          hour: dayjs(responsedata.endTime).format("hh:mm A"),
+        };
+
+        (async () => {
+          await sendNotification(payload);
+        })();
+      }
       query.refetch();
       if (recheduleModal) {
         showToast(t("event_has_been_rescheduled"), "success");
@@ -760,7 +782,27 @@ export default function Bookings() {
                   method: "POST",
                 });
 
+                const booking = currentAppointment?.event?.resource;
                 if (res.status >= 200 && res.status < 300) {
+                  const types = [
+                    "MEMBER_BOOKING_CANCELLATION_CUSTOMER",
+                    "CUSTOMER_BOOKING_CANCELLATION_MEMBER",
+                  ];
+                  for (let i = 0; i < types.length; i++) {
+                    const payload = {
+                      member_email: booking?.user?.email,
+                      member_phone: booking?.user?.phone,
+                      member_name: booking?.user?.name,
+                      customer_name: booking?.responses?.name,
+                      customer_email: booking?.responses?.email,
+                      customer_phone: booking?.responses?.phone,
+                      type_: types[i],
+                    };
+
+                    (async () => {
+                      await sendNotification(payload);
+                    })();
+                  }
                   query.refetch();
                   setDeleteAppModal(false);
                 } else {
