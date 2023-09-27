@@ -122,6 +122,7 @@ export const BookEventFormChild = ({
   eventQuery: ReturnType<typeof useEvent>;
   rescheduleUid: string | null;
 }) => {
+  const session = useSession();
   const eventType = eventQuery.data;
   const bookingFormSchema = z
     .object({
@@ -174,8 +175,6 @@ export const BookEventFormChild = ({
   });
   const createBookingMutation = useMutation(createBooking, {
     onSuccess: (responseData) => {
-      console.log(responseData, "responseData");
-
       const { uid, paymentUid } = responseData;
       const fullName = getFullName(bookingForm.getValues("responses.name"));
       if (paymentUid) {
@@ -199,7 +198,8 @@ export const BookEventFormChild = ({
       let types = [];
 
       if (isRescheduling) {
-        types = ["", ""];
+        if (session.data) types = ["MEMBER_BOOKING_RESCHEDULE_MEMBER", "MEMBER_BOOKING_RESCHEDULE_CUSTOMER"];
+        else types = ["CUSTOMER_BOOKING_RESCHEDULE_MEMBER", "CUSTOMER_BOOKING_RESCHEDULE_CUSTOMER"];
       } else {
         types = ["GENERAL_BOOKING_MEMBER", "GENERAL_BOOKING_CUSTOMER"];
       }
@@ -214,6 +214,8 @@ export const BookEventFormChild = ({
           customer_phone: responseData.responses?.phone,
           service_name: responseData.title,
           type_: types[i],
+          old_date: dayjs(bookingData?.startTime).format("DD-MM-YYYY"),
+          old_hour: dayjs(bookingData?.startTime).format("hh:mm A"),
           date: dayjs(responseData.startTime).format("DD-MM-YYYY"),
           hour: dayjs(responseData.startTime).format("hh:mm A"),
         };
@@ -221,6 +223,8 @@ export const BookEventFormChild = ({
         if (types[i].includes("MEMBER")) {
           payload.date = dayjs(responseData.startTime).tz(userTimezone).format("DD-MM-YYYY");
           payload.hour = dayjs(responseData.startTime).tz(userTimezone).format("hh:mm A");
+          payload.old_date = dayjs(bookingData?.startTime).tz(userTimezone).format("DD-MM-YYYY");
+          payload.old_hour = dayjs(bookingData?.startTime).tz(userTimezone).format("hh:mm A");
         }
 
         (async () => {
@@ -365,7 +369,6 @@ export const BookEventFormChild = ({
         mapRecurringBookingToMutationInput(bookingInput, recurringEventCount)
       );
     } else {
-      console.log("maps booking create ", bookingInput, mapBookingToMutationInput(bookingInput));
       createBookingMutation.mutate(mapBookingToMutationInput(bookingInput));
     }
   };
