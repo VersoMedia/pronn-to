@@ -21,6 +21,7 @@ import { z } from "zod";
 import dayjs from "@calcom/dayjs";
 import { getLayout } from "@calcom/features/MainLayout";
 import { FiltersContainer } from "@calcom/features/bookings/components/FiltersContainer";
+import { sendNotification } from "@calcom/features/bookings/lib";
 import { createBooking } from "@calcom/features/bookings/lib";
 //import type { filterQuerySchema } from "@calcom/features/bookings/lib/useFilterQuery";
 import { useFilterQuery } from "@calcom/features/bookings/lib/useFilterQuery";
@@ -379,6 +380,30 @@ export default function Bookings() {
       metadata: {},
       hasHashedBookingLink: false,
     };
+
+    const data = event?.resource;
+
+    const types = ["MEMBER_BOOKING_RESCHEDULE_MEMBER", "MEMBER_BOOKING_RESCHEDULE_CUSTOMER"];
+    for (let i = 0; i < types.length; i++) {
+      const payload = {
+        member_email: data.user?.email,
+        member_phone: data.user?.phone,
+        member_name: data.user?.name,
+        customer_name: data.responses?.name,
+        customer_email: data.responses?.email,
+        customer_phone: data.responses?.phone,
+        service_name: data.title,
+        type_: types[i],
+        old_date: dayjs(data?.startTime).format("DD-MM-YYYY"),
+        old_hour: dayjs(data?.startTime).format("hh:mm A"),
+        date: dayjs(start).format("DD-MM-YYYY"),
+        hour: dayjs(end).format("hh:mm A"),
+      };
+
+      (async () => {
+        await sendNotification(payload);
+      })();
+    }
 
     showToast(t("loading"), "success");
     updateBookingMutation.mutate(payload);

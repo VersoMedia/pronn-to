@@ -9,11 +9,7 @@ import { Button, TextArea } from "@calcom/ui";
 import { X } from "@calcom/ui/components/icon";
 
 type Props = {
-  booking: {
-    title?: string;
-    uid?: string;
-    id?: number;
-  };
+  booking: any;
   profile: {
     name: string | null;
     slug: string | null;
@@ -99,6 +95,7 @@ export default function CancelBooking(props: Props) {
                     },
                     method: "POST",
                   });
+                  console.log(booking);
 
                   if (res.status >= 200 && res.status < 300) {
                     const types = [
@@ -107,12 +104,12 @@ export default function CancelBooking(props: Props) {
                     ];
                     for (let i = 0; i < types.length; i++) {
                       const payload = {
-                        member_email: booking.user?.email,
-                        member_phone: booking.user?.phone,
-                        member_name: booking.user?.name,
-                        customer_name: booking.responses?.name,
-                        customer_email: booking.responses?.email,
-                        customer_phone: booking.responses?.phone,
+                        member_email: booking?.user?.email,
+                        member_phone: booking?.user?.phone,
+                        member_name: booking?.user?.name,
+                        customer_name: booking?.responses?.name,
+                        customer_email: booking?.responses?.email,
+                        customer_phone: booking?.responses?.phone,
                         type_: types[i],
                       };
 

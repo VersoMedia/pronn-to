@@ -566,7 +566,7 @@ export default function Success(props: SuccessProps) {
                     <>
                       <hr className="border-subtle" />
                       <CancelBooking
-                        booking={{ uid: bookingInfo?.uid, title: bookingInfo?.title, id: bookingInfo?.id }}
+                        booking={bookingInfo}
                         profile={{ name: props.profile.name, slug: props.profile.slug }}
                         recurringEvent={eventType.recurringEvent}
                         team={eventType?.team?.name}
@@ -856,6 +856,7 @@ const getEventTypesFromDB = async (id: number) => {
     id: true,
     name: true,
     username: true,
+    phone: true,
     hideBranding: true,
     theme: true,
     brandColor: true,
@@ -952,6 +953,7 @@ const handleSeatsEventTypeOnBooking = async (
             id: true;
             name: true;
             email: true;
+            phone: true;
             username: true;
             timeZone: true;
           };
@@ -1040,6 +1042,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
           id: true,
           name: true,
           email: true,
+          phone: true,
           username: true,
           timeZone: true,
         },
@@ -1048,6 +1051,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         select: {
           name: true,
           email: true,
+          phone: true,
           timeZone: true,
         },
       },
