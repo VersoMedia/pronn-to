@@ -5,14 +5,14 @@ import { localStorage } from "@calcom/lib/webstorage";
 import { Card } from "@calcom/ui";
 
 export const tips = [
-  {
-    id: 1,
-    thumbnailUrl: "https://img.youtube.com/vi/60HJt8DOVNo/0.jpg",
-    mediaLink: "https://go.cal.com/dynamic-video",
-    title: "Dynamic booking links",
-    description: "Booking link that allows people to quickly schedule meetings.",
-    href: "https://cal.com/blog/cal-v-1-9",
-  },
+  // {
+  //   id: 1,
+  //   thumbnailUrl: "https://img.youtube.com/vi/60HJt8DOVNo/0.jpg",
+  //   mediaLink: "https://go.cal.com/dynamic-video",
+  //   title: "Dynamic booking links",
+  //   description: "Booking link that allows people to quickly schedule meetings.",
+  //   href: "https://cal.com/blog/cal-v-1-9",
+  // },
   // {
   //   id: 2,
   //   thumbnailUrl: "https://img.youtube.com/vi/EAc46SPL6iA/0.jpg",
