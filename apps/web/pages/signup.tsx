@@ -79,7 +79,7 @@ export default function Signup({ prepopulateFormValues, token, orgSlug }: Signup
       .then(handleErrors)
       .then(async () => {
         telemetry.event(telemetryEventTypes.signup, collectPageParameters());
-        const verifyOrGettingStarted = flags["email-verification"] ? "auth/verify-email" : "getting-started";
+        const verifyOrGettingStarted = "getting-started"; //flags["email-verification"] ? "auth/verify-email" :
         await signIn<"credentials">("credentials", {
           ...data,
           callbackUrl: `${
