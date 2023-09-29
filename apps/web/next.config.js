@@ -479,28 +479,34 @@ const nextConfig = {
         : []),
     ];
 
-    if (process.env.NEXT_PUBLIC_WEBAPP_URL === "https://app.cal.com") {
-      redirects.push(
-        {
-          source: "/apps/dailyvideo",
-          destination: "/apps/daily-video",
-          permanent: true,
-        },
-        {
-          source: "/apps/huddle01_video",
-          destination: "/apps/huddle01",
-          permanent: true,
-        },
-        {
-          source: "/apps/jitsi_video",
-          destination: "/apps/jitsi",
-          permanent: true,
-        }
-      );
-    }
+    // if (process.env.NEXT_PUBLIC_WEBAPP_URL === "https://app.cal.com") {
+    //   redirects.push(
+    //     {
+    //       source: "/apps/dailyvideo",
+    //       destination: "/apps/daily-video",
+    //       permanent: true,
+    //     },
+    //     {
+    //       source: "/apps/huddle01_video",
+    //       destination: "/apps/huddle01",
+    //       permanent: true,
+    //     },
+    //     {
+    //       source: "/apps/jitsi_video",
+    //       destination: "/apps/jitsi",
+    //       permanent: true,
+    //     }
+    //   );
+    // }
 
     return redirects;
   },
 };
 
-module.exports = () => plugins.reduce((acc, next) => next(acc), nextConfig);
+const nextConfigWithPwa = require("next-pwa")({
+  dest: "public",
+  register: true,
+  skipWaiting: true,
+})(nextConfig);
+
+module.exports = () => plugins.reduce((acc, next) => next(acc), nextConfigWithPwa);

@@ -17,7 +17,7 @@ describe("useGetBrandingColours", () => {
         "800": "#990d0d",
         "900": "#7d0b0b",
       },
-      dark: {
+      darked: {
         "50": "#f2f5ff",
         "100": "#e6ecff",
         "200": "#bfcfff",

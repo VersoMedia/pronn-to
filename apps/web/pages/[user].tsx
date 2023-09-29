@@ -101,7 +101,7 @@ export function UserPage(props: InferGetServerSidePropsType<typeof getServerSide
             <h1 className="font-cal text-emphasis mb-1 text-3xl">
               {profile.name}
               {user.verified && (
-                <Verified className=" mx-1 -mt-1 inline h-6 w-6 fill-blue-500 text-white dark:text-black" />
+                <Verified className=" darked:text-black mx-1 -mt-1 inline h-6 w-6 fill-blue-500 text-white" />
               )}
             </h1>
             {!isBioEmpty && (
@@ -129,7 +129,7 @@ export function UserPage(props: InferGetServerSidePropsType<typeof getServerSide
                 <div
                   key={type.id}
                   style={{ display: "flex", ...eventTypeListItemEmbedStyles }}
-                  className="bg-default border-subtle dark:bg-muted dark:hover:bg-emphasis hover:bg-muted group relative border-b first:rounded-t-md last:rounded-b-md last:border-b-0">
+                  className="bg-default border-subtle darked:bg-muted darked:hover:bg-emphasis hover:bg-muted group relative border-b first:rounded-t-md last:rounded-b-md last:border-b-0">
                   <ArrowRight className="text-emphasis  absolute right-4 top-4 h-4 w-4 opacity-0 transition-opacity group-hover:opacity-100" />
                   {/* Don't prefetch till the time we drop the amount of javascript in [user][type] page which is impacting score for [user] page */}
                   <div className="block w-full p-5">

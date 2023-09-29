@@ -116,7 +116,7 @@ export type BookingFieldType = FormBuilderFieldType;
 // So it is a dynamic validation and thus entire validation can't exist here
 export const bookingResponses = z
   .object({
-    email: z.string(),
+    email: z.string().optional(),
     //TODO: Why don't we move name out of bookingResponses and let it be handled like user fields?
     name: z.union([
       nonEmptyString(),
@@ -266,7 +266,7 @@ export const extendedBookingCreateBody = bookingCreateBodySchema.merge(
 
 // It has only the legacy props that are part of `responses` now. The API can still hit old props
 export const bookingCreateSchemaLegacyPropsForApi = z.object({
-  email: z.string(),
+  email: z.string().optional(),
   name: z.string(),
   guests: z.array(z.string()).optional(),
   notes: z.string().optional(),
@@ -418,7 +418,7 @@ export const DeploymentTheme = z
     bookingLighter: z.string().default("#ACACAC"),
     bookingLight: z.string().default("#888888"),
     bookingMedian: z.string().default("#494949"),
-    bookingDark: z.string().default("#313131"),
+    bookingdarked: z.string().default("#313131"),
     bookingDarker: z.string().default("#292929"),
     fontName: z.string().default("Cal Sans"),
     fontSrc: z.string().default("https://cal.com/cal.ttf"),

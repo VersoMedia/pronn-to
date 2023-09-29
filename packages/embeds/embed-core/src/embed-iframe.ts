@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import type { Message } from "./embed";
 import { sdkActionManager } from "./sdk-event";
 
-type Theme = "dark" | "light";
+type Theme = "dark" | "light" | "darked";
 
 export type BookerLayouts = "month_view" | "week_view" | "column_view";
 

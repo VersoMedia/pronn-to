@@ -20,7 +20,7 @@ const DateTimePicker = ({ minDate, disabled, value, onDatesChange, className }: 
       <PrimitiveDateTimePicker
         className={classNames("w-[100%] border-none", className)}
         showTimeInput
-        calendarClassName="rounded-md dark:text-black"
+        calendarClassName="rounded-md darked:text-black"
         dateFormat="dd-MM-yyyy h:mm aa"
         selected={value}
         minDate={minDate}

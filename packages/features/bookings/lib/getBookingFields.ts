@@ -172,7 +172,7 @@ export const ensureBookingInputsHaveSystemFields = ({
       defaultLabel: "email_address",
       type: "email",
       name: "email",
-      required: true,
+      required: false,
       editable: "system",
       sources: [
         {

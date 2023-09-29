@@ -71,7 +71,7 @@ function TeamPage({ team, isUnpublished, markdownStrippedBio, isValidOrgDomain }
         <li
           key={index}
           className={classNames(
-            "dark:bg-darkgray-100 bg-default hover:bg-muted border-subtle group relative border-b first:rounded-t-md last:rounded-b-md last:border-b-0",
+            "darked:bg-darkgray-100 bg-default hover:bg-muted border-subtle group relative border-b first:rounded-t-md last:rounded-b-md last:border-b-0",
             !isEmbed && "bg-default"
           )}>
           <div className="px-6 py-4 ">
@@ -152,9 +152,9 @@ function TeamPage({ team, isUnpublished, markdownStrippedBio, isValidOrgDomain }
       </ul>
     ) : (
       <div className="space-y-6" data-testid="event-types">
-        <div className="overflow-hidden rounded-sm border dark:border-gray-900">
-          <div className="text-muted dark:text-inverted p-8 text-center">
-            <h2 className="font-cal dark:text-inverted text-emphasis600 mb-2 text-3xl">
+        <div className="darked:border-gray-900 overflow-hidden rounded-sm border">
+          <div className="text-muted darked:text-inverted p-8 text-center">
+            <h2 className="font-cal darked:text-inverted text-emphasis600 mb-2 text-3xl">
               {" " + t("org_no_teams_yet")}
             </h2>
             <p className="mx-auto max-w-md">{t("org_no_teams_yet_description")}</p>
@@ -173,7 +173,7 @@ function TeamPage({ team, isUnpublished, markdownStrippedBio, isValidOrgDomain }
           profile: { name: `${team.name}`, image: getPlaceholderAvatar(team.logo, team.name) },
         }}
       />
-      <main className="dark:bg-darkgray-50 bg-subtle mx-auto max-w-3xl rounded-md px-4 pb-12 pt-12">
+      <main className="darked:bg-darkgray-50 bg-subtle mx-auto max-w-3xl rounded-md px-4 pb-12 pt-12">
         <div className="mx-auto mb-8 max-w-3xl text-center">
           <div className="relative">
             <Avatar
@@ -211,17 +211,17 @@ function TeamPage({ team, isUnpublished, markdownStrippedBio, isValidOrgDomain }
                         <div className="border-subtle w-full border-t" />
                       </div>
                       <div className="relative flex justify-center">
-                        <span className="dark:bg-darkgray-50 bg-subtle text-subtle dark:text-inverted px-2 text-sm">
+                        <span className="darked:bg-darkgray-50 bg-subtle text-subtle darked:text-inverted px-2 text-sm">
                           {t("or")}
                         </span>
                       </div>
                     </div>
 
-                    <aside className="dark:text-inverted mt-8 flex justify-center text-center">
+                    <aside className="darked:text-inverted mt-8 flex justify-center text-center">
                       <Button
                         color="minimal"
                         EndIcon={ArrowRight}
-                        className="dark:hover:bg-darkgray-200"
+                        className="darked:hover:bg-darkgray-200"
                         href={{
                           pathname: `${isValidOrgDomain ? "" : "/team"}/${team.slug}`,
                           query: {

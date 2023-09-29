@@ -22,8 +22,8 @@ function RenderIcon({
     <img
       src={eventLocationType.iconUrl}
       className={classNames(
-        "me-[10px]  h-4 w-4 opacity-70 dark:opacity-100",
-        !eventLocationType.iconUrl?.startsWith("/app-store") ? "dark:invert-[.65]" : "",
+        "darked:opacity-100  me-[10px] h-4 w-4 opacity-70",
+        !eventLocationType.iconUrl?.startsWith("/app-store") ? "darked:invert-[.65]" : "",
         !eventLocationType.iconUrl?.startsWith("/app-store") && isTooltip && "invert"
       )}
       alt={`${eventLocationType.label} icon`}
@@ -100,7 +100,7 @@ export function AvailableEventLocations({ locations }: { locations: LocationObje
     <div className="flex flex-row items-center text-sm font-medium">
       <img
         src="/map-pin.svg"
-        className={classNames("me-[10px] h-4 w-4 opacity-70 dark:invert")}
+        className={classNames("darked:invert me-[10px] h-4 w-4 opacity-70")}
         alt="map-pin"
       />
       <Tooltip content={<RenderLocationTooltip locations={locations} />}>

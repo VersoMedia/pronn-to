@@ -29,7 +29,7 @@ export function WizardLayout({
 
   return (
     <div
-      className="dark:bg-brand dark:text-brand-contrast text-emphasis min-h-screen"
+      className="darked:bg-brand darked:text-brand-contrast text-emphasis min-h-screen"
       data-testid="onboarding">
       <div>
         <Toaster position="bottom-right" />

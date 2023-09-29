@@ -27,7 +27,7 @@ export default function OIDCConnection({
       <div className="flex flex-col sm:flex-row">
         <div>
           <h2 className="font-medium">{t("sso_oidc_heading")}</h2>
-          <p className="text-default text-sm font-normal leading-6 dark:text-gray-300">
+          <p className="text-default darked:text-gray-300 text-sm font-normal leading-6">
             {t("sso_oidc_description")}
           </p>
         </div>

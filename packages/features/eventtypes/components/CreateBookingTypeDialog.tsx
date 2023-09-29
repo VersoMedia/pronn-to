@@ -8,6 +8,7 @@ import { z } from "zod";
 
 import dayjs from "@calcom/dayjs";
 import { createBooking } from "@calcom/features/bookings/lib";
+import { sendNotification } from "@calcom/features/bookings/lib";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { useTypedQuery } from "@calcom/lib/hooks/useTypedQuery";
 import { SchedulingType, MembershipRole } from "@calcom/prisma/enums";
@@ -25,6 +26,7 @@ import {
   Label,
   DateTimePicker,
   TimezoneSelect,
+  PhoneInput,
 } from "@calcom/ui";
 
 // this describes the uniform data needed to create a new event type on Profile or Team
@@ -100,42 +102,30 @@ export default function CreateBookingTypeDialog({
 
   const createBookingMutation = useMutation(createBooking, {
     onSuccess: async (responseData) => {
-      refetch();
-      await router.replace("/bookings/upcoming");
-      showToast("Cita agregada con exito!", "success");
-      //   const { uid, paymentUid } = responseData;
-      //   const fullName = getFullName(bookingForm.getValues("responses.name"));
-      //   if (paymentUid) {
-      //     return router.push(
-      //       createPaymentLink({
-      //         paymentUid,
-      //         date: timeslot,
-      //         name: fullName,
-      //         email: bookingForm.getValues("responses.email"),
-      //         absolute: false,
-      //       })
-      //     );
-      //   }
+      const types = ["GENERAL_BOOKING_MEMBER", "GENERAL_BOOKING_CUSTOMER"];
 
-      //   if (!uid) {
-      //     console.error("No uid returned from createBookingMutation");
-      //     return;
-      //   }
+      for (let i = 0; i < types.length; i++) {
+        const payload = {
+          member_email: responseData.user?.email,
+          member_phone: responseData.user?.phone,
+          member_name: responseData.user?.name,
+          customer_name: responseData.responses?.name,
+          customer_email: responseData.responses?.email,
+          customer_phone: responseData.responses?.phone,
+          service_name: responseData.title,
+          type_: types[i],
+          date: dayjs(responseData.startTime).format("DD-MM-YYYY"),
+          hour: dayjs(responseData.startTime).format("hh:mm A"),
+        };
 
-      //   const query = {
-      //     isSuccessBookingPage: true,
-      //     email: bookingForm.getValues("responses.email"),
-      //     eventTypeSlug: eventSlug,
-      //     seatReferenceUid: "seatReferenceUid" in responseData ? responseData.seatReferenceUid : null,
-      //     formerTime:
-      //       isRescheduling && bookingData?.startTime ? dayjs(bookingData.startTime).toString() : undefined,
-      //   };
+        (async () => {
+          await sendNotification(payload);
+        })();
 
-      //   return bookingSuccessRedirect({
-      //     successRedirectUrl: eventType?.successRedirectUrl || "",
-      //     query,
-      //     bookingUid: uid,
-      //   });
+        refetch();
+        await router.replace("/bookings/upcoming");
+        showToast("Cita agregada con exito!", "success");
+      }
     },
     onError: (err) => {
       const message = `${err.message}`;
@@ -287,19 +277,33 @@ export default function CreateBookingTypeDialog({
                   />
 
                   <TextField
-                    placeholder="Correo electronico"
+                    placeholder="Correo electronico (optional)"
                     value={form.getValues("attendee.email")}
                     onChange={(e) => {
                       form.setValue("attendee.email", e?.target.value);
                     }}
                   />
 
-                  <TextField
+                  {/* <TextField
                     placeholder="Teléfono"
                     value={form.getValues("attendee.phone")}
                     onChange={(e) => {
                       form.setValue("attendee.phone", e?.target.value);
                     }}
+                  /> */}
+                  <Controller
+                    control={form.control}
+                    name="attendee.phone"
+                    render={({ field: { value, onChange } }) => (
+                      <PhoneInput
+                        className="rounded-md"
+                        placeholder={t("enter_phone_number")}
+                        id="phone"
+                        required
+                        value={value}
+                        onChange={onChange}
+                      />
+                    )}
                   />
                 </>
               )}

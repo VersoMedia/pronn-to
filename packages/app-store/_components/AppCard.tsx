@@ -39,7 +39,7 @@ export default function AppCard({
     <div
       className={classNames(
         "border-subtle",
-        app?.isInstalled && "mb-4 rounded-md border",
+        app?.isInstalled && "mb-4 rounded-md",
         !app.enabled && "grayscale"
       )}>
       <div className={classNames(app.isInstalled ? "p-4 text-sm sm:p-4" : "px-5 py-4 text-sm sm:px-5")}>
@@ -50,7 +50,7 @@ export default function AppCard({
             className={classNames(app?.isInstalled ? "mr-[11px]" : "mr-3", "h-auto w-10 rounded-sm")}>
             <img
               className={classNames(
-                app?.logo.includes("-dark") && "dark:invert",
+                app?.logo.includes("-dark") && "darked:invert",
                 app?.isInstalled ? "min-w-[42px]" : "min-w-[40px]",
                 "w-full"
               )}

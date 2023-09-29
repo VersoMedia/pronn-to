@@ -31,7 +31,7 @@ export const Info = (props: {
           }}>
           {props.formatted ? (
             <p
-              className="dark:text-darkgray-600 mt-2 text-sm text-gray-500 [&_a]:text-blue-500 [&_a]:underline [&_a]:hover:text-blue-600"
+              className="darked:text-darkgray-600 mt-2 text-sm text-gray-500 [&_a]:text-blue-500 [&_a]:underline [&_a]:hover:text-blue-600"
               dangerouslySetInnerHTML={{
                 __html: safeDescription
                   .replaceAll("<p>", `<p style="${descriptionCSS}">`)

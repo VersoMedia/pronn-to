@@ -150,7 +150,7 @@ const CalendarsView = () => {
                               <img
                                 className={classNames(
                                   "h-10 w-10",
-                                  item.integration.logo.includes("-dark") && "dark:invert"
+                                  item.integration.logo.includes("-dark") && "darked:invert"
                                 )}
                                 src={item.integration.logo}
                                 alt={item.integration.title}

@@ -91,7 +91,7 @@ function Cell({ isDisabled, topOffsetMinutes, timeSlot }: CellProps) {
       className={classNames(
         "group flex w-[calc(100%-1px)] items-center justify-center",
         isDisabled && "pointer-events-none",
-        !isDisabled && "bg-default dark:bg-muted",
+        !isDisabled && "bg-default darked:bg-muted",
         topOffsetMinutes && "absolute"
       )}
       data-disabled={isDisabled}
@@ -107,7 +107,7 @@ function Cell({ isDisabled, topOffsetMinutes, timeSlot }: CellProps) {
       {!isDisabled && hoverEventDuration !== 0 && (
         <div
           className={classNames(
-            "opacity-4 bg-brand-default hover:bg-brand-default text-brand dark:border-emphasis absolute hidden rounded-[4px] p-[6px] text-xs font-semibold leading-5 group-hover:flex group-hover:cursor-pointer",
+            "opacity-4 bg-brand-default hover:bg-brand-default text-brand darked:border-emphasis absolute hidden rounded-[4px] p-[6px] text-xs font-semibold leading-5 group-hover:flex group-hover:cursor-pointer",
             hoverEventDuration && hoverEventDuration > 15 && "items-start pt-3",
             hoverEventDuration && hoverEventDuration < 15 && "items-center"
           )}

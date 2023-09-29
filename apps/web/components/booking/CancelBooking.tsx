@@ -1,6 +1,7 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useState } from "react";
 
+import { sendNotification } from "@calcom/features/bookings/lib";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { collectPageParameters, telemetryEventTypes, useTelemetry } from "@calcom/lib/telemetry";
 import type { RecurringEvent } from "@calcom/types/Calendar";
@@ -8,11 +9,7 @@ import { Button, TextArea } from "@calcom/ui";
 import { X } from "@calcom/ui/components/icon";
 
 type Props = {
-  booking: {
-    title?: string;
-    uid?: string;
-    id?: number;
-  };
+  booking: any;
   profile: {
     name: string | null;
     slug: string | null;
@@ -100,6 +97,26 @@ export default function CancelBooking(props: Props) {
                   });
 
                   if (res.status >= 200 && res.status < 300) {
+                    const types = [
+                      "MEMBER_BOOKING_CANCELLATION_CUSTOMER",
+                      "CUSTOMER_BOOKING_CANCELLATION_MEMBER",
+                    ];
+                    for (let i = 0; i < types.length; i++) {
+                      const payload = {
+                        member_email: booking?.user?.email,
+                        member_phone: booking?.user?.phone,
+                        member_name: booking?.user?.name,
+                        customer_name: booking?.responses?.name,
+                        customer_email: booking?.responses?.email,
+                        customer_phone: booking?.responses?.phone,
+                        type_: types[i],
+                      };
+
+                      (async () => {
+                        await sendNotification(payload);
+                      })();
+                    }
+
                     router.replace(asPath);
                   } else {
                     setLoading(false);

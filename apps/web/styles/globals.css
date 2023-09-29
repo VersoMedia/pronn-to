@@ -1,52 +1,58 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@import url('https://fonts.cdnfonts.com/css/open-sauce-one');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+* {
+    font-family: 'Open Sauce One', sans-serif;
+}
 /**
 * Add css variables here as well for light mode in addition to tailwind.config to avoid FOUC
 */
 :root {
   /* background */
 
-  --cal-bg-emphasis: #e5e7eb;
-  --cal-bg: white;
-  --cal-bg-subtle: #f3f4f6;
-  --cal-bg-muted: #f9fafb;
-  --cal-bg-inverted: #111827;
+  --cal-bg-emphasis: #e5e7eb !important;
+    --cal-bg: white !important;
+    --cal-bg-subtle: #f3f4f6 !important;
+    --cal-bg-muted: #f9fafb !important; 
+    --cal-bg-inverted: #111827 !important;
 
-  /* background -> components*/
-  --cal-bg-info: #dee9fc;
-  --cal-bg-success: #e2fbe8;
-  --cal-bg-attention: #fceed8;
-  --cal-bg-error: #f9e3e2;
-  --cal-bg-dark-error: #752522;
+    /* background -> components*/
+    --cal-bg-info: #dee9fc !important;
+    --cal-bg-success: #e2fbe8 !important;
+    --cal-bg-attention: #fceed8 !important;
+    --cal-bg-error: #f9e3e2 !important;
+    --cal-bg-dark-error: #752522 !important;
 
-  /* Borders */
-  --cal-border-emphasis: #9ca3af;
-  --cal-border: #d1d5db;
-  --cal-border-subtle: #e5e7eb;
-  --cal-border-booker: #e5e7eb;
-  --cal-border-muted: #f3f4f6;
-  --cal-border-error: #aa2e26;
+    /* Borders */
+    --cal-border-emphasis: #9ca3af !important;
+    --cal-border: #d1d5db !important;
+    --cal-border-subtle: #e5e7eb !important;
+    --cal-border-muted: #f3f4f6 !important;
+    --cal-border-error: #aa2e26 !important;
 
-  /* Content/Text */
-  --cal-text-emphasis: #111827;
-  --cal-text: #374151;
-  --cal-text-subtle: #6b7280;
-  --cal-text-muted: #9ca3af;
-  --cal-text-inverted: white;
+    /* Content/Text */
+    --cal-text-emphasis: #111827 !important;
+    --cal-text: #374151 !important;
+    --cal-text-subtle: #6b7280 !important;
+    --cal-text-muted: #9ca3af !important;
+    --cal-text-inverted: white !important;
 
-  /* Content/Text -> components */
-  --cal-text-info: #253985;
-  --cal-text-success: #285231;
-  --cal-text-attention: #73321b;
-  --cal-text-error: #752522;
+    /* Content/Text -> components */
+    --cal-text-info: #253985 !important;
+    --cal-text-success: #285231 !important;
+    --cal-text-attention: #73321b !important;
+    --cal-text-error: #752522 !important;
 
-  /* Brand shinanigans
+    /* Brand shinanigans
       -> These will be computed for the users theme at runtime.
     */
-  --cal-brand: #111827;
-  --cal-brand-emphasis: #101010;
-  --cal-brand-text: white;
+    --cal-brand: #111827 !important;
+    --cal-brand-emphasis: #101010 !important;
+    --cal-brand-text: white !important;
 }
 .dark {
   /* background */
@@ -518,4 +524,72 @@ select:focus {
 }
 .rbc-allday-cell{
   display: none !important;
+}
+.rbc-time-gutter > .rbc-timeslot-group > .rbc-time-slot{
+  width: 56px !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.rbc-time-gutter > .rbc-timeslot-group > .rbc-time-slot > .rbc-label {
+  text-align: center;
+  font-family: 'Open Sauce One', sans-serif !important;
+  color: rgb(82 82 82) !important;
+  line-height: 1.25rem !important;
+  font-size: .75rem !important;
+}
+.rbc-time-header-gutter{
+  width: 56px !important;
+  max-width: 56px !important;
+}
+.rbc-timeslot-group > .rbc-time-slot:nth-child(2){
+  display: none !important;
+}
+.rbc-calendar{
+  border-color: rgb(236 239 242) !important;
+}
+.rbc-current-time-indicator{
+  border: 1px solid red !important;
+  background-color: transparent !important;
+}
+
+.rbc-header + .rbc-today{
+  background-color: rgb(236 239 242) !important;
+}
+.rbc-time-content {
+  border-top: none !important;
+}
+.rbc-allday-cell{
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1) !important;
+}
+.rbc-header{
+  font-weight: 400 !important;
+}
+.rbc-event, .rbc-day-slot .rbc-background-event {
+  padding: 0px !important;
+}
+.rbc-event-label{
+  display: none !important;
+}
+.rbc-addons-dnd .rbc-addons-dnd-resize-ns-anchor .rbc-addons-dnd-resize-ns-icon {
+  border-top: 1px double gray !important;
+}
+.rbc-event, .rbc-day-slot .rbc-background-event {
+  background-color: transparent !important;
+}
+.rbc-time-view {
+  border: none !important;
+}
+
+@media only screen and (max-width: 768px) {
+  .rbc-header{
+      width: 20px !important;
+      white-space: inherit !important;
+      height: 45px !important;
+      background-color: #FFF !important;
+  }
+}
+.rbc-day-slot .rbc-event, .rbc-day-slot .rbc-background-event {
+  border: none !important;
 }

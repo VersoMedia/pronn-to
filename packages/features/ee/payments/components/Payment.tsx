@@ -137,7 +137,7 @@ const PaymentForm = (props: Props) => {
         </Button>
       </div>
       {state.status === "error" && (
-        <div className="mt-4 text-center text-red-900 dark:text-gray-300" role="alert">
+        <div className="darked:text-gray-300 mt-4 text-center text-red-900" role="alert">
           {state.error.message}
         </div>
       )}
@@ -149,7 +149,7 @@ const ELEMENT_STYLES: stripejs.Appearance = {
   theme: "none",
 };
 
-const ELEMENT_STYLES_DARK: stripejs.Appearance = {
+const ELEMENT_STYLES_darked: stripejs.Appearance = {
   theme: "night",
   variables: {
     colorText: "#d6d6d6",
@@ -173,7 +173,7 @@ export default function PaymentComponent(props: Props) {
       stripe={stripePromise}
       options={{
         clientSecret: props.clientSecret,
-        appearance: darkMode ? ELEMENT_STYLES_DARK : ELEMENT_STYLES,
+        appearance: darkMode ? ELEMENT_STYLES_darked : ELEMENT_STYLES,
       }}>
       <PaymentForm {...props} />
     </Elements>

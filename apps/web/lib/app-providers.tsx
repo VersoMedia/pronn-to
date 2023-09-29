@@ -116,7 +116,7 @@ const CalcomThemeProvider = (props: CalcomThemeProps) => {
         <style jsx global>
           {`
             .dark {
-              color-scheme: dark;
+              color-scheme: root;
             }
           `}
         </style>

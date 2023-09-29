@@ -100,6 +100,8 @@ export default async function getEventTypeById({
       durationLimits: true,
       successRedirectUrl: true,
       currency: true,
+      paymentCash: true,
+      paymentTransfer: true,
       bookingFields: true,
       parent: {
         select: {
@@ -242,7 +244,8 @@ export default async function getEventTypeById({
     },
   });
 
-  const { locations, metadata, ...restEventType } = rawEventType;
+  const { locations, metadata, price, currency, paymentCash, paymentTransfer, ...restEventType } =
+    rawEventType;
   const newMetadata = EventTypeMetaDataSchema.parse(metadata || {}) || {};
   const apps = newMetadata?.apps || {};
   const eventTypeWithParsedMetadata = { ...rawEventType, metadata: newMetadata };
@@ -267,6 +270,10 @@ export default async function getEventTypeById({
 
   const eventType = {
     ...restEventType,
+    price,
+    currency,
+    paymentCash,
+    paymentTransfer,
     schedule: rawEventType.schedule?.id || rawEventType.users[0]?.defaultScheduleId || null,
     scheduleName: rawEventType.schedule?.name || null,
     recurringEvent: parseRecurringEvent(restEventType.recurringEvent),

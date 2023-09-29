@@ -19,7 +19,7 @@ function WorkflowExample(props: WorkflowExampleType) {
     <div className="border-subtle mx-2 my-2 max-h-24 max-w-[600px] rounded-md border border-solid p-6">
       <div className="flex ">
         <div className="flex items-center justify-center">
-          <div className="bg-emphasis dark:bg-default mr-4 flex h-10 w-10 items-center justify-center rounded-full">
+          <div className="bg-emphasis darked:bg-default mr-4 flex h-10 w-10 items-center justify-center rounded-full">
             <Icon className="text-default h-6 w-6 stroke-[2px]" />
           </div>
         </div>
@@ -70,11 +70,11 @@ export default function EmptyScreen(props: { isFilteredView: boolean }) {
     <>
       <div className="min-h-80 flex w-full flex-col items-center justify-center rounded-md ">
         <div className="bg-emphasis flex h-[72px] w-[72px] items-center justify-center rounded-full">
-          <Zap className="dark:text-default inline-block h-10 w-10 stroke-[1.3px]" />
+          <Zap className="darked:text-default inline-block h-10 w-10 stroke-[1.3px]" />
         </div>
         <div className="max-w-[420px] text-center">
-          <h2 className="text-semibold font-cal mt-6 text-xl dark:text-gray-300">{t("workflows")}</h2>
-          <p className="text-default mt-3 line-clamp-2 text-sm font-normal leading-6 dark:text-gray-300">
+          <h2 className="text-semibold font-cal darked:text-gray-300 mt-6 text-xl">{t("workflows")}</h2>
+          <p className="text-default darked:text-gray-300 mt-3 line-clamp-2 text-sm font-normal leading-6">
             {t("no_workflows_description")}
           </p>
           <div className="mt-8 ">

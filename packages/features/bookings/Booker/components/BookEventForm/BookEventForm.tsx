@@ -122,6 +122,7 @@ export const BookEventFormChild = ({
   eventQuery: ReturnType<typeof useEvent>;
   rescheduleUid: string | null;
 }) => {
+  const session = useSession();
   const eventType = eventQuery.data;
   const bookingFormSchema = z
     .object({
@@ -174,8 +175,6 @@ export const BookEventFormChild = ({
   });
   const createBookingMutation = useMutation(createBooking, {
     onSuccess: (responseData) => {
-      console.log(responseData, "responseData");
-
       const { uid, paymentUid } = responseData;
       const fullName = getFullName(bookingForm.getValues("responses.name"));
       if (paymentUid) {
@@ -184,7 +183,7 @@ export const BookEventFormChild = ({
             paymentUid,
             date: timeslot,
             name: fullName,
-            email: bookingForm.getValues("responses.email"),
+            email: bookingForm.getValues("responses.email") ?? "",
             absolute: false,
           })
         );
@@ -199,7 +198,8 @@ export const BookEventFormChild = ({
       let types = [];
 
       if (isRescheduling) {
-        types = ["", ""];
+        if (session.data) types = ["MEMBER_BOOKING_RESCHEDULE_MEMBER", "MEMBER_BOOKING_RESCHEDULE_CUSTOMER"];
+        else types = ["CUSTOMER_BOOKING_RESCHEDULE_MEMBER", "CUSTOMER_BOOKING_RESCHEDULE_CUSTOMER"];
       } else {
         types = ["GENERAL_BOOKING_MEMBER", "GENERAL_BOOKING_CUSTOMER"];
       }
@@ -214,6 +214,8 @@ export const BookEventFormChild = ({
           customer_phone: responseData.responses?.phone,
           service_name: responseData.title,
           type_: types[i],
+          old_date: dayjs(bookingData?.startTime).format("DD-MM-YYYY"),
+          old_hour: dayjs(bookingData?.startTime).format("hh:mm A"),
           date: dayjs(responseData.startTime).format("DD-MM-YYYY"),
           hour: dayjs(responseData.startTime).format("hh:mm A"),
         };
@@ -221,6 +223,8 @@ export const BookEventFormChild = ({
         if (types[i].includes("MEMBER")) {
           payload.date = dayjs(responseData.startTime).tz(userTimezone).format("DD-MM-YYYY");
           payload.hour = dayjs(responseData.startTime).tz(userTimezone).format("hh:mm A");
+          payload.old_date = dayjs(bookingData?.startTime).tz(userTimezone).format("DD-MM-YYYY");
+          payload.old_hour = dayjs(bookingData?.startTime).tz(userTimezone).format("hh:mm A");
         }
 
         (async () => {
@@ -230,7 +234,7 @@ export const BookEventFormChild = ({
 
       const query = {
         isSuccessBookingPage: true,
-        email: bookingForm.getValues("responses.email"),
+        email: bookingForm.getValues("responses.email") || "",
         eventTypeSlug: eventSlug,
         seatReferenceUid: "seatReferenceUid" in responseData ? responseData.seatReferenceUid : null,
         formerTime:
@@ -260,7 +264,7 @@ export const BookEventFormChild = ({
       const query = {
         isSuccessBookingPage: true,
         allRemainingBookings: true,
-        email: bookingForm.getValues("responses.email"),
+        email: bookingForm.getValues("responses.email") || "",
         eventTypeSlug: eventSlug,
         formerTime:
           isRescheduling && bookingData?.startTime ? dayjs(bookingData.startTime).toString() : undefined,
@@ -275,7 +279,7 @@ export const BookEventFormChild = ({
   });
 
   const [isEmailVerificationModalVisible, setEmailVerificationModalVisible] = useState(false);
-  const email = bookingForm.watch("responses.email");
+  const email = bookingForm.watch("responses.email") || null;
 
   const sendEmailVerificationByCodeMutation = trpc.viewer.auth.sendVerifyEmailCode.useMutation({
     onSuccess() {
@@ -365,8 +369,14 @@ export const BookEventFormChild = ({
         mapRecurringBookingToMutationInput(bookingInput, recurringEventCount)
       );
     } else {
-      console.log("maps booking create ", bookingInput, mapBookingToMutationInput(bookingInput));
-      createBookingMutation.mutate(mapBookingToMutationInput(bookingInput));
+      const decode = mapBookingToMutationInput(bookingInput);
+      decode.responses.payments = {
+        optionValue: "",
+        value: bookingForm.getValues()?.responses?.payments?.value || null,
+      };
+
+      console.log(decode);
+      createBookingMutation.mutate(decode);
     }
   };
 
@@ -377,6 +387,56 @@ export const BookEventFormChild = ({
 
   const renderConfirmNotVerifyEmailButtonCond =
     !eventType?.requiresBookerEmailVerification || (email && verifiedEmail && verifiedEmail === email);
+
+  const getFieldInEvent = () => {
+    const fields = eventType.bookingFields;
+    const options = [];
+
+    if (eventType.paymentCash) {
+      options.push({ value: "cash", label: "Pago en efectivo" });
+    }
+
+    if (eventType.paymentTransfer) {
+      options.push({ value: "transfer", label: "Pago por transferencia" });
+    }
+
+    if (eventType?.metadata?.apps?.stripe?.enabled) {
+      options.push({ value: "stripe", label: "Pago con Stripe" });
+    }
+
+    const fieldPayments = {
+      name: "payments",
+      type: "radioInput",
+      defaultLabel: "payment_method",
+      required: true,
+      hidden: false,
+      getOptionsAt: "payments",
+      optionsInputs: {},
+      hideWhenJustOneOption: true,
+      editable: "system",
+      sources: [
+        {
+          id: "default",
+          type: "default",
+          label: "Default",
+        },
+      ],
+      options: options,
+    };
+
+    const fieldNew = [];
+    for (let i = 0; i < fields.length; i++) {
+      if (i === 3) {
+        fieldNew.push(fields[i]);
+
+        if (!isRescheduling) fieldNew.push(fieldPayments);
+      } else {
+        fieldNew.push(fields[i]);
+      }
+    }
+
+    return fieldNew;
+  };
 
   return (
     <div className="flex h-full flex-col">
@@ -394,7 +454,7 @@ export const BookEventFormChild = ({
         noValidate>
         <BookingFields
           isDynamicGroupBooking={!!(username && username.indexOf("+") > -1)}
-          fields={eventType.bookingFields}
+          fields={getFieldInEvent()}
           locations={eventType.locations}
           rescheduleUid={rescheduleUid || undefined}
         />
@@ -493,9 +553,54 @@ function useInitialFormValues({
       if (!eventType?.bookingFields) {
         return {};
       }
+
+      const options = [];
+      if (eventType.paymentCash) {
+        options.push({ value: "cash", label: "Pago en efectivo" });
+      }
+
+      if (eventType.paymentTransfer) {
+        options.push({ value: "transfer", label: "Pago por transferencia" });
+      }
+
+      if (eventType?.metadata?.apps?.stripe?.enabled) {
+        options.push({ value: "stripe", label: "Pago con Stripe" });
+      }
+
+      const fieldPayments = {
+        name: "payments",
+        type: "radioInput",
+        defaultLabel: "payment_method",
+        required: true,
+        hidden: false,
+        getOptionsAt: "payments",
+        optionsInputs: {},
+        hideWhenJustOneOption: true,
+        editable: "system",
+        sources: [
+          {
+            id: "default",
+            type: "default",
+            label: "Default",
+          },
+        ],
+        options: options,
+      };
+
+      const fieldNew = [];
+      for (let i = 0; i < eventType?.bookingFields.length; i++) {
+        if (i === 3) {
+          fieldNew.push(eventType?.bookingFields[i]);
+
+          if (!isRescheduling) fieldNew.push(fieldPayments);
+        } else {
+          fieldNew.push(eventType?.bookingFields[i]);
+        }
+      }
+
       const querySchema = getBookingResponsesPartialSchema({
         eventType: {
-          bookingFields: eventType.bookingFields,
+          bookingFields: fieldNew,
         },
         view: rescheduleUid ? "reschedule" : "booking",
       });
@@ -521,7 +626,7 @@ function useInitialFormValues({
           responses: {} as Partial<z.infer<ReturnType<typeof getBookingResponsesSchema>>>,
         };
 
-        const responses = eventType.bookingFields.reduce((responses, field) => {
+        const responses = fieldNew.reduce((responses, field) => {
           return {
             ...responses,
             [field.name]: parsedQuery[field.name] || undefined,
@@ -549,7 +654,7 @@ function useInitialFormValues({
         responses: {} as Partial<z.infer<ReturnType<typeof getBookingResponsesSchema>>>,
       };
 
-      const responses = eventType.bookingFields.reduce((responses, field) => {
+      const responses = fieldNew.reduce((responses, field) => {
         return {
           ...responses,
           [field.name]: bookingData.responses[field.name],

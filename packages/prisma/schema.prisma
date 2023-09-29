@@ -98,10 +98,10 @@ model EventType {
   schedulingType                  SchedulingType?
   schedule                        Schedule?               @relation(fields: [scheduleId], references: [id])
   scheduleId                      Int?
-  // price is deprecated. It has now moved to metadata.apps.stripe.price. Plan to drop this column.
   price                           Int                     @default(0)
-  // currency is deprecated. It has now moved to metadata.apps.stripe.currency. Plan to drop this column.
   currency                        String                  @default("usd")
+  paymentCash                     Boolean?                @default(false)
+  paymentTransfer                 Boolean?                @default(false)
   slotInterval                    Int?
   /// @zod.custom(imports.EventTypeMetaDataSchema)
   metadata                        Json?
@@ -118,6 +118,17 @@ model EventType {
   @@unique([userId, parentId])
   @@index([userId])
   @@index([teamId])
+}
+
+model TransferCredential {
+  id     Int     @id @default(autoincrement())
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int?
+  clabe  String?
+  name   String?
+  bank   String?
+
+  @@unique([userId])
 }
 
 model Credential {
@@ -191,6 +202,7 @@ model User {
   trialEndsAt         DateTime?
   eventTypes          EventType[]          @relation("user_eventtype")
   credentials         Credential[]
+  transferCredentials TransferCredential?
   teams               Membership[]
   bookings            Booking[]
   schedules           Schedule[]
@@ -372,8 +384,9 @@ model BookingReference {
 
 model Attendee {
   id          Int          @id @default(autoincrement())
-  email       String
+  email       String?
   name        String
+  phone       String?
   timeZone    String
   locale      String?      @default("en")
   booking     Booking?     @relation(fields: [bookingId], references: [id], onDelete: Cascade)

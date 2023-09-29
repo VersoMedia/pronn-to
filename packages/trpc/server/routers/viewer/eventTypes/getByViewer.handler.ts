@@ -37,6 +37,8 @@ const eventTypeSelect = Prisma.validator<Prisma.EventTypeSelect>()({
   locations: true,
   destinationCalendar: true,
   userId: true,
+  paymentCash: true,
+  paymentTransfer: true,
   team: {
     select: {
       id: true,

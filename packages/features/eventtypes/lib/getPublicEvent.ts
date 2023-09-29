@@ -40,6 +40,8 @@ const publicEventSelect = Prisma.validator<Prisma.EventTypeSelect>()({
   currency: true,
   seatsPerTimeSlot: true,
   bookingFields: true,
+  paymentCash: true,
+  paymentTransfer: true,
   team: {
     select: {
       parentId: true,
@@ -79,6 +81,7 @@ const publicEventSelect = Prisma.validator<Prisma.EventTypeSelect>()({
           darkBrandColor: true,
           theme: true,
           metadata: true,
+          transferCredentials: true,
         },
       },
     },
@@ -87,6 +90,7 @@ const publicEventSelect = Prisma.validator<Prisma.EventTypeSelect>()({
     select: {
       weekStart: true,
       username: true,
+      transferCredentials: true,
       name: true,
       theme: true,
       metadata: true,
@@ -128,6 +132,7 @@ export const getPublicEvent = async (
         metadata: true,
         brandColor: true,
         darkBrandColor: true,
+        transferCredentials: true,
         theme: true,
         organization: {
           select: {
@@ -171,6 +176,7 @@ export const getPublicEvent = async (
       profile: {
         username: users[0].username,
         name: users[0].name,
+        transferCredential: users[0]?.transferCredentials || {},
         weekStart: users[0].weekStart,
         image: `/${users[0].username}/avatar.png`,
         brandColor: users[0].brandColor,

@@ -37,7 +37,7 @@ const ConnectedCalendars = (props: IConnectCalendarsProps) => {
         firstCalendar.integration.title &&
         firstCalendar.integration.logo && (
           <>
-            <List className="bg-default border-subtle rounded-md border p-0 dark:bg-black ">
+            <List className="bg-default border-subtle darked:bg-black rounded-md border p-0 ">
               <ConnectedCalendarItem
                 key={firstCalendar.integration.title}
                 name={firstCalendar.integration.title}
@@ -59,7 +59,7 @@ const ConnectedCalendars = (props: IConnectCalendarsProps) => {
 
       {/* Connect calendars list */}
       {firstCalendar === undefined && queryIntegrations.data && queryIntegrations.data.items.length > 0 && (
-        <List className="bg-default divide-subtle border-subtle mx-1 divide-y rounded-md border p-0 dark:bg-black sm:mx-0">
+        <List className="bg-default divide-subtle border-subtle darked:bg-black mx-1 divide-y rounded-md border p-0 sm:mx-0">
           {queryIntegrations.data &&
             queryIntegrations.data.items.map((item) => (
               <li key={item.title}>

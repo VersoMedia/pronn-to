@@ -1,4 +1,5 @@
 import { WEBAPP_URL } from "@calcom/lib/constants";
+import { prisma } from "@calcom/prisma";
 import type { TrpcSessionUser } from "@calcom/trpc/server/trpc";
 
 type MeOptions = {
@@ -12,9 +13,19 @@ export const meHandler = async ({ ctx }: MeOptions) => {
   const { user } = ctx;
   // Destructuring here only makes it more illegible
   // pick only the part we want to expose in the API
+  let transferCredential = {};
+  if (user?.id) {
+    transferCredential = await prisma.transferCredential.findFirst({
+      where: {
+        userId: user?.id,
+      },
+    });
+  }
+
   return {
     id: user.id,
     name: user.name,
+    transferCredential: transferCredential || {},
     notificationSettings: user.notificationSettings,
     phone: user.phone,
     username: user.username,
