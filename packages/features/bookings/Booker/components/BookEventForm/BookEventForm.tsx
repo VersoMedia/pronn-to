@@ -369,7 +369,14 @@ export const BookEventFormChild = ({
         mapRecurringBookingToMutationInput(bookingInput, recurringEventCount)
       );
     } else {
-      createBookingMutation.mutate(mapBookingToMutationInput(bookingInput));
+      const decode = mapBookingToMutationInput(bookingInput);
+      decode.responses.payments = {
+        optionValue: "",
+        value: bookingForm.getValues()?.responses?.payments?.value || null,
+      };
+
+      console.log(decode);
+      createBookingMutation.mutate(decode);
     }
   };
 
@@ -380,6 +387,56 @@ export const BookEventFormChild = ({
 
   const renderConfirmNotVerifyEmailButtonCond =
     !eventType?.requiresBookerEmailVerification || (email && verifiedEmail && verifiedEmail === email);
+
+  const getFieldInEvent = () => {
+    const fields = eventType.bookingFields;
+    const options = [];
+
+    if (eventType.paymentCash) {
+      options.push({ value: "cash", label: "Pago en efectivo" });
+    }
+
+    if (eventType.paymentTransfer) {
+      options.push({ value: "transfer", label: "Pago por transferencia" });
+    }
+
+    if (eventType?.metadata?.apps?.stripe?.enabled) {
+      options.push({ value: "stripe", label: "Pago con Stripe" });
+    }
+
+    const fieldPayments = {
+      name: "payments",
+      type: "radioInput",
+      defaultLabel: "payment_method",
+      required: true,
+      hidden: false,
+      getOptionsAt: "payments",
+      optionsInputs: {},
+      hideWhenJustOneOption: true,
+      editable: "system",
+      sources: [
+        {
+          id: "default",
+          type: "default",
+          label: "Default",
+        },
+      ],
+      options: options,
+    };
+
+    const fieldNew = [];
+    for (let i = 0; i < fields.length; i++) {
+      if (i === 3) {
+        fieldNew.push(fields[i]);
+
+        if (!isRescheduling) fieldNew.push(fieldPayments);
+      } else {
+        fieldNew.push(fields[i]);
+      }
+    }
+
+    return fieldNew;
+  };
 
   return (
     <div className="flex h-full flex-col">
@@ -397,7 +454,7 @@ export const BookEventFormChild = ({
         noValidate>
         <BookingFields
           isDynamicGroupBooking={!!(username && username.indexOf("+") > -1)}
-          fields={eventType.bookingFields}
+          fields={getFieldInEvent()}
           locations={eventType.locations}
           rescheduleUid={rescheduleUid || undefined}
         />
@@ -496,9 +553,54 @@ function useInitialFormValues({
       if (!eventType?.bookingFields) {
         return {};
       }
+
+      const options = [];
+      if (eventType.paymentCash) {
+        options.push({ value: "cash", label: "Pago en efectivo" });
+      }
+
+      if (eventType.paymentTransfer) {
+        options.push({ value: "transfer", label: "Pago por transferencia" });
+      }
+
+      if (eventType?.metadata?.apps?.stripe?.enabled) {
+        options.push({ value: "stripe", label: "Pago con Stripe" });
+      }
+
+      const fieldPayments = {
+        name: "payments",
+        type: "radioInput",
+        defaultLabel: "payment_method",
+        required: true,
+        hidden: false,
+        getOptionsAt: "payments",
+        optionsInputs: {},
+        hideWhenJustOneOption: true,
+        editable: "system",
+        sources: [
+          {
+            id: "default",
+            type: "default",
+            label: "Default",
+          },
+        ],
+        options: options,
+      };
+
+      const fieldNew = [];
+      for (let i = 0; i < eventType?.bookingFields.length; i++) {
+        if (i === 3) {
+          fieldNew.push(eventType?.bookingFields[i]);
+
+          if (!isRescheduling) fieldNew.push(fieldPayments);
+        } else {
+          fieldNew.push(eventType?.bookingFields[i]);
+        }
+      }
+
       const querySchema = getBookingResponsesPartialSchema({
         eventType: {
-          bookingFields: eventType.bookingFields,
+          bookingFields: fieldNew,
         },
         view: rescheduleUid ? "reschedule" : "booking",
       });
@@ -524,7 +626,7 @@ function useInitialFormValues({
           responses: {} as Partial<z.infer<ReturnType<typeof getBookingResponsesSchema>>>,
         };
 
-        const responses = eventType.bookingFields.reduce((responses, field) => {
+        const responses = fieldNew.reduce((responses, field) => {
           return {
             ...responses,
             [field.name]: parsedQuery[field.name] || undefined,
@@ -552,7 +654,7 @@ function useInitialFormValues({
         responses: {} as Partial<z.infer<ReturnType<typeof getBookingResponsesSchema>>>,
       };
 
-      const responses = eventType.bookingFields.reduce((responses, field) => {
+      const responses = fieldNew.reduce((responses, field) => {
         return {
           ...responses,
           [field.name]: bookingData.responses[field.name],

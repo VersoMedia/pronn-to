@@ -7,7 +7,10 @@ export type EventTypeApps = NonNullable<NonNullable<z.infer<typeof EventTypeMeta
 export type EventTypeAppsList = keyof EventTypeApps;
 
 export const getEventTypeAppData = <T extends EventTypeAppsList>(
-  eventType: Pick<z.infer<typeof EventTypeModel>, "price" | "currency" | "metadata">,
+  eventType: Pick<
+    z.infer<typeof EventTypeModel>,
+    "price" | "currency" | "metadata" | "paymentTransfer" | "paymentCash"
+  >,
   appId: T,
   forcedGet?: boolean
 ): EventTypeApps[T] => {
@@ -21,6 +24,8 @@ export const getEventTypeAppData = <T extends EventTypeAppsList>(
           // We should favor eventType's price and currency over appMetadata's price and currency
           price: eventType.price || appMetadata.price,
           currency: eventType.currency || appMetadata.currency,
+          paymentCash: eventType.paymentCash,
+          paymentTransfert: eventType.paymentTransfer,
           // trackingId is legacy way to store value for TRACKING_ID. So, we need to support both.
           TRACKING_ID: appMetadata.TRACKING_ID || appMetadata.trackingId,
         }
@@ -34,6 +39,8 @@ export const getEventTypeAppData = <T extends EventTypeAppsList>(
       enabled: !!eventType.price,
       // Price default is 0 in DB. So, it would always be non nullish.
       price: eventType.price,
+      paymentCash: eventType.paymentCash,
+      paymentTransfert: eventType.paymentTransfer,
       // Currency default is "usd" in DB.So, it would also be available always
       currency: eventType.currency,
       paymentOption: "ON_BOOKING",

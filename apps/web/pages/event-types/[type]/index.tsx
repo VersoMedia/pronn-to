@@ -65,8 +65,8 @@ const EventRecurringTab = dynamic(() =>
   import("@components/eventtype/EventRecurringTab").then((mod) => mod.EventRecurringTab)
 );
 
-const EventAppsTab = dynamic(() =>
-  import("@components/eventtype/EventAppsTab").then((mod) => mod.EventAppsTab)
+const EventPaymentTab = dynamic(() =>
+  import("@components/eventtype/EventPaymentTab").then((mod) => mod.EventPaymentTab)
 );
 
 const EventWorkflowsTab = dynamic(() => import("@components/eventtype/EventWorkfowsTab"));
@@ -82,6 +82,8 @@ export type FormValues = {
   eventTitle: string;
   eventName: string;
   slug: string;
+  price: number;
+  currency: string;
   length: number;
   offsetStart: number;
   description: string;
@@ -141,7 +143,7 @@ const querySchema = z.object({
     .enum([
       "setup",
       "availability",
-      "apps",
+      "payments",
       "limits",
       "recurring",
       "team",
@@ -246,6 +248,10 @@ const EventTypePage = (props: EventTypeSetupProps) => {
     return {
       title: eventType.title,
       locations: eventType.locations || [],
+      price: eventType.price,
+      currency: eventType.currency,
+      paymentCash: eventType.paymentCash,
+      paymentTransfer: eventType.paymentTransfer,
       recurringEvent: eventType.recurringEvent || null,
       description: eventType.description ?? undefined,
       schedule: eventType.schedule || undefined,
@@ -345,7 +351,7 @@ const EventTypePage = (props: EventTypeSetupProps) => {
     limits: <EventLimitsTab eventType={eventType} />,
     advanced: <EventAdvancedTab eventType={eventType} team={team} />,
     recurring: <EventRecurringTab eventType={eventType} />,
-    apps: <EventAppsTab eventType={{ ...eventType, URL: permalink }} />,
+    payments: <EventPaymentTab eventType={{ ...eventType, URL: permalink }} />,
     workflows: (
       <EventWorkflowsTab
         eventType={eventType}

@@ -75,6 +75,8 @@ const commons = {
   availability: [],
   price: 0,
   currency: "usd",
+  paymentCash: false,
+  paymentTransfer: false,
   schedulingType: SchedulingType.COLLECTIVE,
   seatsPerTimeSlot: null,
   seatsShowAttendees: null,

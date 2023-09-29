@@ -41,7 +41,7 @@ import {
   Clock,
   Sliders,
   Repeat,
-  Grid,
+  CreditCard,
   Users,
   ExternalLink,
   Code,
@@ -104,11 +104,11 @@ function getNavigation(props: {
       info: `recurring_event_tab_description`,
     },
     {
-      name: "apps",
-      href: `/event-types/${eventType.id}?tabName=apps`,
-      icon: Grid,
+      name: "payments",
+      href: `/event-types/${eventType.id}?tabName=payments`,
+      icon: CreditCard,
       //TODO: Handle proper translation with count handling
-      info: `${installedAppsNumber} apps, ${enabledAppsNumber} ${t("active")}`,
+      info: `payment_event_tab_description`,
     },
     // {
     //   name: "workflows",

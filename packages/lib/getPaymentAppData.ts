@@ -39,6 +39,10 @@ export default function getPaymentAppData(
       };
     }
   }
+
+  if ((eventType.paymentCash || eventType.paymentTransfer) && !paymentAppData?.enabled) {
+    return { enabled: true, price: eventType?.price, currency: eventType?.currency, appId: null };
+  }
   // This is the current expectation of system to have price and currency set always(using DB Level defaults).
   // Newly added apps code should assume that their app data might not be set.
   return (

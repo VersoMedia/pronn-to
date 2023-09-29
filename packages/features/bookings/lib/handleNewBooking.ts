@@ -267,6 +267,8 @@ const getEventTypesFromDB = async (eventTypeId: number) => {
       requiresBookerEmailVerification: true,
       userId: true,
       price: true,
+      paymentCash: true,
+      paymentTransfer: true,
       currency: true,
       metadata: true,
       destinationCalendar: true,
@@ -475,9 +477,36 @@ async function getBookingData({
   isNotAnApiCall: boolean;
   eventType: Awaited<ReturnType<typeof getEventTypesFromDB>>;
 }) {
+  const bookingFieldsnew = [
+    ...eventType.bookingFields,
+    {
+      name: "payments",
+      type: "radioInput",
+      defaultLabel: "payment_method",
+      required: false,
+      hidden: false,
+      getOptionsAt: "payments",
+      optionsInputs: {},
+      hideWhenJustOneOption: true,
+      editable: "system",
+      sources: [
+        {
+          id: "default",
+          type: "default",
+          label: "Default",
+        },
+      ],
+      options: [
+        { value: "cash", label: "Pago en efectivo" },
+        { value: "transfer", label: "Pago por transferencia" },
+        { value: "stripe", label: "Pago con Stripe" },
+      ],
+    },
+  ];
+
   const responsesSchema = getBookingResponsesSchema({
     eventType: {
-      bookingFields: eventType.bookingFields,
+      bookingFields: req.body?.responses?.payments?.value ? bookingFieldsnew : eventType.bookingFields,
     },
     view: req.body.rescheduleUid ? "reschedule" : "booking",
   });
@@ -691,6 +720,7 @@ async function handler(
     eventType.schedulingType === SchedulingType.ROUND_ROBIN;
 
   const paymentAppData = getPaymentAppData(eventType);
+  console.log(`Booking eventType ${paymentAppData} started`);
 
   let timeOutOfBounds = false;
   try {
@@ -1651,7 +1681,12 @@ async function handler(
 
       const foundBooking = await findBookingQuery(booking.id);
 
-      if (!Number.isNaN(paymentAppData.price) && paymentAppData.price > 0 && !!booking) {
+      if (
+        !Number.isNaN(paymentAppData.price) &&
+        paymentAppData.price > 0 &&
+        !!booking &&
+        reqBody?.responses?.payments?.value === "stripe"
+      ) {
         const credentialPaymentAppCategories = await prisma.credential.findMany({
           where: {
             ...(paymentAppData.credentialId
@@ -1897,20 +1932,21 @@ async function handler(
       }
     }
 
-    if (typeof paymentAppData.price === "number" && paymentAppData.price > 0) {
-      /* Validate if there is any payment app credential for this user */
-      await prisma.credential.findFirstOrThrow({
-        where: {
-          appId: paymentAppData.appId,
-          ...(paymentAppData.credentialId
-            ? { id: paymentAppData.credentialId }
-            : { userId: organizerUser.id }),
-        },
-        select: {
-          id: true,
-        },
-      });
-    }
+    /* DEPRECATE options payment cash, transfer not working with credential */
+    // if (typeof paymentAppData.price === "number" && paymentAppData.price > 0) {
+    //   /* Validate if there is any payment app credential for this user */
+    //   // await prisma.credential.findFirstOrThrow({
+    //   //   where: {
+    //   //     appId: paymentAppData.appId,
+    //   //     ...(paymentAppData.credentialId
+    //   //       ? { id: paymentAppData.credentialId }
+    //   //       : { userId: organizerUser.id }),
+    //   //   },
+    //   //   select: {
+    //   //     id: true,
+    //   //   },
+    //   // });
+    // }
 
     return prisma.booking.create(createBookingObj);
   }
@@ -2202,7 +2238,8 @@ async function handler(
     !Number.isNaN(paymentAppData.price) &&
     paymentAppData.price > 0 &&
     !originalRescheduledBooking?.paid &&
-    !!booking;
+    !!booking &&
+    reqBody?.responses?.payments?.value === "stripe";
 
   if (!isConfirmedByDefault && noEmail !== true && !bookingRequiresPayment) {
     await sendOrganizerRequestEmail({ ...evt, additionalNotes });

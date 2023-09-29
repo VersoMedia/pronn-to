@@ -6,7 +6,7 @@ import Switch from "./Switch";
 
 type Props = {
   children?: ReactNode;
-  title: string;
+  title?: string;
   description?: string;
   checked: boolean;
   disabled?: boolean;
@@ -14,6 +14,7 @@ type Props = {
   onCheckedChange?: (checked: boolean) => void;
   "data-testid"?: string;
   tooltip?: string;
+  className?: string;
 };
 
 function SettingsToggle({
@@ -25,13 +26,15 @@ function SettingsToggle({
   children,
   disabled,
   tooltip,
+  className,
   ...rest
 }: Props) {
   const [animateRef] = useAutoAnimate<HTMLDivElement>();
 
   return (
     <>
-      <div className="flex w-full flex-col space-y-4 lg:flex-row lg:space-x-4 lg:space-y-0">
+      <div
+        className={`flex w-full flex-col space-y-4 lg:flex-row lg:space-x-4 lg:space-y-0 ${className ?? ""}`}>
         <fieldset className="block w-full flex-col sm:flex">
           <div className="flex space-x-3">
             <Switch

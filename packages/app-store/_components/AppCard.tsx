@@ -39,7 +39,7 @@ export default function AppCard({
     <div
       className={classNames(
         "border-subtle",
-        app?.isInstalled && "mb-4 rounded-md border",
+        app?.isInstalled && "mb-4 rounded-md",
         !app.enabled && "grayscale"
       )}>
       <div className={classNames(app.isInstalled ? "p-4 text-sm sm:p-4" : "px-5 py-4 text-sm sm:px-5")}>

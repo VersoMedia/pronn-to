@@ -15,6 +15,7 @@ import { ZSetDestinationCalendarInputSchema } from "./setDestinationCalendar.sch
 import { ZSubmitFeedbackInputSchema } from "./submitFeedback.schema";
 import { ZUpdateNotificationInputSchema } from "./updateNotification.schema";
 import { ZUpdateProfileInputSchema } from "./updateProfile.schema";
+import { ZUpdateTransferCredentialInputSchema } from "./updateTransferCredential.schema";
 import { ZUpdateUserDefaultConferencingAppInputSchema } from "./updateUserDefaultConferencingApp.schema";
 
 type AppsRouterHandlerCache = {
@@ -31,6 +32,7 @@ type AppsRouterHandlerCache = {
   appCredentialsByType?: typeof import("./appCredentialsByType.handler").appCredentialsByTypeHandler;
   stripeCustomer?: typeof import("./stripeCustomer.handler").stripeCustomerHandler;
   updateProfile?: typeof import("./updateProfile.handler").updateProfileHandler;
+  updateTransferCredential?: typeof import("./updateTransferCredential.handler").updateTransferCredential;
   updateNotification?: typeof import("./updateNotification.handler").updateNotificationHandler;
   eventTypeOrder?: typeof import("./eventTypeOrder.handler").eventTypeOrderHandler;
   submitFeedback?: typeof import("./submitFeedback.handler").submitFeedbackHandler;
@@ -216,6 +218,23 @@ export const loggedInViewerRouter = router({
 
     return UNSTABLE_HANDLER_CACHE.updateProfile({ ctx, input });
   }),
+
+  updateTransferCredential: authedProcedure
+    .input(ZUpdateTransferCredentialInputSchema)
+    .mutation(async ({ ctx, input }) => {
+      if (!UNSTABLE_HANDLER_CACHE.updateTransferCredential) {
+        UNSTABLE_HANDLER_CACHE.updateTransferCredential = (
+          await import("./updateTransferCredential.handler")
+        ).updateTransferCredential;
+      }
+
+      // Unreachable code but required for type safety
+      if (!UNSTABLE_HANDLER_CACHE.updateTransferCredential) {
+        throw new Error("Failed to load handler");
+      }
+
+      return UNSTABLE_HANDLER_CACHE.updateTransferCredential({ ctx, input });
+    }),
 
   updateNotifications: authedProcedure
     .input(ZUpdateNotificationInputSchema)
