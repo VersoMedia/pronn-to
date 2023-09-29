@@ -173,7 +173,7 @@ export default function PaymentComponent(props: Props) {
       stripe={stripePromise}
       options={{
         clientSecret: props.clientSecret,
-        appearance: darkMode ? ELEMENT_STYLES_DARK : ELEMENT_STYLES,
+        appearance: darkMode ? ELEMENT_STYLES_darked : ELEMENT_STYLES,
       }}>
       <PaymentForm {...props} />
     </Elements>
