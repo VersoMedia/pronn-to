@@ -438,8 +438,6 @@ export const BookEventFormChild = ({
     return fieldNew;
   };
 
-  console.log(eventType, "even typo");
-
   return (
     <div className="flex h-full flex-col">
       <Form
