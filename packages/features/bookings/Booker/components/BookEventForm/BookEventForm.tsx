@@ -438,6 +438,8 @@ export const BookEventFormChild = ({
     return fieldNew;
   };
 
+  console.log(eventType, "even typo");
+
   return (
     <div className="flex h-full flex-col">
       <Form
@@ -457,6 +459,7 @@ export const BookEventFormChild = ({
           fields={getFieldInEvent()}
           locations={eventType.locations}
           rescheduleUid={rescheduleUid || undefined}
+          transferdata={eventType.owner?.transferCredentials}
         />
         {(createBookingMutation.isError ||
           createRecurringBookingMutation.isError ||

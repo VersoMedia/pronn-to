@@ -13,15 +13,18 @@ export const BookingFields = ({
   locations,
   rescheduleUid,
   isDynamicGroupBooking,
+  transferdata,
 }: {
   fields: NonNullable<RouterOutputs["viewer"]["public"]["event"]>["bookingFields"];
   locations: LocationObject[];
   rescheduleUid?: string;
   isDynamicGroupBooking: boolean;
+  transferdata: any;
 }) => {
   const { t } = useLocale();
   const { watch, setValue } = useFormContext();
   const locationResponse = watch("responses.location");
+  const paymentsResponse = watch("responses.payments");
   const currentView = rescheduleUid ? "reschedule" : "";
 
   return (
@@ -87,6 +90,32 @@ export const BookingFields = ({
 
           field.options = options.filter(
             (location): location is NonNullable<(typeof options)[number]> => !!location
+          );
+        }
+
+        if (
+          paymentsResponse?.value === "transfer" &&
+          field.type === "radioInput" &&
+          field.name === "payments"
+        ) {
+          return (
+            <>
+              <FormBuilderField
+                className="mb-4"
+                field={{ ...field, hidden }}
+                readOnly={readOnly}
+                key={index}
+              />
+              <div className="min-h-2 mb-2 rounded-lg border border-gray-200 p-3">
+                <h6 className="mb-2">Datos de transferencía</h6>
+
+                <div className="flex flex-col gap-y-1">
+                  <p className="text-sm">Nombre: {transferdata?.name}</p>
+                  <p className="text-sm">CLABE: {transferdata?.clabe}</p>
+                  <p className="text-sm">Banco: {transferdata?.bank}</p>
+                </div>
+              </div>
+            </>
           );
         }
 
