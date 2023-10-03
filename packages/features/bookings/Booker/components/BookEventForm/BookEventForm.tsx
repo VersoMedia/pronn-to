@@ -457,6 +457,7 @@ export const BookEventFormChild = ({
           fields={getFieldInEvent()}
           locations={eventType.locations}
           rescheduleUid={rescheduleUid || undefined}
+          transferdata={eventType.owner?.transferCredentials}
         />
         {(createBookingMutation.isError ||
           createRecurringBookingMutation.isError ||

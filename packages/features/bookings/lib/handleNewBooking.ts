@@ -591,7 +591,7 @@ async function getBookingData({
     return {
       ...reqBody,
       name: reqBodyWithLegacyProps.name,
-      email: reqBodyWithLegacyProps.email,
+      email: reqBodyWithLegacyProps.email || "",
       guests: reqBodyWithLegacyProps.guests,
       location: reqBodyWithLegacyProps.location || "",
       smsReminderNumber: reqBodyWithLegacyProps.smsReminderNumber,
@@ -612,7 +612,7 @@ async function getBookingData({
     return {
       ...reqBody,
       name: responses.name,
-      email: responses.email,
+      email: responses?.email || "",
       guests: responses.guests ? responses.guests : [],
       location: responses.location?.optionValue || responses.location?.value || "",
       smsReminderNumber: responses.smsReminderNumber,

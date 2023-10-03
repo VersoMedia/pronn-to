@@ -21,7 +21,6 @@ export const getCalEventResponses = ({
       customInputs: true;
       attendees: {
         select: {
-          email: true;
           name: true;
         };
       };
