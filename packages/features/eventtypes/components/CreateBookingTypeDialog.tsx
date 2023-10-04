@@ -98,6 +98,8 @@ export default function CreateBookingTypeDialog({
     },
   });
 
+  const attendees = trpc.viewer.attendees.getByViewer.useQuery({});
+
   const { register, control } = form;
 
   const createBookingMutation = useMutation(createBooking, {
@@ -123,6 +125,7 @@ export default function CreateBookingTypeDialog({
         })();
 
         refetch();
+        attendees.refetch();
         await router.replace("/bookings/upcoming");
         showToast("Cita agregada con exito!", "success");
       }
@@ -140,24 +143,21 @@ export default function CreateBookingTypeDialog({
     (teamProfile?.membershipRole === MembershipRole.OWNER ||
       teamProfile?.membershipRole === MembershipRole.ADMIN);
 
-  const attendees = trpc.viewer.attendees.getByViewer.useQuery(
-    {},
-    {
-      refetchOnWindowFocus: false,
-      cacheTime: 1 * 60 * 60 * 1000,
-      staleTime: 1 * 60 * 60 * 1000,
-    }
-  );
-
   const attendeesDecode =
     attendees?.data?.attendees && attendees?.data?.attendees.length > 0
       ? attendees?.data?.attendees.map((att) => ({
           value: att.id,
           label: att.name,
           email: att.email,
+          phone: att.phone,
           name: att.name,
         }))
       : [];
+
+  const attendeesList = attendeesDecode.filter(
+    (obj, index) =>
+      attendeesDecode.findIndex((item) => item.email === obj.email || item.phone === obj.phone) === index
+  );
 
   const eventTypes =
     events?.eventTypeGroups.length > 0
@@ -198,7 +198,7 @@ export default function CreateBookingTypeDialog({
                 ...values?.attendee,
               };
             } else {
-              attendee = attendeesDecode.find((att) => values.attendantId === att.value);
+              attendee = attendeesList.find((att) => values.attendantId === att.value);
             }
 
             const payload = {
@@ -258,7 +258,7 @@ export default function CreateBookingTypeDialog({
                     isSearchable={false}
                     placeholder="Selecciona un cliente"
                     className="mt-0 w-full capitalize"
-                    options={attendeesDecode}
+                    options={attendeesList}
                     {...register("attendantId")}
                     onChange={(e) => {
                       form.setValue("attendantId", e?.value);
