@@ -58,6 +58,7 @@ export const getByViewerHandler = async ({ ctx }: GetByViewerOptions) => {
         id: attendee.id,
         name: attendee.name,
         email: attendee.email,
+        phone: attendee.phone,
         timeZone: attendee.timeZone,
         language: {
           translate: await getTranslation(attendee.locale ?? "en", "common"),

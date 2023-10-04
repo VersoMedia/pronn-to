@@ -592,6 +592,7 @@ async function getBookingData({
       ...reqBody,
       name: reqBodyWithLegacyProps.name,
       email: reqBodyWithLegacyProps.email || "",
+      phone: reqBodyWithLegacyProps.phone || "",
       guests: reqBodyWithLegacyProps.guests,
       location: reqBodyWithLegacyProps.location || "",
       smsReminderNumber: reqBodyWithLegacyProps.smsReminderNumber,
@@ -613,6 +614,7 @@ async function getBookingData({
       ...reqBody,
       name: responses.name,
       email: responses?.email || "",
+      phone: responses?.phone || "",
       guests: responses.guests ? responses.guests : [],
       location: responses.location?.optionValue || responses.location?.value || "",
       smsReminderNumber: responses.smsReminderNumber,
@@ -696,6 +698,7 @@ async function handler(
     appsStatus: reqAppsStatus,
     name: bookerName,
     email: bookerEmail,
+    phone: bookerPhone,
     guests: reqGuests,
     location,
     notes: additionalNotes,
@@ -967,6 +970,7 @@ async function handler(
     {
       email: bookerEmail,
       name: fullName,
+      phone: bookerPhone,
       firstName: (typeof bookerName === "object" && bookerName.firstName) || "",
       lastName: (typeof bookerName === "object" && bookerName.lastName) || "",
       timeZone: attendeeTimezone,
@@ -982,6 +986,7 @@ async function handler(
     guestArray.push({
       email: guest,
       name: "",
+      phone: "",
       firstName: "",
       lastName: "",
       timeZone: attendeeTimezone,
@@ -1263,12 +1268,13 @@ async function handler(
 
       const updatedBookingAttendees = originalRescheduledBooking.attendees.reduce(
         (filteredAttendees, attendee) => {
-          if (attendee.email === bookerEmail) {
+          if (attendee.email === bookerEmail || attendee.phone === bookerPhone) {
             return filteredAttendees; // skip current booker, as we know the language already.
           }
           filteredAttendees.push({
             name: attendee.name,
             email: attendee.email,
+            phone: attendee.phone,
             timeZone: attendee.timeZone,
             language: { translate: tAttendees, locale: attendee.locale ?? "en" },
           });
@@ -1311,6 +1317,7 @@ async function handler(
           return {
             name: attendee.name,
             email: attendee.email,
+            phone: attendee?.phone,
             timeZone: attendee.timeZone,
             language: { translate: tAttendees, locale: attendee.locale ?? "en" },
           };
@@ -1638,6 +1645,7 @@ async function handler(
             create: {
               email: invitee[0].email,
               name: invitee[0].name,
+              phone: invitee[0].phone,
               timeZone: invitee[0].timeZone,
               locale: invitee[0].language.locale,
               bookingSeat: {
@@ -1838,6 +1846,7 @@ async function handler(
       return {
         name: attendee.name,
         email: attendee.email,
+        phone: attendee.phone,
         timeZone: attendee.timeZone,
         locale: attendee.language.locale,
       };
@@ -1848,6 +1857,7 @@ async function handler(
         ...evt.team.members.map((member) => ({
           email: member.email,
           name: member.name,
+          phone: member.phone,
           timeZone: member.timeZone,
           locale: member.language.locale,
         }))

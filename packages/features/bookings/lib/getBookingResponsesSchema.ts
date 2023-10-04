@@ -113,7 +113,9 @@ function preprocess<T extends z.ZodType>({
       for (const bookingField of eventType.bookingFields) {
         const value = responses[bookingField.name];
         const stringSchema = z.string();
-        const emailSchema = isPartialSchema ? z.string() : z.string().refine(emailSchemaRefinement);
+        const emailSchema = isPartialSchema
+          ? z.string().optional()
+          : z.string().refine(emailSchemaRefinement).optional();
         const phoneSchema = isPartialSchema
           ? z.string()
           : z.string().refine(async (val) => {
@@ -142,10 +144,10 @@ function preprocess<T extends z.ZodType>({
 
         if (bookingField.type === "email") {
           // Email RegExp to validate if the input is a valid email
-          if (!emailSchema.safeParse(value).success) {
+          if (!emailSchema.safeParse(value).success && bookingField.required) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
-              message: m("email_validation_error"),
+              message: "El correo fue seleccionado como requerido en tu evento",
             });
           }
           continue;
@@ -236,7 +238,7 @@ function preprocess<T extends z.ZodType>({
         // If say we want to do special validation for 'address' that can be added to `fieldTypesSchemaMap`
         if (["address", "text", "select", "number", "radio", "textarea"].includes(bookingField.type)) {
           const schema = stringSchema;
-          if (!schema.safeParse(value).success) {
+          if (!schema.safeParse(value).success && bookingField.required) {
             ctx.addIssue({ code: z.ZodIssueCode.custom, message: m("Invalid string") });
           }
           continue;
