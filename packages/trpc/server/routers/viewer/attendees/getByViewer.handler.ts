@@ -2,7 +2,6 @@ import { type PrismaClient } from "@prisma/client";
 
 import { hasFilter } from "@calcom/features/filters/lib/hasFilter";
 import { checkRateLimitAndThrowError } from "@calcom/lib/checkRateLimitAndThrowError";
-import { getTranslation } from "@calcom/lib/server/i18n";
 import { MembershipRole } from "@calcom/prisma/enums";
 
 import { TRPCError } from "@trpc/server";
@@ -38,11 +37,7 @@ export const getByViewerHandler = async ({ ctx }: GetByViewerOptions) => {
     },
     select: {
       id: true,
-      bookings: {
-        select: {
-          attendees: true,
-        },
-      },
+      attendees: true,
     },
   });
 
@@ -50,31 +45,9 @@ export const getByViewerHandler = async ({ ctx }: GetByViewerOptions) => {
     throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
   }
 
-  const attendeesListPromises = [];
-
-  for (const booking of user.bookings) {
-    for (const attendee of booking.attendees) {
-      const attendeeObject = {
-        id: attendee.id,
-        name: attendee.name,
-        email: attendee.email,
-        phone: attendee.phone,
-        timeZone: attendee.timeZone,
-        language: {
-          translate: await getTranslation(attendee.locale ?? "en", "common"),
-          locale: attendee.locale ?? "en",
-        },
-      };
-
-      attendeesListPromises.push(attendeeObject);
-    }
-  }
-
-  const attendeesList = await Promise.all(attendeesListPromises);
-
   return {
     // don't display event teams without event types,
-    attendees: attendeesList,
+    attendees: user.attendees,
   };
 };
 
