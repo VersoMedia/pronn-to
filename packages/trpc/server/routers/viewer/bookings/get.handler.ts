@@ -290,6 +290,8 @@ export const getHandler = async ({ ctx, input }: GetOptions) => {
   );
 
   const bookings = bookingsQuery.map((booking) => {
+    const attendees = booking.attendeesMany.map((atte) => ({ ...atte.attendee }));
+    booking.attendees = attendees;
     // If seats are enabled and the event is not set to show attendees, filter out attendees that are not the current user
     if (booking.seatsReferences.length && !booking.eventType?.seatsShowAttendees) {
       booking.attendees = booking.attendees.filter((attendee) => attendee.email === user.email);

@@ -1,6 +1,7 @@
 import type { App, Attendee, Credential, EventTypeCustomInput } from "@prisma/client";
 import { Prisma } from "@prisma/client";
 import async from "async";
+import * as PromiseExtend from "bluebird";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import { cloneDeep } from "lodash";
 import type { NextApiRequest } from "next";
@@ -95,6 +96,15 @@ const log = logger.getChildLogger({ prefix: ["[api] book:user"] });
 type User = Prisma.UserGetPayload<typeof userSelect>;
 type BufferedBusyTimes = BufferedBusyTime[];
 type BookingType = Prisma.PromiseReturnType<typeof getOriginalRescheduledBooking>;
+type AttendeeRetrunI = {
+  id: number;
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+  timeZone: string;
+  locale?: string | null | undefined;
+  bookingId?: number | null;
+};
 
 interface IEventTypePaymentCredentialType {
   appId: EventTypeAppsList;
@@ -446,6 +456,7 @@ async function getOriginalRescheduledBooking(uid: string, seatsEventType?: boole
         select: {
           name: true,
           email: true,
+          phone: true,
           locale: true,
           timeZone: true,
           ...(seatsEventType && { bookingSeat: true, id: true }),
@@ -1816,6 +1827,50 @@ async function handler(
   const userReschedulingIsOwner = userId && originalRescheduledBooking?.user?.id === userId;
   const isConfirmedByDefault = (!requiresConfirmation && !paymentAppData.price) || userReschedulingIsOwner;
 
+  async function createAttendee(
+    attendees: Array<Prisma.AttendeeCreateInput>,
+    bookingId: number,
+    userId: number
+  ): Promise<Array<AttendeeRetrunI>> {
+    const attendeeList: Array<AttendeeRetrunI> = [];
+
+    await PromiseExtend.Promise.map(attendees, async (attendee: Prisma.AttendeeCreateInput) => {
+      const prev = await prisma.attendee.findFirst({
+        where: {
+          OR: [{ email: attendee.email }, { phone: attendee.phone }],
+        },
+      });
+
+      if (!prev) {
+        const createAttendee = await prisma.attendee.create({
+          data: { ...attendee, userId },
+        });
+
+        await prisma.attendeeManyBooking.create({
+          data: {
+            bookingId,
+            attendeeId: createAttendee.id,
+          },
+        });
+
+        attendeeList.push(createAttendee);
+      }
+
+      if (prev) {
+        await prisma.attendeeManyBooking.create({
+          data: {
+            bookingId,
+            attendeeId: prev.id,
+          },
+        });
+
+        attendeeList.push(prev);
+      }
+    });
+
+    return attendeeList;
+  }
+
   async function createBooking() {
     if (originalRescheduledBooking) {
       evt.title = originalRescheduledBooking?.title || evt.title;
@@ -1840,7 +1895,7 @@ async function handler(
     const userReschedulingIsOwner = userId && originalRescheduledBooking?.user?.id === userId;
     const isConfirmedByDefault = (!requiresConfirmation && !paymentAppData.price) || userReschedulingIsOwner;
 
-    const attendeesData = evt.attendees.map((attendee) => {
+    let attendeesData = evt.attendees.map((attendee) => {
       //if attendee is team member, it should fetch their locale not booker's locale
       //perhaps make email fetch request to see if his locale is stored, else
       return {
@@ -1877,11 +1932,11 @@ async function handler(
       eventType: eventTypeRel,
       smsReminderNumber,
       metadata: reqBody.metadata,
-      attendees: {
-        createMany: {
-          data: attendeesData,
-        },
-      },
+      // attendees: {
+      //   createMany: {
+      //     data: attendeesData,
+      //   },
+      // },
       dynamicEventSlugRef,
       dynamicGroupSlugRef,
       user: {
@@ -1908,12 +1963,10 @@ async function handler(
       if (originalRescheduledBooking.uid) {
         newBookingData.cancellationReason = rescheduleReason;
       }
-      if (newBookingData.attendees?.createMany?.data) {
+      if (attendeesData.length > 0) {
         // Reschedule logic with booking with seats
         if (eventType?.seatsPerTimeSlot && bookerEmail) {
-          newBookingData.attendees.createMany.data = attendeesData.filter(
-            (attendee) => attendee.email === bookerEmail
-          );
+          attendeesData = attendeesData.filter((attendee) => attendee.email === bookerEmail);
         }
       }
       if (originalRescheduledBooking.recurringEventId) {
@@ -1923,9 +1976,9 @@ async function handler(
     const createBookingObj = {
       include: {
         user: {
-          select: { email: true, name: true, timeZone: true, phone: true },
+          select: { id: true, email: true, name: true, timeZone: true, phone: true },
         },
-        attendees: true,
+        //attendees: true,
         payment: true,
         references: true,
       },
@@ -1958,7 +2011,13 @@ async function handler(
     //   // });
     // }
 
-    return prisma.booking.create(createBookingObj);
+    const booking = await prisma.booking.create(createBookingObj);
+    const attendeeList = await createAttendee(attendeesData, booking.id, booking.user?.id);
+
+    return {
+      ...booking,
+      attendees: attendeeList,
+    };
   }
 
   let results: EventResult<AdditionalInformation & { url?: string; iCalUID?: string }>[] = [];

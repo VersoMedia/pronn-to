@@ -154,10 +154,10 @@ export default function CreateBookingTypeDialog({
         }))
       : [];
 
-  const attendeesList = attendeesDecode.filter(
-    (obj, index) =>
-      attendeesDecode.findIndex((item) => item.email === obj.email || item.phone === obj.phone) === index
-  );
+  // const attendeesList = attendeesDecode.filter(
+  //   (obj, index) =>
+  //     attendeesDecode.findIndex((item) => item.email === obj.email || item.phone === obj.phone) === index
+  // );
 
   const eventTypes =
     events?.eventTypeGroups.length > 0
@@ -198,7 +198,7 @@ export default function CreateBookingTypeDialog({
                 ...values?.attendee,
               };
             } else {
-              attendee = attendeesList.find((att) => values.attendantId === att.value);
+              attendee = attendeesDecode.find((att) => values.attendantId === att.value);
             }
 
             const payload = {
@@ -258,7 +258,7 @@ export default function CreateBookingTypeDialog({
                     isSearchable={false}
                     placeholder="Selecciona un cliente"
                     className="mt-0 w-full capitalize"
-                    options={attendeesList}
+                    options={attendeesDecode}
                     {...register("attendantId")}
                     onChange={(e) => {
                       form.setValue("attendantId", e?.value);

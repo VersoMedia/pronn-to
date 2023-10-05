@@ -205,6 +205,7 @@ model User {
   transferCredentials TransferCredential?
   teams               Membership[]
   bookings            Booking[]
+  attendees           Attendee[]
   schedules           Schedule[]
   defaultScheduleId   Int?
   selectedCalendars   SelectedCalendar[]
@@ -383,18 +384,22 @@ model BookingReference {
 }
 
 model Attendee {
-  id          Int          @id @default(autoincrement())
+  id          Int                   @id @default(autoincrement())
   email       String?
   name        String
   phone       String?
   timeZone    String
-  locale      String?      @default("en")
-  booking     Booking?     @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  locale      String?               @default("en")
+  booking     Booking?              @relation(fields: [bookingId], references: [id], onDelete: Cascade)
   bookingId   Int?
   bookingSeat BookingSeat?
+  bookingMany AttendeeManyBooking[]
+  user        User?                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      Int?
 
   @@index([email])
   @@index([bookingId])
+  @@index([userId])
 }
 
 enum BookingStatus {
@@ -402,6 +407,17 @@ enum BookingStatus {
   ACCEPTED  @map("accepted")
   REJECTED  @map("rejected")
   PENDING   @map("pending")
+}
+
+model AttendeeManyBooking {
+  id         Int      @id @default(autoincrement())
+  attendee   Attendee @relation(fields: [attendeeId], references: [id])
+  attendeeId Int
+  booking    Booking  @relation(fields: [bookingId], references: [id])
+  bookingId  Int
+
+  @@index([attendeeId])
+  @@index([bookingId])
 }
 
 model Booking {
@@ -420,6 +436,7 @@ model Booking {
   startTime             DateTime
   endTime               DateTime
   attendees             Attendee[]
+  attendeesMany         AttendeeManyBooking[]
   location              String?
   createdAt             DateTime              @default(now())
   updatedAt             DateTime?
