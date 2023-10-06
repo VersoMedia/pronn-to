@@ -182,7 +182,9 @@ export default function RecurringEventController({ eventType }: RecurringEventCo
             onChange={(e) => {
               formMethods.setValue("price", Number(e.target.value) * 100);
             }}
-            value={formMethods.getValues("price") > 0 ? formMethods.getValues("price") / 100 : undefined}
+            defaultValue={
+              formMethods.getValues("price") > 0 ? formMethods.getValues("price") / 100 : undefined
+            }
           />
         </>
       </div>
