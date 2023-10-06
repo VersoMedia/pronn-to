@@ -94,6 +94,7 @@
   },
   "dependencies": {
     "@types/bluebird": "^3.5.39",
+    "@types/pg": "^8.10.3",
     "bluebird": "^3.7.2",
     "city-timezones": "^1.2.1",
     "date-fns": "^2.30.0",
@@ -101,6 +102,7 @@
     "lucide-react": "^0.171.0",
     "moment": "^2.29.4",
     "next-pwa": "^5.6.0",
+    "pg": "^8.11.3",
     "react-big-calendar": "^1.8.2",
     "turbo": "^1.10.1"
   },
