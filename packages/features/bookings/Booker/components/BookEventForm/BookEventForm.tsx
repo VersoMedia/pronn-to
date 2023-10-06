@@ -178,6 +178,7 @@ export const BookEventFormChild = ({
       const { uid, paymentUid } = responseData;
       const fullName = getFullName(bookingForm.getValues("responses.name"));
       if (paymentUid) {
+        /** else if(bookingForm.getValues()?.responses?.payments?.value === "stripe") types = ["SERVICE_BOOKING_STRIPE_MEMBER", "SERVICE_BOOKING_STRIPE_CUSTOMER"] */
         return router.push(
           createPaymentLink({
             paymentUid,
@@ -201,7 +202,11 @@ export const BookEventFormChild = ({
         if (session.data) types = ["MEMBER_BOOKING_RESCHEDULE_MEMBER", "MEMBER_BOOKING_RESCHEDULE_CUSTOMER"];
         else types = ["CUSTOMER_BOOKING_RESCHEDULE_MEMBER", "CUSTOMER_BOOKING_RESCHEDULE_CUSTOMER"];
       } else {
-        types = ["GENERAL_BOOKING_MEMBER", "GENERAL_BOOKING_CUSTOMER"];
+        if (bookingForm.getValues()?.responses?.payments?.value === "cash")
+          types = ["SERVICE_BOOKING_CASH_MEMBER", "SERVICE_BOOKING_CASH_CUSTOMER"];
+        else if (bookingForm.getValues()?.responses?.payments?.value === "transfer")
+          types = ["SERVICE_BOOKING_TRANSFER_MEMBER", "SERVICE_BOOKING_TRANSFER_CUSTOMER"];
+        else types = ["GENERAL_BOOKING_MEMBER", "GENERAL_BOOKING_CUSTOMER"];
       }
 
       for (let i = 0; i < types.length; i++) {
@@ -218,6 +223,10 @@ export const BookEventFormChild = ({
           old_hour: dayjs(bookingData?.startTime).format("hh:mm A"),
           date: dayjs(responseData.startTime).format("DD-MM-YYYY"),
           hour: dayjs(responseData.startTime).format("hh:mm A"),
+          service_price: `$ ${bookingData?.price}`,
+          member_financial_name: eventType.owner?.transferCredentials?.name || "",
+          bank: eventType.owner?.transferCredentials?.bank || "",
+          clabe: eventType.owner?.transferCredentials?.clabe || "",
         };
 
         if (types[i].includes("MEMBER")) {
@@ -374,8 +383,6 @@ export const BookEventFormChild = ({
         optionValue: "",
         value: bookingForm.getValues()?.responses?.payments?.value || null,
       };
-
-      console.log(decode);
       createBookingMutation.mutate(decode);
     }
   };
