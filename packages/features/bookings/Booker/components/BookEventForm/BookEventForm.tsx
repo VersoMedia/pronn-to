@@ -223,7 +223,7 @@ export const BookEventFormChild = ({
           old_hour: dayjs(bookingData?.startTime).format("hh:mm A"),
           date: dayjs(responseData.startTime).format("DD-MM-YYYY"),
           hour: dayjs(responseData.startTime).format("hh:mm A"),
-          service_price: `$ ${bookingData?.price}`,
+          service_price: `$ ${eventType?.price}`,
           member_financial_name: eventType.owner?.transferCredentials?.name || "",
           bank: eventType.owner?.transferCredentials?.bank || "",
           clabe: eventType.owner?.transferCredentials?.clabe || "",
@@ -240,6 +240,7 @@ export const BookEventFormChild = ({
           await sendNotification(payload);
         })();
       }
+      console.log(bookingData, eventType);
 
       const query = {
         isSuccessBookingPage: true,
