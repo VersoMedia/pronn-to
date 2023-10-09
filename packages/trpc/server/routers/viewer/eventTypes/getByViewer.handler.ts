@@ -153,6 +153,7 @@ export const getByViewerHandler = async ({ ctx, input }: GetByViewerOptions) => 
   if (!user) {
     throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
   }
+  console.log(user);
 
   const mapEventType = (eventType: (typeof user.eventTypes)[number]) => ({
     ...eventType,

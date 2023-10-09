@@ -254,6 +254,7 @@ export default async function getEventTypeById({
     ...apps,
     stripe: {
       ...stripeMetaData,
+      enabled: !!stripeMetaData.appId,
       paymentOption: stripeMetaData.paymentOption as string,
       currency:
         (
