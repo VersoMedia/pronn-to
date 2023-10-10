@@ -173,12 +173,49 @@ export const BookEventFormChild = ({
       }
     ),
   });
+
+  const sendNotificationWhatsapp = async (types, responseData, bookingData) => {
+    const userTimezone = responseData.user?.timeZone;
+    for (let i = 0; i < types.length; i++) {
+      const payload = {
+        member_email: responseData.user?.email,
+        member_phone: responseData.user?.phone,
+        member_name: responseData.user?.name,
+        customer_name: responseData.responses?.name,
+        customer_email: responseData.responses?.email,
+        customer_phone: responseData.responses?.phone,
+        service_name: responseData.title,
+        type_: types[i],
+        old_date: dayjs(bookingData?.startTime).format("DD-MM-YYYY"),
+        old_hour: dayjs(bookingData?.startTime).format("hh:mm A"),
+        date: dayjs(responseData.startTime).format("DD-MM-YYYY"),
+        hour: dayjs(responseData.startTime).format("hh:mm A"),
+        service_price: `$ ${eventType?.price / 100}`,
+        member_financial_name: eventType?.owner?.transferCredentials?.name || "",
+        bank: eventType?.owner?.transferCredentials?.bank || "",
+        clabe: eventType?.owner?.transferCredentials?.clabe || "",
+      };
+
+      if (types[i].includes("MEMBER")) {
+        payload.date = dayjs(responseData.startTime).tz(userTimezone).format("DD-MM-YYYY");
+        payload.hour = dayjs(responseData.startTime).tz(userTimezone).format("hh:mm A");
+        payload.old_date = dayjs(bookingData?.startTime).tz(userTimezone).format("DD-MM-YYYY");
+        payload.old_hour = dayjs(bookingData?.startTime).tz(userTimezone).format("hh:mm A");
+      }
+
+      await sendNotification(payload);
+    }
+  };
+
   const createBookingMutation = useMutation(createBooking, {
     onSuccess: (responseData) => {
       const { uid, paymentUid } = responseData;
       const fullName = getFullName(bookingForm.getValues("responses.name"));
       if (paymentUid) {
-        /** else if(bookingForm.getValues()?.responses?.payments?.value === "stripe") types = ["SERVICE_BOOKING_STRIPE_MEMBER", "SERVICE_BOOKING_STRIPE_CUSTOMER"] */
+        const types = ["SERVICE_BOOKING_STRIPE_MEMBER", "SERVICE_BOOKING_STRIPE_CUSTOMER"](async () => {
+          await sendNotificationWhatsapp(types, responseData, bookingData);
+        })();
+
         return router.push(
           createPaymentLink({
             paymentUid,
@@ -195,7 +232,6 @@ export const BookEventFormChild = ({
         return;
       }
 
-      const userTimezone = responseData.user?.timeZone;
       let types = [];
 
       if (isRescheduling) {
@@ -209,38 +245,9 @@ export const BookEventFormChild = ({
         else types = ["GENERAL_BOOKING_MEMBER", "GENERAL_BOOKING_CUSTOMER"];
       }
 
-      for (let i = 0; i < types.length; i++) {
-        const payload = {
-          member_email: responseData.user?.email,
-          member_phone: responseData.user?.phone,
-          member_name: responseData.user?.name,
-          customer_name: responseData.responses?.name,
-          customer_email: responseData.responses?.email,
-          customer_phone: responseData.responses?.phone,
-          service_name: responseData.title,
-          type_: types[i],
-          old_date: dayjs(bookingData?.startTime).format("DD-MM-YYYY"),
-          old_hour: dayjs(bookingData?.startTime).format("hh:mm A"),
-          date: dayjs(responseData.startTime).format("DD-MM-YYYY"),
-          hour: dayjs(responseData.startTime).format("hh:mm A"),
-          service_price: `$ ${eventType?.price / 100}`,
-          member_financial_name: eventType.owner?.transferCredentials?.name || "",
-          bank: eventType.owner?.transferCredentials?.bank || "",
-          clabe: eventType.owner?.transferCredentials?.clabe || "",
-        };
-
-        if (types[i].includes("MEMBER")) {
-          payload.date = dayjs(responseData.startTime).tz(userTimezone).format("DD-MM-YYYY");
-          payload.hour = dayjs(responseData.startTime).tz(userTimezone).format("hh:mm A");
-          payload.old_date = dayjs(bookingData?.startTime).tz(userTimezone).format("DD-MM-YYYY");
-          payload.old_hour = dayjs(bookingData?.startTime).tz(userTimezone).format("hh:mm A");
-        }
-
-        (async () => {
-          await sendNotification(payload);
-        })();
-      }
-      console.log(bookingData, eventType);
+      (async () => {
+        await sendNotificationWhatsapp(types, responseData, bookingData);
+      })();
 
       const query = {
         isSuccessBookingPage: true,
