@@ -251,7 +251,9 @@ export async function getBusyTimesForLimitChecks(params: {
     where: {
       userId,
       eventTypeId,
-      status: BookingStatus.ACCEPTED,
+      status: {
+        in: [BookingStatus.ACCEPTED, BookingStatus.PENDING],
+      },
       // FIXME: bookings that overlap on one side will never be counted
       startTime: {
         gte: startDate,
