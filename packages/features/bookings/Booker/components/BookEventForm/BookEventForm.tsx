@@ -205,6 +205,8 @@ export const BookEventFormChild = ({
 
       await sendNotification(payload);
     }
+
+    return "success";
   };
 
   const createBookingMutation = useMutation(createBooking, {
@@ -212,7 +214,8 @@ export const BookEventFormChild = ({
       const { uid, paymentUid } = responseData;
       const fullName = getFullName(bookingForm.getValues("responses.name"));
       if (paymentUid) {
-        const types = ["SERVICE_BOOKING_STRIPE_MEMBER", "SERVICE_BOOKING_STRIPE_CUSTOMER"](async () => {
+        const types = ["SERVICE_BOOKING_STRIPE_MEMBER", "SERVICE_BOOKING_STRIPE_CUSTOMER"];
+        (async () => {
           await sendNotificationWhatsapp(types, responseData, bookingData);
         })();
 
