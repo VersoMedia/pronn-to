@@ -80,7 +80,7 @@ export async function getBusyTimes(params: {
     startTime: { gte: startTimeDate },
     endTime: { lte: endTimeDate },
     status: {
-      in: [BookingStatus.ACCEPTED],
+      in: [BookingStatus.ACCEPTED, BookingStatus.PENDING],
     },
   };
   // Find bookings that block this user from hosting further bookings.
