@@ -80,7 +80,7 @@ export async function getBusyTimes(params: {
     startTime: { gte: startTimeDate },
     endTime: { lte: endTimeDate },
     status: {
-      in: [BookingStatus.ACCEPTED],
+      in: [BookingStatus.ACCEPTED, BookingStatus.PENDING],
     },
   };
   // Find bookings that block this user from hosting further bookings.
@@ -251,7 +251,9 @@ export async function getBusyTimesForLimitChecks(params: {
     where: {
       userId,
       eventTypeId,
-      status: BookingStatus.ACCEPTED,
+      status: {
+        in: [BookingStatus.ACCEPTED, BookingStatus.PENDING],
+      },
       // FIXME: bookings that overlap on one side will never be counted
       startTime: {
         gte: startDate,

@@ -95,7 +95,7 @@ export const getCurrentSeats = (eventTypeId: number, dateFrom: Dayjs, dateTo: Da
         gte: dateFrom.format(),
         lte: dateTo.format(),
       },
-      status: BookingStatus.ACCEPTED,
+      status: [BookingStatus.ACCEPTED, BookingStatus.PENDING],
     },
     select: {
       uid: true,
