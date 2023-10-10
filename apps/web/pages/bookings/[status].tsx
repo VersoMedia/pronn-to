@@ -317,7 +317,7 @@ export default function Bookings() {
     if (views === "week") {
       currentToday = moment(today).add(7, "days");
 
-      if (date) {
+      if (date !== "") {
         currentToday = moment(date);
       }
     } else if (views === "month") {
@@ -518,7 +518,7 @@ export default function Bookings() {
                     <button
                       type="button"
                       className="flex h-9 items-center justify-center rounded-r-sm py-1.5 pl-4 pr-3 text-gray-400 hover:text-gray-500 focus:relative md:w-9 md:px-2"
-                      onClick={onClickNextWeek}>
+                      onClick={() => onClickNextWeek("")}>
                       <span className="sr-only">Next period</span>
                       <ChevronRightIcon className="h-5 w-5" aria-hidden="true" color="#000" />
                     </button>
@@ -575,7 +575,7 @@ export default function Bookings() {
                   events={appointments
                     .filter((ap) => ap.status !== "CANCELLED")
                     .map((ap) => ({
-                      title: ap.attendees[0].name,
+                      title: ap.attendees[0]?.name || "Invitado",
                       start: new Date(ap.startTime),
                       end: new Date(ap.endTime),
                       resource: { ...ap, openModal: (data) => handleOpenModalEvent(data) },
