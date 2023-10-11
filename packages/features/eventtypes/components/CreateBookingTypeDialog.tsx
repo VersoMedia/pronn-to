@@ -215,6 +215,7 @@ export default function CreateBookingTypeDialog({
               language: "es",
               metadata: {},
               hasHashedBookingLink: false,
+              internal: true,
             };
 
             createBookingMutation.mutate(payload);

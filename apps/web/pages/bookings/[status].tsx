@@ -401,6 +401,7 @@ export default function Bookings() {
       language: "es",
       metadata: {},
       hasHashedBookingLink: false,
+      internal: true,
     };
 
     const data = event?.resource;
@@ -444,6 +445,7 @@ export default function Bookings() {
       language: "es",
       metadata: {},
       hasHashedBookingLink: false,
+      internal: true,
     };
 
     showToast(t("loading"), "success");
@@ -738,7 +740,7 @@ export default function Bookings() {
                   setVisible(false);
                   setRecheduleModal(true);
                 }}>
-                {t("booking_rescheduled")}
+                {t("reschedule")}
               </Button>
               <Button
                 data-testid="cancel-booking"
@@ -747,7 +749,7 @@ export default function Bookings() {
                   setVisible(false);
                   setDeleteAppModal(true);
                 }}>
-                {t("booking_cancelled")}
+                {t("cancel")}
               </Button>
               <DialogClose color="secondary" className="w-full text-center" />
             </div>
@@ -838,6 +840,7 @@ export default function Bookings() {
                 language: "es",
                 metadata: {},
                 hasHashedBookingLink: false,
+                internal: true,
               };
 
               updateBookingMutation.mutate(payload);

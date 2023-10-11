@@ -330,6 +330,7 @@
   "back_to_bookings": "Volver a Reservas",
   "free_to_pick_another_event_type": "No dude en elegir otro evento en cualquier momento.",
   "cancelled": "Cancelado",
+  "cancel": "Cancelar",
   "cancellation_successful": "Cancelación Realizada",
   "really_cancel_booking": "¿Realmente deseas cancelar tu reserva?",
   "cannot_cancel_booking": "No puedes cancelar esta reserva",
