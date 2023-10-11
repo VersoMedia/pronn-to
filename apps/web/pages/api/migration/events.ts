@@ -38,7 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       select: { username: true, email: true, id: true },
     });
     const eventTypes = await prisma.eventType.findMany({
-      select: { id: true, slug: true },
+      select: { id: true, slug: true, users: { select: { username: true } } },
     });
     // const attendeesCurrent = await prisma.attendee.findMany({
     //   select: { email: true, phone: true },
@@ -50,7 +50,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (
         !String(service.username).includes("test") &&
         usersCurrent.find((user) => user.username === service.username) &&
-        !eventTypes.find((event) => event.slug === slugify(service.title))
+        !eventTypes.find(
+          (event) =>
+            event.users.find((us) => us.username === service.username) &&
+            event.slug === slugify(service.title)
+        )
       )
         eventTypeCreateObject.push({
           title: service.title,
@@ -68,6 +72,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         });
     });
 
+    console.log(eventTypeCreateObject);
     eventTypeCreateObject.map(async (event) => await prisma.eventType.create({ data: event }));
 
     return res.json({ message: "Migration complete", data: eventTypeCreateObject.length });

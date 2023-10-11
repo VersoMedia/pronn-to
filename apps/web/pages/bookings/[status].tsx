@@ -182,7 +182,7 @@ const CustomCardAppointment = ({ title, event }: { title: string; event: any }) 
           <Avatar size="sm" className="h-[16px] w-[16px]" />
         </div>
         <p
-          className="nowrap-text !w-[80px] pl-2 font-semibold leading-[11px]"
+          className="!w-[80px] overflow-hidden truncate pl-2 font-semibold leading-[11px]"
           style={{ fontSize: 10, color: StatusColor[status] }}>
           {title}
         </p>
@@ -242,7 +242,7 @@ export default function Bookings() {
 
   const query = trpc.viewer.bookings.get.useInfiniteQuery(
     {
-      limit: 10,
+      limit: 100,
       filters: {
         ...filterQuery,
         status: filterQuery.status ?? status,
@@ -474,9 +474,9 @@ export default function Bookings() {
         />
       }>
       <div className="flex w-full flex-col">
-        <div className="flex w-full items-center justify-between">
+        <div className="flex w-full flex-col lg:flex-row lg:items-center lg:justify-between">
           <HorizontalTabs tabs={tabs} />
-          <div className="hidden lg:block">
+          <div className="block">
             <div className="flex h-9">
               <label className="text-emphasis mr-2 ms-2 align-text-top text-sm font-medium">Lista</label>
               <Switch checked={typeView} onClick={() => setTypeView(!typeView)} style={{ marginTop: -12 }} />
@@ -652,14 +652,11 @@ export default function Bookings() {
                   <div className="border-subtle overflow-hidden rounded-md border">
                     <table className="w-full max-w-full table-fixed">
                       <tbody className="bg-default divide-subtle divide-y" data-testid="bookings">
-                        {query?.data?.pages?.map((page, index) => (
+                        {query.data?.pages?.map((page, index) => (
                           <Fragment key={index}>
                             {page.bookings
                               .filter(filterBookings)
-                              .filter(
-                                (bk) =>
-                                  (dayjs(bk.startTime).isSame(viewSlots, "day") && isMobile) || !isMobile
-                              )
+
                               .map((booking: BookingOutput) => {
                                 const recurringInfo = page.recurringInfo.find(
                                   (info) => info.recurringEventId === booking.recurringEventId
