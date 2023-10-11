@@ -28,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     'INNER JOIN "Profile" ON "users".id = "Profile"."userId" ' +
     'INNER JOIN "Customer" ON "Booking"."attendeeId" = "Customer".id ' +
     'INNER JOIN "Schedule" ON "Booking"."scheduleId" = "Schedule".id ' +
-    'WHERE "Booking"."startTime" >= Now()';
+    'WHERE "Booking"."startTime" >= Now() AND "Booking"."userId" = 411';
 
   try {
     const client = new Client({
@@ -61,30 +61,45 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         user: { select: { username: true } },
       },
     });
-
+    console.log(
+      response.rows,
+      bookingsCurrent.filter((b) => b.user?.username === "nutriflu")
+    );
     const bookingCreateObject: Prisma.BookingCreateInput[] = [];
 
     response.rows.map((booking) => {
-      const seed = `${booking.username}:${dayjs(booking.startTime).utc().format()}:${new Date().getTime()}`;
+      const seed = `${booking.username}:${dayjs(booking.startTime).format()}:${new Date().getTime()}`;
       const uid = translator.fromUUID(uuidv5(seed, uuidv5.URL));
 
       if (
-        !bookingsCurrent.find(
-          (bb) =>
-            dayjs(bb.startTime).utc().format() === dayjs(booking.startTime).utc().format() &&
-            dayjs(bb.endTime).utc().format() === dayjs(booking.endTime).utc().format() &&
-            usersCurrent.find((user) => user.username === bb?.user?.username)?.id &&
-            eventTypes.find((event) => event.slug === slugify(bb?.eventType?.title || ""))?.id
-        ) &&
+        !bookingsCurrent
+          .filter((b) => b.user?.username === booking.username)
+          .find(
+            (bb) =>
+              dayjs(bb.startTime).format("YYYY-MM-DD hh:mm") ===
+                dayjs(new Date(booking.startTime) + " UTC").format("YYYY-MM-DD hh:mm") &&
+              dayjs(bb.endTime).format("YYYY-MM-DD hh:mm") ===
+                dayjs(new Date(booking.endTime) + " UTC").format("YYYY-MM-DD hh:mm")
+          ) &&
         usersCurrent.find((user) => user.username === booking.username)?.id
-      )
+      ) {
+        const createOrConnect = attendeesCurrent.find((att) => att.phone === booking.phone)
+          ? { connect: { id: attendeesCurrent.find((att) => att.phone === booking.phone)?.id } }
+          : {
+              create: {
+                name: booking.name || "",
+                phone: booking.phone || "",
+                email: booking.email || "",
+                timeZone: "America/Mexico_City",
+              },
+            };
         bookingCreateObject.push({
           title: `Cita entre ${booking.displayName} y ${booking.name}`,
           uid,
-          startTime: dayjs(booking.startTime)
+          startTime: dayjs(new Date(booking.startTime) + " UTC")
             .tz(booking.timezone ?? "America/Mexico_City")
             .format(),
-          endTime: dayjs(booking.endTime)
+          endTime: dayjs(new Date(booking.endTime) + " UTC")
             .tz(booking.timezone ?? "America/Mexico_City")
             .format(),
           status: booking.status === "COMPLETED" ? "ACCEPTED" : booking.status,
@@ -93,12 +108,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               id: usersCurrent.find((user) => user.username === booking.username)?.id,
             },
           },
-          attendees: {
+          attendeesMany: {
             create: {
-              name: booking.name || "",
-              phone: booking.phone || "",
-              email: booking.email || "",
-              timeZone: "America/Mexico_City",
+              attendee: {
+                ...createOrConnect,
+              },
             },
           },
           eventType: {
@@ -112,6 +126,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             phone: booking.phone,
           },
         });
+      }
     });
 
     //console.log(bookingCreateObject)
