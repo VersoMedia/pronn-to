@@ -403,7 +403,7 @@ async function ensureAvailableUsers(
       }
     );
 
-    if (!dateRanges.length) {
+    if (!dateRanges.length && !internalRequest) {
       // user does not have availability at this time, skip user.
       continue;
     }
