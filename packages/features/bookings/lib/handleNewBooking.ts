@@ -1843,6 +1843,7 @@ async function handler(
       const prev = await prisma.attendee.findFirst({
         where: {
           phone: attendee.phone,
+          userId,
         },
       });
 
