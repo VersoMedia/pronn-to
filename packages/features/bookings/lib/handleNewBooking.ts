@@ -368,6 +368,7 @@ type IsFixedAwareUser = User & {
 };
 
 async function ensureAvailableUsers(
+  internalRequest: boolean,
   eventType: Awaited<ReturnType<typeof getEventTypesFromDB>> & {
     users: IsFixedAwareUser[];
   },
@@ -411,21 +412,23 @@ async function ensureAvailableUsers(
 
     let foundConflict = false;
     try {
-      if (
-        eventType.recurringEvent &&
-        recurringDatesInfo?.currentRecurringIndex === 0 &&
-        recurringDatesInfo.allRecurringDates
-      ) {
-        const allBookingDates = recurringDatesInfo.allRecurringDates.map((strDate) => new Date(strDate));
-        // Go through each date for the recurring event and check if each one's availability
-        // DONE: Decreased computational complexity from O(2^n) to O(n) by refactoring this loop to stop
-        // running at the first unavailable time.
-        let i = 0;
-        while (!foundConflict && i < allBookingDates.length) {
-          foundConflict = checkForConflicts(bufferedBusyTimes, allBookingDates[i++], eventType.length);
+      if (!internalRequest) {
+        if (
+          eventType.recurringEvent &&
+          recurringDatesInfo?.currentRecurringIndex === 0 &&
+          recurringDatesInfo.allRecurringDates
+        ) {
+          const allBookingDates = recurringDatesInfo.allRecurringDates.map((strDate) => new Date(strDate));
+          // Go through each date for the recurring event and check if each one's availability
+          // DONE: Decreased computational complexity from O(2^n) to O(n) by refactoring this loop to stop
+          // running at the first unavailable time.
+          let i = 0;
+          while (!foundConflict && i < allBookingDates.length) {
+            foundConflict = checkForConflicts(bufferedBusyTimes, allBookingDates[i++], eventType.length);
+          }
+        } else {
+          foundConflict = checkForConflicts(bufferedBusyTimes, input.dateFrom, eventType.length);
         }
-      } else {
-        foundConflict = checkForConflicts(bufferedBusyTimes, input.dateFrom, eventType.length);
       }
     } catch {
       log.debug({
@@ -681,6 +684,7 @@ async function handler(
   const { userId } = req;
 
   const userIp = getIP(req);
+  const internalRequest: boolean = req.body?.internal ?? false; // identify internal creation or update booking for compare conflict
 
   await checkRateLimitAndThrowError({
     rateLimitingType: "core",
@@ -898,6 +902,7 @@ async function handler(
 
   if (!eventType.seatsPerTimeSlot) {
     const availableUsers = await ensureAvailableUsers(
+      internalRequest,
       {
         ...eventType,
         users: users as IsFixedAwareUser[],
@@ -1837,7 +1842,7 @@ async function handler(
     await PromiseExtend.Promise.map(attendees, async (attendee: Prisma.AttendeeCreateInput) => {
       const prev = await prisma.attendee.findFirst({
         where: {
-          OR: [{ email: attendee.email }, { phone: attendee.phone }],
+          phone: attendee.phone,
         },
       });
 

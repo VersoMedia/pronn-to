@@ -401,6 +401,7 @@ export default function Bookings() {
       language: "es",
       metadata: {},
       hasHashedBookingLink: false,
+      internal: true,
     };
 
     const data = event?.resource;
@@ -444,6 +445,7 @@ export default function Bookings() {
       language: "es",
       metadata: {},
       hasHashedBookingLink: false,
+      internal: true,
     };
 
     showToast(t("loading"), "success");
@@ -838,6 +840,7 @@ export default function Bookings() {
                 language: "es",
                 metadata: {},
                 hasHashedBookingLink: false,
+                internal: true,
               };
 
               updateBookingMutation.mutate(payload);
