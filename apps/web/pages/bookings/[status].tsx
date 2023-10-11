@@ -424,7 +424,7 @@ export default function Bookings() {
       };
 
       (async () => {
-        await sendNotification(payload);
+        await sendNotification(payloadNotification);
       })();
     }
 
