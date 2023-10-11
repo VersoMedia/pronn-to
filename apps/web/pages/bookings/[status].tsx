@@ -408,7 +408,7 @@ export default function Bookings() {
 
     const types = ["MEMBER_BOOKING_RESCHEDULE_MEMBER", "MEMBER_BOOKING_RESCHEDULE_CUSTOMER"];
     for (let i = 0; i < types.length; i++) {
-      const payload = {
+      const payloadNotification = {
         member_email: data.user?.email,
         member_phone: data.user?.phone,
         member_name: data.user?.name,
