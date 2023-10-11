@@ -740,7 +740,7 @@ export default function Bookings() {
                   setVisible(false);
                   setRecheduleModal(true);
                 }}>
-                {t("booking_rescheduled")}
+                {t("reschedule")}
               </Button>
               <Button
                 data-testid="cancel-booking"
@@ -749,7 +749,7 @@ export default function Bookings() {
                   setVisible(false);
                   setDeleteAppModal(true);
                 }}>
-                {t("booking_cancelled")}
+                {t("cancel")}
               </Button>
               <DialogClose color="secondary" className="w-full text-center" />
             </div>
