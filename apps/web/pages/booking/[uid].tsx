@@ -1047,6 +1047,18 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
           timeZone: true,
         },
       },
+      attendeesMany: {
+        select: {
+          attendee: {
+            select: {
+              name: true,
+              email: true,
+              phone: true,
+              timeZone: true,
+            },
+          },
+        },
+      },
       attendees: {
         select: {
           name: true,
@@ -1084,6 +1096,10 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       notFound: true,
     };
   }
+
+  bookingInfoRaw.attendees = [bookingInfoRaw.attendeesMany?.[0]?.attendee].length
+    ? [bookingInfoRaw.attendeesMany[0]?.attendee]
+    : [];
 
   const bookingInfo = getBookingWithResponses(bookingInfoRaw);
   // @NOTE: had to do this because Server side cant return [Object objects]
