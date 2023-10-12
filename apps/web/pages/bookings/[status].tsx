@@ -423,6 +423,22 @@ export default function Bookings() {
         hour: dayjs(end).format("hh:mm A"),
       };
 
+      if (types[i] === "MEMBER_BOOKING_RESCHEDULE_MEMBER") {
+        payloadNotification.old_date = dayjs(data?.startTime)
+          .tz(event?.resource?.user?.timeZone ?? "America/Mexico_city")
+          .format("DD-MM-YYYY");
+        payloadNotification.old_hour = dayjs(data?.startTime)
+          .tz(event?.resource?.user?.timeZone ?? "America/Mexico_city")
+          .format("hh:mm A");
+
+        payloadNotification.date = dayjs(start)
+          .tz(event?.resource?.user?.timeZone ?? "America/Mexico_city")
+          .format("DD-MM-YYYY");
+        payloadNotification.hour = dayjs(end)
+          .tz(event?.resource?.user?.timeZone ?? "America/Mexico_city")
+          .format("hh:mm A");
+      }
+
       (async () => {
         await sendNotification(payloadNotification);
       })();
