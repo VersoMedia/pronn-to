@@ -12,6 +12,7 @@ type BookingSelect = {
     select: {
       email: true;
       name: true;
+      phone: true;
     };
   };
   location: true;
@@ -59,10 +60,23 @@ async function getBooking(prisma: PrismaClient, uid: string) {
       smsReminderNumber: true,
       location: true,
       eventTypeId: true,
+      attendeesMany: {
+        select: {
+          attendee: {
+            select: {
+              email: true,
+              name: true,
+              phone: true,
+              bookingSeat: true,
+            },
+          },
+        },
+      },
       attendees: {
         select: {
           email: true,
           name: true,
+          phone: true,
           bookingSeat: true,
         },
       },
@@ -131,6 +145,7 @@ export const getBookingForReschedule = async (uid: string) => {
         id: true,
         attendee: {
           select: {
+            phone: true,
             name: true,
             email: true,
           },
@@ -159,8 +174,10 @@ export const getBookingForReschedule = async (uid: string) => {
   return {
     ...booking,
     attendees: rescheduleUid
-      ? booking.attendees.filter((attendee) => attendee.email === attendeeEmail)
-      : booking.attendees,
+      ? booking.attendeesMany
+          .filter((attendee) => attendee.attendee.email === attendeeEmail)
+          .map((attendee) => ({ ...attendee.attendee }))
+      : [booking.attendeesMany?.[0]?.attendee],
   };
 };
 
@@ -219,6 +236,7 @@ export const getBookingForSeatedEvent = async (uid: string) => {
       ...attendee,
       email: "",
       name: "",
+      phone: "",
       bookingSeat: null,
     })),
   };
