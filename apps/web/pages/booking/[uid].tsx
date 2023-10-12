@@ -1098,7 +1098,9 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   }
 
   const bookingInfo = getBookingWithResponses(bookingInfoRaw);
-  bookingInfo.attendees = bookingInfo.attendeesMany[0]?.attendee ?? [];
+  bookingInfo.attendees = [bookingInfo.attendeesMany[0]?.attendee].length
+    ? [bookingInfo.attendeesMany[0]?.attendee]
+    : [];
   // @NOTE: had to do this because Server side cant return [Object objects]
   // probably fixable with json.stringify -> json.parse
   bookingInfo["startTime"] = (bookingInfo?.startTime as Date)?.toISOString() as unknown as Date;
