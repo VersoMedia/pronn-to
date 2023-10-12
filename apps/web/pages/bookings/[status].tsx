@@ -647,19 +647,14 @@ export default function Bookings() {
                       <table className="w-full max-w-full table-fixed">
                         <tbody className="bg-default divide-subtle divide-y" data-testid="today-bookings">
                           <Fragment>
-                            {bookingsToday
-                              .filter(
-                                (bk) =>
-                                  (dayjs(bk.startTime).isSame(viewSlots, "day") && isMobile) || !isMobile
-                              )
-                              .map((booking: BookingOutput) => (
-                                <BookingListItem
-                                  key={booking.id}
-                                  listingStatus={status}
-                                  recurringInfo={recurringInfoToday}
-                                  {...booking}
-                                />
-                              ))}
+                            {bookingsToday.map((booking: BookingOutput) => (
+                              <BookingListItem
+                                key={booking.id}
+                                listingStatus={status}
+                                recurringInfo={recurringInfoToday}
+                                {...booking}
+                              />
+                            ))}
                           </Fragment>
                         </tbody>
                       </table>
@@ -672,22 +667,19 @@ export default function Bookings() {
                       <tbody className="bg-default divide-subtle divide-y" data-testid="bookings">
                         {query.data?.pages?.map((page, index) => (
                           <Fragment key={index}>
-                            {page.bookings
-                              .filter(filterBookings)
-
-                              .map((booking: BookingOutput) => {
-                                const recurringInfo = page.recurringInfo.find(
-                                  (info) => info.recurringEventId === booking.recurringEventId
-                                );
-                                return (
-                                  <BookingListItem
-                                    key={booking.id}
-                                    listingStatus={status}
-                                    recurringInfo={recurringInfo}
-                                    {...booking}
-                                  />
-                                );
-                              })}
+                            {page.bookings.filter(filterBookings).map((booking: BookingOutput) => {
+                              const recurringInfo = page.recurringInfo.find(
+                                (info) => info.recurringEventId === booking.recurringEventId
+                              );
+                              return (
+                                <BookingListItem
+                                  key={booking.id}
+                                  listingStatus={status}
+                                  recurringInfo={recurringInfo}
+                                  {...booking}
+                                />
+                              );
+                            })}
                           </Fragment>
                         ))}
                       </tbody>
