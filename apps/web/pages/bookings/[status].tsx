@@ -179,7 +179,7 @@ const CustomCardAppointment = ({ title, event }: { title: string; event: any }) 
       onClick={() => event.resource?.openModal({ title, event })}>
       <div className="flex flex-row items-center" style={{ maxWidth: "60%" }}>
         <div className="rounded-full">
-          <Avatar size="sm" className="h-[16px] w-[16px]" />
+          <Avatar size="sm" className="h-[70%] w-[70%]" />
         </div>
         <p
           className="!w-[80px] overflow-hidden truncate pl-2 font-semibold leading-[11px]"
@@ -188,7 +188,7 @@ const CustomCardAppointment = ({ title, event }: { title: string; event: any }) 
         </p>
       </div>
       <p className="pl-1" style={{ fontSize: 10, color: StatusColor[status] }}>
-        {dayjs(event?.resource?.startTime).format("hh:mm A")}
+        {dayjs(event?.start).format("hh:mm A")}
       </p>
     </div>
   );
@@ -590,14 +590,12 @@ export default function Bookings() {
                   onView={onView}
                   view={isMobile && views === "week" ? "day" : views}
                   toolbar={false}
-                  events={appointments
-                    .filter((ap) => ap.status !== "CANCELLED")
-                    .map((ap) => ({
-                      title: ap.attendees[0]?.name || "Invitado",
-                      start: new Date(ap.startTime),
-                      end: new Date(ap.endTime),
-                      resource: { ...ap, openModal: (data) => handleOpenModalEvent(data) },
-                    }))}
+                  events={appointments.map((ap) => ({
+                    title: ap.attendees[0]?.name || "Invitado",
+                    start: new Date(dayjs(ap.startTime).tz(ap.user?.timeZone).format()),
+                    end: new Date(dayjs(ap.endTime).tz(ap.user?.timeZone).format()),
+                    resource: { ...ap, openModal: (data) => handleOpenModalEvent(data) },
+                  }))}
                   formats={{
                     timeGutterFormat: (date, culture, localizer) => localizer.format(date, "hh a", culture),
                     dayFormat: (date, culture, localizer) =>
@@ -629,6 +627,8 @@ export default function Bookings() {
                         <CustomCardAppointment event={event} title={title} />
                       ),
                   }}
+                  startAccessor="start"
+                  endAccessor="end"
                   onEventDrop={moveEvent}
                   onEventResize={resizeEvent}
                   selectable
