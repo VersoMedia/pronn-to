@@ -362,10 +362,10 @@ export default function Bookings() {
           customer_phone: data?.responses?.phone,
           service_name: data?.title,
           type_: types[i],
-          old_date: dayjs(data?.startTime).format("DD-MM-YYYY"),
-          old_hour: dayjs(data?.startTime).format("hh:mm A"),
+          old_date: dayjs(currentAppointment?.event?.start).format("DD-MM-YYYY"),
+          old_hour: dayjs(currentAppointment?.event?.start).format("hh:mm A"),
           date: dayjs(responsedata.startTime).format("DD-MM-YYYY"),
-          hour: dayjs(responsedata.endTime).format("hh:mm A"),
+          hour: dayjs(responsedata.startTime).format("hh:mm A"),
         };
 
         (async () => {
@@ -408,7 +408,7 @@ export default function Bookings() {
 
     const types = ["MEMBER_BOOKING_RESCHEDULE_MEMBER", "MEMBER_BOOKING_RESCHEDULE_CUSTOMER"];
     for (let i = 0; i < types.length; i++) {
-      const payload = {
+      const payloadNotification = {
         member_email: data.user?.email,
         member_phone: data.user?.phone,
         member_name: data.user?.name,
@@ -417,14 +417,30 @@ export default function Bookings() {
         customer_phone: data.responses?.phone,
         service_name: data.title,
         type_: types[i],
-        old_date: dayjs(data?.startTime).format("DD-MM-YYYY"),
-        old_hour: dayjs(data?.startTime).format("hh:mm A"),
+        old_date: dayjs(event?.start).format("DD-MM-YYYY"),
+        old_hour: dayjs(event?.start).format("hh:mm A"),
         date: dayjs(start).format("DD-MM-YYYY"),
-        hour: dayjs(end).format("hh:mm A"),
+        hour: dayjs(start).format("hh:mm A"),
       };
 
+      if (types[i] === "MEMBER_BOOKING_RESCHEDULE_CUSTOMER") {
+        payloadNotification.old_date = dayjs(event?.start)
+          .tz(event?.resource?.attendeesMany[0]?.attendee?.timeZone ?? "America/Mexico_city")
+          .format("DD-MM-YYYY");
+        payloadNotification.old_hour = dayjs(event?.start)
+          .tz(event?.resource?.attendeesMany[0]?.attendee?.timeZone ?? "America/Mexico_city")
+          .format("hh:mm A");
+
+        payloadNotification.date = dayjs(start)
+          .tz(event?.resource?.attendeesMany[0]?.attendee?.timeZone ?? "America/Mexico_city")
+          .format("DD-MM-YYYY");
+        payloadNotification.hour = dayjs(start)
+          .tz(event?.resource?.attendeesMany[0]?.attendee?.timeZone ?? "America/Mexico_city")
+          .format("hh:mm A");
+      }
+
       (async () => {
-        await sendNotification(payload);
+        await sendNotification(payloadNotification);
       })();
     }
 
