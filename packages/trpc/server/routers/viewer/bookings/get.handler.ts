@@ -226,8 +226,8 @@ export const getHandler = async ({ ctx, input }: GetOptions) => {
         },
       },
       orderBy,
-      take: take + 1,
-      skip,
+      //take: take + 1,
+      //skip,
     }),
     prisma.booking.groupBy({
       by: ["recurringEventId"],
