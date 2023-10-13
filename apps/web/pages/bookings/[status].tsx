@@ -242,7 +242,7 @@ export default function Bookings() {
 
   const query = trpc.viewer.bookings.get.useInfiniteQuery(
     {
-      limit: 100,
+      limit: 1000,
       filters: {
         ...filterQuery,
         status: filterQuery.status ?? status,
