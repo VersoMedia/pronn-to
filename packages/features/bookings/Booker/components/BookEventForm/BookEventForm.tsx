@@ -178,11 +178,11 @@ export const BookEventFormChild = ({
     const userTimezone = responseData.user?.timeZone;
     for (let i = 0; i < types.length; i++) {
       const payload = {
-        member_email: responseData.user?.email,
+        member_email: responseData.user?.email ?? "Sin correo",
         member_phone: responseData.user?.phone,
         member_name: responseData.user?.name,
         customer_name: responseData.responses?.name,
-        customer_email: responseData.responses?.email,
+        customer_email: responseData.responses?.email ?? "Sin correo",
         customer_phone: responseData.responses?.phone,
         service_name: responseData.title,
         type_: types[i],
