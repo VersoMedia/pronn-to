@@ -179,7 +179,7 @@ const CustomCardAppointment = ({ title, event }: { title: string; event: any }) 
       onClick={() => event.resource?.openModal({ title, event })}>
       <div className="flex flex-row items-center" style={{ maxWidth: "60%" }}>
         <div className="rounded-full">
-          <Avatar size="sm" className="h-[16px] w-[16px]" />
+          <Avatar size="sm" className="h-[70%] w-[70%]" />
         </div>
         <p
           className="!w-[80px] overflow-hidden truncate pl-2 font-semibold leading-[11px]"
@@ -188,7 +188,7 @@ const CustomCardAppointment = ({ title, event }: { title: string; event: any }) 
         </p>
       </div>
       <p className="pl-1" style={{ fontSize: 10, color: StatusColor[status] }}>
-        {dayjs(event?.resource?.startTime).format("hh:mm A")}
+        {dayjs(event?.start).format("hh:mm A")}
       </p>
     </div>
   );
@@ -362,10 +362,10 @@ export default function Bookings() {
           customer_phone: data?.responses?.phone,
           service_name: data?.title,
           type_: types[i],
-          old_date: dayjs(data?.startTime).format("DD-MM-YYYY"),
-          old_hour: dayjs(data?.startTime).format("hh:mm A"),
+          old_date: dayjs(currentAppointment?.event?.start).format("DD-MM-YYYY"),
+          old_hour: dayjs(currentAppointment?.event?.start).format("hh:mm A"),
           date: dayjs(responsedata.startTime).format("DD-MM-YYYY"),
-          hour: dayjs(responsedata.endTime).format("hh:mm A"),
+          hour: dayjs(responsedata.startTime).format("hh:mm A"),
         };
 
         (async () => {
@@ -401,13 +401,14 @@ export default function Bookings() {
       language: "es",
       metadata: {},
       hasHashedBookingLink: false,
+      internal: true,
     };
 
     const data = event?.resource;
 
     const types = ["MEMBER_BOOKING_RESCHEDULE_MEMBER", "MEMBER_BOOKING_RESCHEDULE_CUSTOMER"];
     for (let i = 0; i < types.length; i++) {
-      const payload = {
+      const payloadNotification = {
         member_email: data.user?.email,
         member_phone: data.user?.phone,
         member_name: data.user?.name,
@@ -416,14 +417,30 @@ export default function Bookings() {
         customer_phone: data.responses?.phone,
         service_name: data.title,
         type_: types[i],
-        old_date: dayjs(data?.startTime).format("DD-MM-YYYY"),
-        old_hour: dayjs(data?.startTime).format("hh:mm A"),
+        old_date: dayjs(event?.start).format("DD-MM-YYYY"),
+        old_hour: dayjs(event?.start).format("hh:mm A"),
         date: dayjs(start).format("DD-MM-YYYY"),
-        hour: dayjs(end).format("hh:mm A"),
+        hour: dayjs(start).format("hh:mm A"),
       };
 
+      if (types[i] === "MEMBER_BOOKING_RESCHEDULE_CUSTOMER") {
+        payloadNotification.old_date = dayjs(event?.start)
+          .tz(event?.resource?.attendeesMany[0]?.attendee?.timeZone ?? "America/Mexico_city")
+          .format("DD-MM-YYYY");
+        payloadNotification.old_hour = dayjs(event?.start)
+          .tz(event?.resource?.attendeesMany[0]?.attendee?.timeZone ?? "America/Mexico_city")
+          .format("hh:mm A");
+
+        payloadNotification.date = dayjs(start)
+          .tz(event?.resource?.attendeesMany[0]?.attendee?.timeZone ?? "America/Mexico_city")
+          .format("DD-MM-YYYY");
+        payloadNotification.hour = dayjs(start)
+          .tz(event?.resource?.attendeesMany[0]?.attendee?.timeZone ?? "America/Mexico_city")
+          .format("hh:mm A");
+      }
+
       (async () => {
-        await sendNotification(payload);
+        await sendNotification(payloadNotification);
       })();
     }
 
@@ -444,6 +461,7 @@ export default function Bookings() {
       language: "es",
       metadata: {},
       hasHashedBookingLink: false,
+      internal: true,
     };
 
     showToast(t("loading"), "success");
@@ -572,14 +590,12 @@ export default function Bookings() {
                   onView={onView}
                   view={isMobile && views === "week" ? "day" : views}
                   toolbar={false}
-                  events={appointments
-                    .filter((ap) => ap.status !== "CANCELLED")
-                    .map((ap) => ({
-                      title: ap.attendees[0]?.name || "Invitado",
-                      start: new Date(ap.startTime),
-                      end: new Date(ap.endTime),
-                      resource: { ...ap, openModal: (data) => handleOpenModalEvent(data) },
-                    }))}
+                  events={appointments.map((ap) => ({
+                    title: ap.attendees[0]?.name || "Invitado",
+                    start: new Date(dayjs(ap.startTime).tz(ap.user?.timeZone).format()),
+                    end: new Date(dayjs(ap.endTime).tz(ap.user?.timeZone).format()),
+                    resource: { ...ap, openModal: (data) => handleOpenModalEvent(data) },
+                  }))}
                   formats={{
                     timeGutterFormat: (date, culture, localizer) => localizer.format(date, "hh a", culture),
                     dayFormat: (date, culture, localizer) =>
@@ -611,6 +627,8 @@ export default function Bookings() {
                         <CustomCardAppointment event={event} title={title} />
                       ),
                   }}
+                  startAccessor="start"
+                  endAccessor="end"
                   onEventDrop={moveEvent}
                   onEventResize={resizeEvent}
                   selectable
@@ -629,19 +647,14 @@ export default function Bookings() {
                       <table className="w-full max-w-full table-fixed">
                         <tbody className="bg-default divide-subtle divide-y" data-testid="today-bookings">
                           <Fragment>
-                            {bookingsToday
-                              .filter(
-                                (bk) =>
-                                  (dayjs(bk.startTime).isSame(viewSlots, "day") && isMobile) || !isMobile
-                              )
-                              .map((booking: BookingOutput) => (
-                                <BookingListItem
-                                  key={booking.id}
-                                  listingStatus={status}
-                                  recurringInfo={recurringInfoToday}
-                                  {...booking}
-                                />
-                              ))}
+                            {bookingsToday.map((booking: BookingOutput) => (
+                              <BookingListItem
+                                key={booking.id}
+                                listingStatus={status}
+                                recurringInfo={recurringInfoToday}
+                                {...booking}
+                              />
+                            ))}
                           </Fragment>
                         </tbody>
                       </table>
@@ -654,22 +667,19 @@ export default function Bookings() {
                       <tbody className="bg-default divide-subtle divide-y" data-testid="bookings">
                         {query.data?.pages?.map((page, index) => (
                           <Fragment key={index}>
-                            {page.bookings
-                              .filter(filterBookings)
-
-                              .map((booking: BookingOutput) => {
-                                const recurringInfo = page.recurringInfo.find(
-                                  (info) => info.recurringEventId === booking.recurringEventId
-                                );
-                                return (
-                                  <BookingListItem
-                                    key={booking.id}
-                                    listingStatus={status}
-                                    recurringInfo={recurringInfo}
-                                    {...booking}
-                                  />
-                                );
-                              })}
+                            {page.bookings.filter(filterBookings).map((booking: BookingOutput) => {
+                              const recurringInfo = page.recurringInfo.find(
+                                (info) => info.recurringEventId === booking.recurringEventId
+                              );
+                              return (
+                                <BookingListItem
+                                  key={booking.id}
+                                  listingStatus={status}
+                                  recurringInfo={recurringInfo}
+                                  {...booking}
+                                />
+                              );
+                            })}
                           </Fragment>
                         ))}
                       </tbody>
@@ -738,7 +748,7 @@ export default function Bookings() {
                   setVisible(false);
                   setRecheduleModal(true);
                 }}>
-                {t("booking_rescheduled")}
+                {t("reschedule")}
               </Button>
               <Button
                 data-testid="cancel-booking"
@@ -747,7 +757,7 @@ export default function Bookings() {
                   setVisible(false);
                   setDeleteAppModal(true);
                 }}>
-                {t("booking_cancelled")}
+                {t("cancel")}
               </Button>
               <DialogClose color="secondary" className="w-full text-center" />
             </div>
@@ -838,6 +848,7 @@ export default function Bookings() {
                 language: "es",
                 metadata: {},
                 hasHashedBookingLink: false,
+                internal: true,
               };
 
               updateBookingMutation.mutate(payload);
