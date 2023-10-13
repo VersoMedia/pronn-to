@@ -242,7 +242,7 @@ export default function Bookings() {
 
   const query = trpc.viewer.bookings.get.useInfiniteQuery(
     {
-      limit: 1000,
+      limit: 100,
       filters: {
         ...filterQuery,
         status: filterQuery.status ?? status,
@@ -354,11 +354,11 @@ export default function Bookings() {
       const types = ["MEMBER_BOOKING_RESCHEDULE_MEMBER", "MEMBER_BOOKING_RESCHEDULE_CUSTOMER"];
       for (let i = 0; i < types.length; i++) {
         const payload = {
-          member_email: data?.user?.email,
+          member_email: data?.user?.email ?? "Sin correo",
           member_phone: data?.user?.phone,
           member_name: data?.user?.name,
           customer_name: data?.responses?.name,
-          customer_email: data?.responses?.email,
+          customer_email: data?.responses?.email ?? "Sin correo",
           customer_phone: data?.responses?.phone,
           service_name: data?.title,
           type_: types[i],
@@ -409,11 +409,11 @@ export default function Bookings() {
     const types = ["MEMBER_BOOKING_RESCHEDULE_MEMBER", "MEMBER_BOOKING_RESCHEDULE_CUSTOMER"];
     for (let i = 0; i < types.length; i++) {
       const payloadNotification = {
-        member_email: data.user?.email,
+        member_email: data.user?.email ?? "Sin correo",
         member_phone: data.user?.phone,
         member_name: data.user?.name,
         customer_name: data.responses?.name,
-        customer_email: data.responses?.email,
+        customer_email: data.responses?.email ?? "Sin correo",
         customer_phone: data.responses?.phone,
         service_name: data.title,
         type_: types[i],
@@ -797,11 +797,11 @@ export default function Bookings() {
                   ];
                   for (let i = 0; i < types.length; i++) {
                     const payload = {
-                      member_email: booking?.user?.email,
+                      member_email: booking?.user?.email ?? "Sin correo",
                       member_phone: booking?.user?.phone,
                       member_name: booking?.user?.name,
                       customer_name: booking?.responses?.name,
-                      customer_email: booking?.responses?.email,
+                      customer_email: booking?.responses?.email ?? "Sin correo",
                       customer_phone: booking?.responses?.phone,
                       type_: types[i],
                     };
