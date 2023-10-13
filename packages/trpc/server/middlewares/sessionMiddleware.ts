@@ -24,6 +24,7 @@ export async function getUserFromSession(ctx: TRPCContextInner, session: Maybe<S
       id: true,
       notificationSettings: true,
       phone: true,
+      stripe_customer_id: true,
       username: true,
       name: true,
       email: true,

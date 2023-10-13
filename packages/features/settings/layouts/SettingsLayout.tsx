@@ -19,6 +19,7 @@ import {
   Building,
   ChevronDown,
   ChevronRight,
+  CreditCard,
   Key,
   Loader,
   Lock,
@@ -55,12 +56,12 @@ const tabs: VerticalTabItemProps[] = [
       { name: "2fa_auth", href: "/settings/security/two-factor-auth" },
     ],
   },
-  // {
-  //   name: "billing",
-  //   href: "/settings/billing",
-  //   icon: CreditCard,
-  //   children: [{ name: "manage_billing", href: "/settings/billing" }],
-  // },
+  {
+    name: "membership",
+    href: "/settings/membership",
+    icon: CreditCard,
+    children: [{ name: "manage_membership", href: "/settings/membership" }],
+  },
   // {
   //   name: "developer",
   //   href: "/settings/developer",
