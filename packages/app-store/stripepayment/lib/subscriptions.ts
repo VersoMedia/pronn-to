@@ -25,5 +25,6 @@ export async function retrieveSubscriptionIdFromStripeCustomerId(
   }
   return {
     subscriptionId: subscription.id,
+    ...subscription,
   };
 }

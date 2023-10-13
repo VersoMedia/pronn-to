@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
+import stripe from "@calcom/app-store/stripepayment/lib/server";
 import { getServerSession } from "@calcom/features/auth/lib/getServerSession";
+import { CAL_URL } from "@calcom/lib/constants";
 import prisma from "@calcom/prisma";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -25,6 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const customer = await stripe.customers.create({
           email: session.user?.email,
         });
+
         stripe_customer_id = customer.id;
         await prisma.user.update({
           where: {
@@ -52,8 +55,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           trial_from_plan: true,
           metadata,
         },
-        success_url: `${"NEXT_PUBLIC_BASE_URL_VERSO"}/profile`,
-        cancel_url: `${"NEXT_PUBLIC_BASE_URL_VERSO"}/profile`,
+        success_url: `${CAL_URL}/settings/membership`,
+        cancel_url: `${CAL_URL}/settings/membership`,
       });
 
       return res.status(200).json({ sessionId: sessionStripe.id });

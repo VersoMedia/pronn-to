@@ -1,10 +1,10 @@
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import { useIntercom } from "@calcom/features/ee/support/lib/intercom/useIntercom";
+import getStripe from "@calcom/app-store/stripepayment/lib/client/getStripe";
+//import { useIntercom } from "@calcom/features/ee/support/lib/intercom/useIntercom";
 import { getLayout } from "@calcom/features/settings/layouts/SettingsLayout";
 import { classNames } from "@calcom/lib";
-import { WEBAPP_URL } from "@calcom/lib/constants";
+//import { WEBAPP_URL } from "@calcom/lib/constants";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { Button, Meta } from "@calcom/ui";
 
@@ -68,8 +68,8 @@ const PlanSelectionForm = ({
   );
 };
 
-const PRICE_MONTH = "process.env.PRICE_MONTH";
-const PRICE_YEAR = "process.env.PRICE_YEAR";
+const PRICE_MONTH = "price_1O0kjzDE7hSLxiKutUKshjfK";
+const PRICE_YEAR = "price_1O0kktDE7hSLxiKuVTXi6LT5";
 const plans = [
   {
     name: "Suscripción Mensual",
@@ -81,20 +81,20 @@ const plans = [
   {
     name: "Membresía Anual",
     description:
-      "Servicios y citas ilimitadas, Agenda interna y registro de clientes, Perfil personalizable, Confirmaciones por correo y WhatsApp, Acceso a nuestra comunidad 😜, 10%(OFF).",
-    price: "$6,000.00/Año", //añadir descuento del 15%
+      "Servicios y citas ilimitadas, Agenda interna y registro de clientes, Perfil personalizable, Confirmaciones por correo y WhatsApp, Acceso a nuestra comunidad 😜, 15%(OFF).",
+    price: "$5,100.00/Año", //añadir descuento del 15%
     stripePriceId: PRICE_YEAR,
   },
 ];
 
 const MembershipView = () => {
-  const pathname = usePathname();
+  //const pathname = usePathname();
   const { t } = useLocale();
-  const { open } = useIntercom();
-  const returnTo = pathname;
-  const billingHref = `/api/integrations/stripepayment/portal?returnTo=${WEBAPP_URL}${returnTo}`;
+  //const { open } = useIntercom();
+  //const returnTo = pathname;
+  //const billingHref = `/api/integrations/stripepayment/portal?returnTo=${WEBAPP_URL}${returnTo}`;
 
-  const [priceStripe, setPriceStripe] = useState("price_1N6MO1DfEqa340LQDa1QKnZa");
+  const [priceStripe, setPriceStripe] = useState("price_1O0kjzDE7hSLxiKutUKshjfK");
   const [subscription, setSubscription] = useState({});
   const [plan, setPlan] = useState({
     name: "",
@@ -107,19 +107,44 @@ const MembershipView = () => {
     //await open();
   };
 
+  const getSubscriptionStatus = async () => {
+    try {
+      const response = await fetch("/api/membership", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const resp = await response.json();
+      if (resp.subscription) {
+        setSubscription(resp.subscription);
+        setPlan({
+          ...plans.find((p) => p.stripePriceId === resp.subscription.plan.id),
+        });
+      }
+      console.log(resp, "aquiii");
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   const handleCheckout = async () => {
     try {
-      const {
-        data: { sessionId },
-      } = await fetch("/api/membership/create-checkout-session", {
+      const response = await fetch("/api/membership/create-checkout-session", {
         method: "POST",
-        body: {
+        body: JSON.stringify({
           price: priceStripe,
+        }),
+        headers: {
+          "Content-Type": "application/json",
         },
-      }).then(async (resp) => await resp.json());
+      });
+      const resp = await response.json();
 
-      const stripe = await getStripe();
-      stripe?.redirectToCheckout({ sessionId });
+      if (resp.sessionId) {
+        const stripe = await getStripe();
+        stripe?.redirectToCheckout({ sessionId: resp.sessionId });
+      }
     } catch (error) {
       return alert(error?.message);
     }
@@ -130,11 +155,15 @@ const MembershipView = () => {
       const resp = await fetch("/api/membership/create-portal-link", { method: "POST" }).then(
         async (resp) => await resp.json()
       );
-      if (resp.data?.url) window.location.assign(resp.data?.url);
+      if (resp?.url) window.location.assign(resp?.url);
     } catch (error) {
       if (error) return alert(error?.message);
     }
   };
+
+  useEffect(() => {
+    getSubscriptionStatus();
+  }, []);
 
   return (
     <>
