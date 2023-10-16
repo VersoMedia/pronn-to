@@ -182,7 +182,7 @@ export const BookEventFormChild = ({
         member_phone: responseData.user?.phone,
         member_name: responseData.user?.name,
         customer_name: responseData.responses?.name,
-        customer_email: responseData.responses?.email ?? "Sin correo",
+        customer_email: responseData.responses?.email ? responseData.responses?.email : "Sin correo",
         customer_phone: responseData.responses?.phone,
         service_name: responseData.title,
         type_: types[i],

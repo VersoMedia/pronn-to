@@ -107,7 +107,7 @@ export default function CancelBooking(props: Props) {
                         member_phone: booking?.user?.phone,
                         member_name: booking?.user?.name,
                         customer_name: booking?.responses?.name,
-                        customer_email: booking?.responses?.email ?? "Sin correo",
+                        customer_email: booking?.responses?.email ? booking?.responses?.email : "Sin correo",
                         customer_phone: booking?.responses?.phone,
                         type_: types[i],
                       };
