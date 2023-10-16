@@ -658,6 +658,8 @@
   "plan_upgrade_teams": "Necesita actualizar su plan para crear un equipo.",
   "plan_upgrade_instructions": "Puedes <1>actualizar aquí</1>.",
   "event_types_page_title": "Tipos de Evento",
+  "landing_page_title": "Customización página pública",
+  "landing_page_subtitle": "Rediseña tu perfil público para tus invitados.",
   "event_types_page_subtitle": "Crea eventos para que la gente que invites reserve en tu calendario.",
   "new": "Nuevo",
   "new_event_type_btn": "Nuevo Tipo de Evento",

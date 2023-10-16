@@ -680,6 +680,8 @@
   "plan_upgrade_teams": "You need to upgrade your plan to create a team.",
   "plan_upgrade_instructions": "You can <1>upgrade here</1>.",
   "event_types_page_title": "Event Types",
+  "landing_page_title": "Custom public page",
+  "landing_page_subtitle": "Redesign the profile public for your customers.",
   "event_types_page_subtitle": "Create events to share for people to book on your calendar.",
   "new": "New",
   "new_event_type_btn": "New event type",

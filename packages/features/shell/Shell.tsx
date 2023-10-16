@@ -67,6 +67,7 @@ import {
   Settings,
   User as UserIcon,
   Users,
+  Code2 as Programing,
 } from "@calcom/ui/components/icon";
 
 import { useOrgBranding } from "../ee/organizations/context/provider";
@@ -531,6 +532,11 @@ const navigation: NavigationItemType[] = [
     icon: Users,
     onlyDesktop: true,
     badge: <TeamInviteBadge />,
+  },
+  {
+    name: "Landing",
+    href: "/landing",
+    icon: Programing,
   },
   // {
   //   name: "apps",
