@@ -426,7 +426,7 @@ export const EventTypeList = ({ group, groupIndex, readOnly, types }: EventTypeL
                         />
                       )}
                       <div className="flex items-center justify-between space-x-2 rtl:space-x-reverse">
-                        {!isManagedEventType && (
+                        {/* {!isManagedEventType && (
                           <>
                             {type.hidden && <Badge variant="gray">{t("hidden")}</Badge>}
                             <Tooltip
@@ -442,7 +442,7 @@ export const EventTypeList = ({ group, groupIndex, readOnly, types }: EventTypeL
                               </div>
                             </Tooltip>
                           </>
-                        )}
+                        )} */}
 
                         <ButtonGroup combined>
                           {!isManagedEventType && (

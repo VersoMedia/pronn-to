@@ -25,6 +25,7 @@ export const meHandler = async ({ ctx }: MeOptions) => {
   return {
     id: user.id,
     name: user.name,
+    landingFields: user.landingFields,
     transferCredential: transferCredential || {},
     notificationSettings: user.notificationSettings,
     stripe_customer_id: user.stripe_customer_id,

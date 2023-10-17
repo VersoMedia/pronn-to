@@ -13,6 +13,7 @@ import { ZIntegrationsInputSchema } from "./integrations.schema";
 import { ZLocationOptionsInputSchema } from "./locationOptions.schema";
 import { ZSetDestinationCalendarInputSchema } from "./setDestinationCalendar.schema";
 import { ZSubmitFeedbackInputSchema } from "./submitFeedback.schema";
+import { ZUpdateLandingInputSchema } from "./updateLanding.schema";
 import { ZUpdateNotificationInputSchema } from "./updateNotification.schema";
 import { ZUpdateProfileInputSchema } from "./updateProfile.schema";
 import { ZUpdateTransferCredentialInputSchema } from "./updateTransferCredential.schema";
@@ -20,6 +21,7 @@ import { ZUpdateUserDefaultConferencingAppInputSchema } from "./updateUserDefaul
 
 type AppsRouterHandlerCache = {
   me?: typeof import("./me.handler").meHandler;
+  updateLanding?: typeof import("./updateLanding.handler").updateLandingHandler;
   shouldVerifyEmail?: typeof import("./shouldVerifyEmail.handler").shouldVerifyEmailHandler;
   avatar?: typeof import("./avatar.handler").avatarHandler;
   deleteMe?: typeof import("./deleteMe.handler").deleteMeHandler;
@@ -60,6 +62,19 @@ export const loggedInViewerRouter = router({
     }
 
     return UNSTABLE_HANDLER_CACHE.me({ ctx });
+  }),
+
+  updateLandings: authedProcedure.input(ZUpdateLandingInputSchema).mutation(async ({ ctx, input }) => {
+    if (!UNSTABLE_HANDLER_CACHE.updateLanding) {
+      UNSTABLE_HANDLER_CACHE.updateLanding = (await import("./updateLanding.handler")).updateLandingHandler;
+    }
+
+    // Unreachable code but required for type safety
+    if (!UNSTABLE_HANDLER_CACHE.updateLanding) {
+      throw new Error("Failed to load handler");
+    }
+
+    return UNSTABLE_HANDLER_CACHE.updateLanding({ ctx, input });
   }),
 
   avatar: authedProcedure.query(async ({ ctx }) => {

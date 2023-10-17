@@ -231,6 +231,7 @@ model User {
   allowSEOIndexing Boolean? @default(true)
 
   /// @zod.custom(imports.userMetadata)
+  landingFields        Json?
   metadata             Json?
   verified             Boolean?                @default(false)
   role                 UserPermissionRole      @default(USER)

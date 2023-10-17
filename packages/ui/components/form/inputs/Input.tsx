@@ -293,6 +293,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
 
 type TextAreaFieldProps = {
   label?: ReactNode;
+  containerClassName?: string;
   t?: (key: string) => string;
 } & React.ComponentProps<typeof TextArea> & {
     name: string;
@@ -314,10 +315,11 @@ export const TextAreaField = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>
     placeholder = t(props.name + "_placeholder") !== props.name + "_placeholder"
       ? t(props.name + "_placeholder")
       : "",
+    containerClassName = "",
     ...passThrough
   } = props;
   return (
-    <div>
+    <div className={containerClassName ?? ""}>
       {!!props.name && (
         <Label htmlFor={id} {...labelProps}>
           {label}
