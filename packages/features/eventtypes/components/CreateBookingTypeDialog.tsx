@@ -108,11 +108,11 @@ export default function CreateBookingTypeDialog({
 
       for (let i = 0; i < types.length; i++) {
         const payload = {
-          member_email: responseData.user?.email ?? "Sin correo",
+          member_email: responseData.user?.email ? responseData.user?.email : "Sin correo",
           member_phone: responseData.user?.phone,
           member_name: responseData.user?.name,
           customer_name: responseData.responses?.name,
-          customer_email: responseData.responses?.email ?? "Sin correo",
+          customer_email: responseData.responses?.email ? responseData.responses?.email : "Sin correo",
           customer_phone: responseData.responses?.phone,
           service_name: responseData.title,
           type_: types[i],
