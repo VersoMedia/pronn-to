@@ -53,6 +53,7 @@ export function UserPage(props: InferGetServerSidePropsType<typeof getServerSide
     orgSlug: _orgSlug,
     ...query
   } = useRouterQuery();
+  console.log(user, "user landing");
   const nameOrUsername = user.name || user.username || "";
 
   /*
@@ -125,35 +126,70 @@ export function UserPage(props: InferGetServerSidePropsType<typeof getServerSide
                 </div>
               </div>
             ) : (
-              eventTypes.map((type) => (
-                <div
-                  key={type.id}
-                  style={{ display: "flex", ...eventTypeListItemEmbedStyles }}
-                  className="bg-default border-subtle darked:bg-muted darked:hover:bg-emphasis hover:bg-muted group relative border-b first:rounded-t-md last:rounded-b-md last:border-b-0">
-                  <ArrowRight className="text-emphasis  absolute right-4 top-4 h-4 w-4 opacity-0 transition-opacity group-hover:opacity-100" />
-                  {/* Don't prefetch till the time we drop the amount of javascript in [user][type] page which is impacting score for [user] page */}
-                  <div className="block w-full p-5">
-                    <Link
-                      prefetch={false}
-                      href={{
-                        pathname: `/${user.username}/${type.slug}`,
-                        query,
-                      }}
-                      passHref
-                      onClick={async () => {
-                        sdkActionManager?.fire("eventTypeSelected", {
-                          eventType: type,
-                        });
-                      }}
-                      data-testid="event-type-link">
-                      <div className="flex flex-wrap items-center">
-                        <h2 className=" text-default pr-2 text-sm font-semibold">{type.title}</h2>
+              user?.landingFields?.map((landing: any) => {
+                if (landing.type === "button" && !landing.hidden) {
+                  return (
+                    <div className="bg-default border-subtle darked:bg-muted darked:hover:bg-emphasis hover:bg-muted group relative border-b first:rounded-t-md last:rounded-b-md last:border-b-0">
+                      <ArrowRight className="text-emphasis  absolute right-4 top-4 h-4 w-4 opacity-0 transition-opacity group-hover:opacity-100" />
+                      <div className="block w-full p-5">
+                        <Link
+                          prefetch={false}
+                          href={{
+                            pathname: landing.content,
+                            query,
+                          }}
+                          passHref
+                          data-testid="event-type-link-button">
+                          <div className="flex flex-wrap items-center">
+                            <h2 className=" text-default pr-2 text-sm font-semibold">{landing.label}</h2>
+                          </div>
+                        </Link>
                       </div>
-                      <EventTypeDescription eventType={type} isPublic={true} />
-                    </Link>
-                  </div>
-                </div>
-              ))
+                    </div>
+                  );
+                }
+
+                if (landing.type === "html" && !landing.hidden) {
+                  return (
+                    <div className="bg-default border-subtle darked:bg-muted darked:hover:bg-emphasis hover:bg-muted group relative border-b p-5 first:rounded-t-md last:rounded-b-md last:border-b-0">
+                      <div dangerouslySetInnerHTML={{ __html: landing.content }} />
+                    </div>
+                  );
+                }
+
+                if (landing.type === "service" && !landing.hidden) {
+                  const type = eventTypes.find((e) => e.slug === landing.name);
+                  return (
+                    <div
+                      key={type.id}
+                      style={{ display: "flex", ...eventTypeListItemEmbedStyles }}
+                      className="bg-default border-subtle darked:bg-muted darked:hover:bg-emphasis hover:bg-muted group relative border-b first:rounded-t-md last:rounded-b-md last:border-b-0">
+                      <ArrowRight className="text-emphasis  absolute right-4 top-4 h-4 w-4 opacity-0 transition-opacity group-hover:opacity-100" />
+                      {/* Don't prefetch till the time we drop the amount of javascript in [user][type] page which is impacting score for [user] page */}
+                      <div className="block w-full p-5">
+                        <Link
+                          prefetch={false}
+                          href={{
+                            pathname: `/${user.username}/${type.slug}`,
+                            query,
+                          }}
+                          passHref
+                          onClick={async () => {
+                            sdkActionManager?.fire("eventTypeSelected", {
+                              eventType: type,
+                            });
+                          }}
+                          data-testid="event-type-link">
+                          <div className="flex flex-wrap items-center">
+                            <h2 className=" text-default pr-2 text-sm font-semibold">{type.title}</h2>
+                          </div>
+                          <EventTypeDescription eventType={type} isPublic={true} />
+                        </Link>
+                      </div>
+                    </div>
+                  );
+                }
+              })
             )}
           </div>
 
@@ -221,7 +257,7 @@ export type UserPageProps = {
     darkBrandColor: string;
     allowSEOIndexing: boolean;
   };
-  users: Pick<User, "away" | "name" | "username" | "bio" | "verified">[];
+  users: Pick<User, "away" | "name" | "username" | "bio" | "verified" | "landingFields">[];
   themeBasis: string | null;
   markdownStrippedBio: string;
   safeBio: string;
@@ -266,6 +302,7 @@ export const getServerSideProps: GetServerSideProps<UserPageProps> = async (cont
     select: {
       id: true,
       username: true,
+      landingFields: true,
       email: true,
       name: true,
       bio: true,
@@ -348,6 +385,7 @@ export const getServerSideProps: GetServerSideProps<UserPageProps> = async (cont
       users: users.map((user) => ({
         name: user.name,
         username: user.username,
+        landingFields: user.landingFields || [],
         bio: user.bio,
         away: user.away,
         verified: user.verified,

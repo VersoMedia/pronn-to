@@ -21,7 +21,7 @@ import TimezoneChangeDialog from "@calcom/features/settings/TimezoneChangeDialog
 import AdminPasswordBanner from "@calcom/features/users/components/AdminPasswordBanner";
 import VerifyEmailBanner from "@calcom/features/users/components/VerifyEmailBanner";
 import classNames from "@calcom/lib/classNames";
-import { APP_NAME, WEBAPP_URL } from "@calcom/lib/constants";
+import { APP_NAME, CAL_URL, WEBAPP_URL } from "@calcom/lib/constants";
 import { getPlaceholderAvatar } from "@calcom/lib/defaultAvatarImage";
 import getBrandColours from "@calcom/lib/getBrandColours";
 import { useBookerUrl } from "@calcom/lib/hooks/useBookerUrl";
@@ -403,6 +403,17 @@ function UserDropdown({ small }: UserDropdownProps) {
               <HelpMenuItem onHelpItemSelect={() => onHelpItemSelect()} />
             ) : (
               <>
+                <DropdownMenuItem className="lg:hidden">
+                  <DropdownItem
+                    type="button"
+                    StartIcon={(props) => (
+                      <LinkIcon className={classNames("text-default", props.className)} aria-hidden="true" />
+                    )}
+                    href={`${CAL_URL}/${user.username}`}
+                    target="_blank">
+                    {t("view_public_page")}
+                  </DropdownItem>
+                </DropdownMenuItem>
                 <DropdownMenuItem>
                   <DropdownItem
                     type="button"
@@ -510,6 +521,11 @@ const MORE_SEPARATOR_NAME = "more";
 
 const navigation: NavigationItemType[] = [
   {
+    name: "Landing",
+    href: "/landing",
+    icon: Programing,
+  },
+  {
     name: "event_types_page_title",
     href: "/event-types",
     icon: LinkIcon,
@@ -532,11 +548,6 @@ const navigation: NavigationItemType[] = [
     icon: Users,
     onlyDesktop: true,
     badge: <TeamInviteBadge />,
-  },
-  {
-    name: "Landing",
-    href: "/landing",
-    icon: Programing,
   },
   // {
   //   name: "apps",

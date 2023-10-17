@@ -111,6 +111,7 @@ export const EventAdvancedTab = ({ eventType, team }: Pick<EventTypeSetupProps, 
     t("locked_fields_admin_description"),
     t("locked_fields_member_description")
   );
+
   const eventNamePlaceholder = getEventName({
     ...eventNameObject,
     eventName: formMethods.watch("eventName"),

@@ -262,7 +262,7 @@ function EventTypeSingleLayout({
                     {t("hidden")}
                   </Skeleton>
                 )}
-                <Tooltip
+                {/* <Tooltip
                   content={
                     formMethods.watch("hidden") ? t("show_eventtype_on_profile") : t("hide_from_profile")
                   }>
@@ -275,9 +275,9 @@ function EventTypeSingleLayout({
                       }}
                     />
                   </div>
-                </Tooltip>
+                </Tooltip> */}
               </div>
-              <VerticalDivider className="hidden lg:block" />
+              {/* <VerticalDivider className="hidden lg:block" /> */}
             </>
           )}
 
