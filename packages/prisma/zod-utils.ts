@@ -17,6 +17,7 @@ import { appDataSchemas } from "@calcom/app-store/apps.schemas.generated";
 import dayjs from "@calcom/dayjs";
 import type { FieldType as FormBuilderFieldType } from "@calcom/features/form-builder/schema";
 import { fieldsSchema as formBuilderFieldsSchema } from "@calcom/features/form-builder/schema";
+import { fieldsSchema as landingBuilderFieldsSchema } from "@calcom/features/landing-builder/schema";
 import { isSupportedTimeZone } from "@calcom/lib/date-fns";
 import { slugify } from "@calcom/lib/slugify";
 import { EventTypeCustomInputType } from "@calcom/prisma/enums";
@@ -108,6 +109,7 @@ export const EventTypeMetaDataSchema = z
   })
   .nullable();
 
+export const landingTypeFields = landingBuilderFieldsSchema;
 export const eventTypeBookingFields = formBuilderFieldsSchema;
 export const BookingFieldTypeEnum = eventTypeBookingFields.element.shape.type.Enum;
 export type BookingFieldType = FormBuilderFieldType;

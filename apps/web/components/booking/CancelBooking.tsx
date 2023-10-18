@@ -103,7 +103,7 @@ export default function CancelBooking(props: Props) {
                     ];
                     for (let i = 0; i < types.length; i++) {
                       const payload = {
-                        member_email: booking?.user?.email ?? "Sin correo",
+                        member_email: booking?.user?.email ? booking?.user?.email : "Sin correo",
                         member_phone: booking?.user?.phone,
                         member_name: booking?.user?.name,
                         customer_name: booking?.responses?.name,
