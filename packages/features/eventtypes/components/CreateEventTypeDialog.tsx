@@ -13,6 +13,7 @@ import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { useTypedQuery } from "@calcom/lib/hooks/useTypedQuery";
 import { HttpError } from "@calcom/lib/http-error";
 import { md } from "@calcom/lib/markdownIt";
+import { analytics, events_analytics } from "@calcom/lib/segment";
 import slugify from "@calcom/lib/slugify";
 import turndown from "@calcom/lib/turndownService";
 import { SchedulingType, MembershipRole } from "@calcom/prisma/enums";
@@ -116,6 +117,12 @@ export default function CreateEventTypeDialog({
 
   const createMutation = trpc.viewer.eventTypes.create.useMutation({
     onSuccess: async ({ eventType }) => {
+      analytics.track(events_analytics.CREATE_EVENT_TYPES, {
+        id: eventType.userId,
+        username: eventType.users[0]?.username,
+        email: eventType.users[0]?.email,
+        name: eventType.users[0]?.name,
+      });
       await router.replace("/event-types/" + eventType.id);
       showToast(t("event_type_created_successfully", { eventTypeTitle: eventType.title }), "success");
     },

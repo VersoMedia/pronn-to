@@ -14,6 +14,7 @@ import { useFlagMap } from "@calcom/features/flags/context/provider";
 import { getFeatureFlagMap } from "@calcom/features/flags/server/utils";
 import { IS_SELF_HOSTED, WEBAPP_URL } from "@calcom/lib/constants";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
+import { analytics, events_analytics } from "@calcom/lib/segment";
 import { collectPageParameters, telemetryEventTypes, useTelemetry } from "@calcom/lib/telemetry";
 import { teamMetadataSchema } from "@calcom/prisma/zod-utils";
 import type { inferSSRProps } from "@calcom/types/inferSSRProps";
@@ -79,6 +80,11 @@ export default function Signup({ prepopulateFormValues, token, orgSlug }: Signup
       .then(handleErrors)
       .then(async () => {
         telemetry.event(telemetryEventTypes.signup, collectPageParameters());
+        analytics.track(events_analytics.SINGUP, {
+          username: data?.username,
+          email: data?.email,
+          phone: data?.phone,
+        });
         const verifyOrGettingStarted = "getting-started"; //flags["email-verification"] ? "auth/verify-email" :
         await signIn<"credentials">("credentials", {
           ...data,

@@ -82,7 +82,10 @@ export const createHandler = async ({ ctx, input }: CreateOptions) => {
   }
 
   try {
-    const eventType = await ctx.prisma.eventType.create({ data });
+    const eventType = await ctx.prisma.eventType.create({
+      data,
+      select: { title: true, id: true, users: true, userId: true },
+    });
     return { eventType };
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {

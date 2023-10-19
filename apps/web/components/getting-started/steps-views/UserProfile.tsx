@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { md } from "@calcom/lib/markdownIt";
+import { analytics, events_analytics } from "@calcom/lib/segment";
 import { telemetryEventTypes, useTelemetry } from "@calcom/lib/telemetry";
 import turndown from "@calcom/lib/turndownService";
 import { trpc } from "@calcom/trpc/react";
@@ -61,6 +62,13 @@ const UserProfile = () => {
     const { bio } = data;
 
     telemetry.event(telemetryEventTypes.onboardingFinished);
+
+    analytics.track(events_analytics.ONBOARDING_FINISHED, {
+      id: user?.id,
+      username: user?.username,
+      email: user?.email,
+      name: user?.name,
+    });
 
     mutation.mutate({
       bio,

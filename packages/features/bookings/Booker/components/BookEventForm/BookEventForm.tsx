@@ -30,6 +30,7 @@ import { MINUTES_TO_BOOK } from "@calcom/lib/constants";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { useRouterQuery } from "@calcom/lib/hooks/useRouterQuery";
 import { HttpError } from "@calcom/lib/http-error";
+import { analytics, events_analytics } from "@calcom/lib/segment";
 import { trpc } from "@calcom/trpc";
 import { Alert, Button, EmptyScreen, Form, showToast } from "@calcom/ui";
 import { Calendar } from "@calcom/ui/components/icon";
@@ -211,6 +212,16 @@ export const BookEventFormChild = ({
 
   const createBookingMutation = useMutation(createBooking, {
     onSuccess: (responseData) => {
+      analytics.track(events_analytics.BOOK_APPOINTMENT, {
+        memberEmail: responseData.user?.email,
+        memberName: responseData.user?.name,
+        memberPhone: responseData.user?.phone,
+        bookingData,
+        clientName: responseData.responses?.name,
+        clientEmail: responseData.responses?.email ? responseData.responses?.email : "Sin correo",
+        clientPhoneNumber: responseData.responses?.phone,
+      });
+
       const { uid, paymentUid } = responseData;
       const fullName = getFullName(bookingForm.getValues("responses.name"));
       if (paymentUid) {
