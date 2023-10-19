@@ -18,6 +18,7 @@ import { isSAMLLoginEnabled, samlProductID, samlTenantID } from "@calcom/feature
 import { WEBAPP_URL, WEBSITE_URL } from "@calcom/lib/constants";
 import { getSafeRedirectUrl } from "@calcom/lib/getSafeRedirectUrl";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
+import { analytics, events_analytics } from "@calcom/lib/segment";
 import { collectPageParameters, telemetryEventTypes, useTelemetry } from "@calcom/lib/telemetry";
 import prisma from "@calcom/prisma";
 import { Alert, Button, EmailField, PasswordField } from "@calcom/ui";
@@ -122,6 +123,9 @@ export default function Login({
   const onSubmit = async (values: LoginValues) => {
     setErrorMessage(null);
     telemetry.event(telemetryEventTypes.login, collectPageParameters());
+    analytics.identify(events_analytics.SINGIN(values.email), {
+      email: values?.email,
+    });
     const res = await signIn<"credentials">("credentials", {
       ...values,
       callbackUrl,

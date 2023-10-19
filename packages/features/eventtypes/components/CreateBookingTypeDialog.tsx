@@ -11,6 +11,7 @@ import { createBooking } from "@calcom/features/bookings/lib";
 import { sendNotification } from "@calcom/features/bookings/lib";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { useTypedQuery } from "@calcom/lib/hooks/useTypedQuery";
+import { analytics, events_analytics } from "@calcom/lib/segment";
 import { SchedulingType, MembershipRole } from "@calcom/prisma/enums";
 import { trpc } from "@calcom/trpc/react";
 import {
@@ -104,6 +105,12 @@ export default function CreateBookingTypeDialog({
 
   const createBookingMutation = useMutation(createBooking, {
     onSuccess: async (responseData) => {
+      analytics.track(events_analytics.CREATE_APPOINTMENT, {
+        id: responseData.user?.id,
+        email: responseData.user?.email,
+        name: responseData.user?.name,
+      });
+
       const types = ["GENERAL_BOOKING_MEMBER", "GENERAL_BOOKING_CUSTOMER"];
 
       for (let i = 0; i < types.length; i++) {
