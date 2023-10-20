@@ -1,3 +1,4 @@
+// eslint-disable @typescript-eslint/no-empty-function
 import type { User as UserAuth } from "next-auth";
 import { signOut, useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
@@ -21,7 +22,7 @@ import TimezoneChangeDialog from "@calcom/features/settings/TimezoneChangeDialog
 import AdminPasswordBanner from "@calcom/features/users/components/AdminPasswordBanner";
 import VerifyEmailBanner from "@calcom/features/users/components/VerifyEmailBanner";
 import classNames from "@calcom/lib/classNames";
-import { APP_NAME, CAL_URL, WEBAPP_URL } from "@calcom/lib/constants";
+import { APP_NAME, CAL_URL, TRIAL_LIMIT_DAYS, WEBAPP_URL } from "@calcom/lib/constants";
 import { getPlaceholderAvatar } from "@calcom/lib/defaultAvatarImage";
 import getBrandColours from "@calcom/lib/getBrandColours";
 import { useBookerUrl } from "@calcom/lib/hooks/useBookerUrl";
@@ -38,6 +39,8 @@ import {
   Button,
   ButtonOrLink,
   Credits,
+  Dialog,
+  DialogContent,
   Dropdown,
   DropdownItem,
   DropdownMenuContent,
@@ -281,11 +284,42 @@ export default function Shell(props: LayoutProps) {
   // System Theme is automatically supported using ThemeProvider. If we intend to use user theme throughout the app we need to uncomment this.
   // useTheme(profile.theme);
   useBrandColors();
+  const pathname = usePathname();
+  const { data: user } = useMeQuery();
+  const [status, setStatus] = useState(false);
+  const [modal, setModal] = useState(true);
+
+  useEffect(() => {
+    if (!user || pathname === "/settings/membership") setStatus(false);
+
+    if (!user.freeTrial || dayjs().diff(dayjs(user.createdDate), "days") > TRIAL_LIMIT_DAYS) setStatus(true);
+  }, [user]);
 
   return !props.isPublic ? (
-    <KBarWrapper withKBar>
-      <Layout {...props} />
-    </KBarWrapper>
+    <>
+      <KBarWrapper withKBar>
+        <Layout {...props} />
+      </KBarWrapper>
+      {status && (
+        <Dialog open={true} onOpenChange={setModal}>
+          <DialogContent title="">
+            <div className="m-h-[530px] flex flex-col p-4">
+              <h2 className="mb-[59px] flex-none text-[45px] font-bold">Sigamos!</h2>
+              <div className="mb-[92px] text-[28px]">
+                Tu prueba gratis ha concluido. <br />
+                <br />
+                Suscríbete al plan pro para poder seguir agendando!
+              </div>
+              <Link
+                href="/settings/membership"
+                className="mb-[30px] flex cursor-pointer flex-col items-center justify-center rounded-md bg-[#000] p-3 text-white">
+                Subir a pro
+              </Link>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   ) : (
     <PublicShell {...props} />
   );

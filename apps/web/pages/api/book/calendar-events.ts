@@ -51,6 +51,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === "GET") {
     if (credentialDestination.length) {
+      console.log(credentialDestination, "credential destination");
       const credentialId =
         credentialDestination.filter((crd) => crd.eventType)[0] ?? credentialDestination[0];
 
@@ -61,10 +62,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
 
       if (credential) {
-        const calendarService = new GoogleService(credential);
-        const availability = await calendarService.getEvents(new Date(req.query?.date));
-        res.status(200).json({ data: availability });
-        return;
+        try {
+          const calendarService = new GoogleService(credential);
+          const availability = await calendarService.getEvents(new Date(req.query?.date));
+          res.status(200).json({ data: availability });
+          return;
+        } catch (e) {
+          console.log(e);
+          return res.status(500);
+        }
       }
 
       res.status(200).json({ data: availability });
@@ -74,4 +80,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return;
     }
   }
+
+  return res.status(401);
 }
