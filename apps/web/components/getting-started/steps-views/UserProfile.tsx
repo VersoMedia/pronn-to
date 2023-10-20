@@ -51,7 +51,7 @@ const UserProfile = () => {
         }
 
         await utils.viewer.me.refetch();
-        router.push("/");
+        router.push("/event-types?welcome=1");
       }
     },
     onError: () => {
