@@ -15,7 +15,7 @@ declare module "next-auth" {
     emailVerified?: PrismaUser["emailVerified"];
     email_verified?: boolean;
     impersonatedByUID?: number;
-    freeTrialAccount?: string | null;
+    freeTrialAccount?: boolean | null;
     createdAt?: string | null;
     belongsToActiveTeam?: boolean;
     organizationId?: number | null;
