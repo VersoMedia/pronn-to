@@ -294,7 +294,8 @@ export default function Shell(props: LayoutProps) {
 
     if (
       (user?.freeTrial || user?.freeTrial === null) &&
-      dayjs().diff(dayjs(user?.createdDate), "days") > TRIAL_LIMIT_DAYS
+      dayjs().diff(dayjs(user?.createdDate), "days") > TRIAL_LIMIT_DAYS &&
+      pathname !== "/settings/membership"
     )
       setStatus(true);
   }, [user]);
