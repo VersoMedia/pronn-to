@@ -298,7 +298,7 @@ export default function Shell(props: LayoutProps) {
       pathname !== "/settings/membership"
     )
       setStatus(true);
-  }, [user]);
+  }, [user, pathname]);
 
   return !props.isPublic ? (
     <>
