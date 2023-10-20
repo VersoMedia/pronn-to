@@ -251,6 +251,7 @@ model User {
   organization         Team?                   @relation("scope", fields: [organizationId], references: [id], onDelete: SetNull)
   stripe_customer_id   String?
   freeTrial            String?
+  freeTrialAccount     Boolean?                @default(true)
   paymentMembership    Json?
   // Linking account code for orgs v2
   //linkedByUserId       Int?

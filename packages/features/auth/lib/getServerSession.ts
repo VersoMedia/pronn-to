@@ -68,7 +68,7 @@ export async function getServerSession(options: {
       email: user.email,
       emailVerified: user.emailVerified,
       email_verified: user.emailVerified !== null,
-      freeTrial: user.freeTrial,
+      freeTrialAccount: user.freeTrialAccount,
       createdAt: user.createdDate.toISOString(),
       role: user.role,
       image: `${CAL_URL}/${user.username}/avatar.png`,

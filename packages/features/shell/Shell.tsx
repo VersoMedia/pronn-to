@@ -293,11 +293,12 @@ export default function Shell(props: LayoutProps) {
     if (!user || pathname === "/settings/membership") setStatus(false);
 
     if (
-      (user.freeTrial || user.freeTrial === null) &&
-      dayjs().diff(dayjs(user.createdDate), "days") > TRIAL_LIMIT_DAYS
+      (user?.freeTrialAccount || user?.freeTrialAccount === null) &&
+      dayjs().diff(dayjs(user?.createdDate), "days") > TRIAL_LIMIT_DAYS &&
+      pathname !== "/settings/membership"
     )
       setStatus(true);
-  }, [user]);
+  }, [user, pathname]);
 
   return !props.isPublic ? (
     <>
