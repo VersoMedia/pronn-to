@@ -292,7 +292,11 @@ export default function Shell(props: LayoutProps) {
   useEffect(() => {
     if (!user || pathname === "/settings/membership") setStatus(false);
 
-    if (!user.freeTrial || dayjs().diff(dayjs(user.createdDate), "days") > TRIAL_LIMIT_DAYS) setStatus(true);
+    if (
+      (user.freeTrial || user.freeTrial === null) &&
+      dayjs().diff(dayjs(user.createdDate), "days") > TRIAL_LIMIT_DAYS
+    )
+      setStatus(true);
   }, [user]);
 
   return !props.isPublic ? (
