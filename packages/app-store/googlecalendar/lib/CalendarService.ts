@@ -350,6 +350,7 @@ export default class GoogleCalendarService implements Calendar {
       const events = res.data.items;
       if (!events || events.length === 0) {
         console.log("No upcoming events found.");
+        resolve([]);
         return;
       }
 
