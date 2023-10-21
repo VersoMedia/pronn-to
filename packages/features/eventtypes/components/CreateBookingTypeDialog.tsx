@@ -231,7 +231,7 @@ export default function CreateBookingTypeDialog({
             <div>
               <Label className="mb-2">Selecciona un evento</Label>
               <Select
-                isSearchable={false}
+                isSearchable
                 placeholder="Selecciona un evento"
                 className="mt-0 w-full capitalize"
                 options={eventTypes}
@@ -263,7 +263,7 @@ export default function CreateBookingTypeDialog({
                 <>
                   <Label className="mb-2">Selecciona un cliente</Label>
                   <Select
-                    isSearchable={false}
+                    isSearchable
                     placeholder="Selecciona un cliente"
                     className="mt-0 w-full capitalize"
                     options={attendeesDecode}
