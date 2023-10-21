@@ -185,7 +185,7 @@ export const BookEventFormChild = ({
         customer_name: responseData.responses?.name,
         customer_email: responseData.responses?.email ? responseData.responses?.email : "Sin correo",
         customer_phone: responseData.responses?.phone,
-        service_name: responseData.title,
+        service_name: responseData.title ? responseData.title : eventType?.title,
         type_: types[i],
         old_date: dayjs(bookingData?.startTime).format("DD-MM-YYYY"),
         old_hour: dayjs(bookingData?.startTime).format("hh:mm A"),

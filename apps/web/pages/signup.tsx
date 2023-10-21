@@ -7,6 +7,7 @@ import type { SubmitHandler } from "react-hook-form";
 import { FormProvider, useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 
+import { sendNotification } from "@calcom/features/bookings/lib";
 import { checkPremiumUsername } from "@calcom/features/ee/common/lib/checkPremiumUsername";
 import { getOrgFullDomain } from "@calcom/features/ee/organizations/lib/orgDomains";
 import { isSAMLLoginEnabled } from "@calcom/features/ee/sso/lib/saml";
@@ -85,6 +86,15 @@ export default function Signup({ prepopulateFormValues, token, orgSlug }: Signup
           email: data?.email,
           phone: data?.phone,
         });
+
+        const payload = {
+          type_: "FIRST_MESSAGE_MEMBER",
+          member_username: data.username,
+          member_phone: data.phone,
+          member_name: data.username,
+        };
+        await sendNotification(payload);
+
         const verifyOrGettingStarted = "getting-started"; //flags["email-verification"] ? "auth/verify-email" :
         await signIn<"credentials">("credentials", {
           ...data,

@@ -3,7 +3,7 @@ import type { User as UserAuth } from "next-auth";
 import { signOut, useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import type { Dispatch, ReactElement, ReactNode, SetStateAction } from "react";
 import React, { cloneElement, Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { Toaster } from "react-hot-toast";
@@ -284,10 +284,12 @@ export default function Shell(props: LayoutProps) {
   // System Theme is automatically supported using ThemeProvider. If we intend to use user theme throughout the app we need to uncomment this.
   // useTheme(profile.theme);
   useBrandColors();
+  const search = useSearchParams();
   const pathname = usePathname();
   const { data: user } = useMeQuery();
   const [status, setStatus] = useState(false);
   const [modal, setModal] = useState(true);
+  const [modalWelcome, setModalWelcome] = useState(false);
 
   useEffect(() => {
     if (!user || pathname === "/settings/membership") setStatus(false);
@@ -299,6 +301,17 @@ export default function Shell(props: LayoutProps) {
     )
       setStatus(true);
   }, [user, pathname]);
+
+  useEffect(() => {
+    if (search.get("welcome") === "1") {
+      setModalWelcome(true);
+    }
+  }, [pathname]);
+
+  const handleClickCopy = () => {
+    window?.open(`${CAL_URL}/${user?.username}`, "_blank");
+    setModalWelcome(false);
+  };
 
   return !props.isPublic ? (
     <>
@@ -324,6 +337,34 @@ export default function Shell(props: LayoutProps) {
           </DialogContent>
         </Dialog>
       )}
+      <Dialog open={modalWelcome} onOpenChange={setModalWelcome}>
+        <DialogContent title="">
+          <div className="flex flex-col items-center justify-center p-4">
+            <img src={`${CAL_URL}/welcome.png`} alt="verso" width={260} className="mb-8" />
+            <div className="text-center text-[36px] text-[#292929]">¡Ya tienes tu Verso!</div>
+            <div className="text-center text-[18px]">
+              Ya puedes comenzar a compartir tu link.
+              <br />
+              <br />
+              Hagamos una prueba. Comparte tu calendario general con un cliente o amigo y pide que agende a
+              través de ahí.
+            </div>
+            <div
+              className="mb-[30px] flex cursor-pointer flex-col items-center justify-center rounded-md bg-[#000] p-3 text-white"
+              onClick={handleClickCopy}
+              style={{
+                background: "#F1F1F1",
+                color: "#0064FA",
+                marginTop: 10,
+              }}>
+              {`${CAL_URL}/${user?.username}`}
+            </div>
+            <div className="mt-2 pb-8 text-center text-[18px]">
+              Después te ayudaremos a configurarlo a la medida.
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   ) : (
     <PublicShell {...props} />
@@ -560,7 +601,7 @@ const MORE_SEPARATOR_NAME = "more";
 
 const navigation: NavigationItemType[] = [
   {
-    name: "Landing",
+    name: "landing",
     href: "/landing",
     icon: Programing,
   },
