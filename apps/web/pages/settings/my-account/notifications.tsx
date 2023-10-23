@@ -131,7 +131,7 @@ const NotificationView = ({ user }: NotificationViewProps) => {
               />
             )}
           />
-          {formMethods.getValues("memberWhats") && (
+          {formMethods.watch("memberWhats") && (
             <Controller
               control={formMethods.control}
               name="phone"
@@ -182,7 +182,7 @@ const NotificationView = ({ user }: NotificationViewProps) => {
               />
             )}
           />
-          {formMethods.getValues("twoDays") && (
+          {formMethods.watch("twoDays") && (
             <TextField
               label={null}
               placeholder={t("custom_text_reminder", { day: "2 days" })}
@@ -204,7 +204,7 @@ const NotificationView = ({ user }: NotificationViewProps) => {
               />
             )}
           />
-          {formMethods.getValues("oneDays") && (
+          {formMethods.watch("oneDays") && (
             <TextField
               label={null}
               placeholder={t("custom_text_reminder", { day: "1 day" })}
@@ -227,7 +227,7 @@ const NotificationView = ({ user }: NotificationViewProps) => {
               />
             )}
           />
-          {formMethods.getValues("twelveHours") && (
+          {formMethods.watch("twelveHours") && (
             <TextField
               label={null}
               placeholder={t("custom_text_reminder", { day: "12 hours" })}
@@ -249,7 +249,7 @@ const NotificationView = ({ user }: NotificationViewProps) => {
               />
             )}
           />
-          {formMethods.getValues("sixHours") && (
+          {formMethods.watch("sixHours") && (
             <TextField
               label={null}
               placeholder={t("custom_text_reminder", { day: "6 hours" })}
@@ -271,7 +271,7 @@ const NotificationView = ({ user }: NotificationViewProps) => {
               />
             )}
           />
-          {formMethods.getValues("oneHour") && (
+          {formMethods.watch("oneHour") && (
             <TextField
               label={null}
               placeholder={t("custom_text_reminder", { day: "1 hour" })}
@@ -293,7 +293,7 @@ const NotificationView = ({ user }: NotificationViewProps) => {
               />
             )}
           />
-          {formMethods.getValues("thirtyMinutes") && (
+          {formMethods.watch("thirtyMinutes") && (
             <TextField
               label={null}
               placeholder={t("custom_text_reminder", { day: "30 minutes" })}
