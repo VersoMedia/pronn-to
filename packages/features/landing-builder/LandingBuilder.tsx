@@ -494,10 +494,10 @@ function FieldEditDialog({
                           containerClassName="mt-6"
                           label={t("content")}
                         />
-                        {fieldForm.getValues("content") &&
+                        {fieldForm.watch("content") &&
                           !isValidUrl(fieldForm.getValues("content")) &&
                           fieldForm.getValues("type") === "button" && (
-                            <p className="text-danger text-sm">URL incorrecta</p>
+                            <p className="text-sm text-red-600">URL incorrecta</p>
                           )}
                       </>
                     )}
@@ -514,10 +514,10 @@ function FieldEditDialog({
                           placeholder={t(fieldForm.getValues("defaultLabel") || "")}
                           label={t("content")}
                         />
-                        {fieldForm.getValues("content") &&
+                        {fieldForm.watch("content") &&
                           !isValidHTML(fieldForm.getValues("content")) &&
-                          fieldForm.getValues("type") === "button" && (
-                            <p className="text-danger text-sm">HTML incorrecto</p>
+                          fieldForm.getValues("type") === "html" && (
+                            <p className="text-sm text-red-600">HTML incorrecto</p>
                           )}
                       </>
                     )}
