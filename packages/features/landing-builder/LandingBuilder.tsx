@@ -414,6 +414,23 @@ function FieldEditDialog({
 
   const fieldTypes = Object.values(fieldTypesConfigMap);
 
+  const isValidUrl = (urlString: string): boolean => {
+    const urlPattern = new RegExp(
+      "^(https?:\\/\\/)?" + // validate protocol
+        "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // validate domain name
+        "((\\d{1,3}\\.){3}\\d{1,3}))" + // validate OR ip (v4) address
+        "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // validate port and path
+        "(\\?[;&a-z\\d%_.~+=-]*)?" + // validate query string
+        "(\\#[-a-z\\d_]*)?$",
+      "i"
+    ); // validate fragment locator
+    return !!urlPattern.test(urlString);
+  };
+
+  const isValidHTML = (tags: string): boolean => {
+    return /<([A-Za-z][A-Za-z0-9]*)\b[^>]*>(.*?)<\/\1>/.test(tags);
+  };
+
   return (
     <Dialog open={dialog.isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-none p-0" data-testid="edit-field-dialog">
@@ -466,55 +483,44 @@ function FieldEditDialog({
                       label={t("label")}
                     />
                     {fieldForm.getValues("type") === "button" && (
-                      <InputField
-                        {...fieldForm.register("content")}
-                        // System fields have a defaultLabel, so there a label is not required
-                        required={
-                          !["system", "system-but-optional"].includes(fieldForm.getValues("editable") || "")
-                        }
-                        placeholder={t(fieldForm.getValues("defaultLabel") || "")}
-                        containerClassName="mt-6"
-                        label={t("content")}
-                      />
-                    )}
-                    {fieldForm.getValues("type") === "html" && (
-                      <TextAreaField
-                        {...fieldForm.register("content")}
-                        // System fields have a defaultLabel, so there a label is not required
-                        required={
-                          !["system", "system-but-optional"].includes(fieldForm.getValues("editable") || "")
-                        }
-                        containerClassName="mt-6"
-                        placeholder={t(fieldForm.getValues("defaultLabel") || "")}
-                        label={t("content")}
-                      />
+                      <>
+                        <InputField
+                          {...fieldForm.register("content")}
+                          // System fields have a defaultLabel, so there a label is not required
+                          required={
+                            !["system", "system-but-optional"].includes(fieldForm.getValues("editable") || "")
+                          }
+                          placeholder={t(fieldForm.getValues("defaultLabel") || "")}
+                          containerClassName="mt-6"
+                          label={t("content")}
+                        />
+                        {fieldForm.watch("content") &&
+                          !isValidUrl(fieldForm.getValues("content")) &&
+                          fieldForm.getValues("type") === "button" && (
+                            <p className="text-sm text-red-600">URL incorrecta</p>
+                          )}
+                      </>
                     )}
 
-                    {/* {fieldType?.needsOptions && !fieldForm.getValues("getOptionsAt") ? (
-                      <Controller
-                        name="options"
-                        render={({ field: { value, onChange } }) => {
-                          return <Options onChange={onChange} value={value} className="mt-6" />;
-                        }}
-                      />
-                    ) : null} */}
-                    {/* <Controller
-                      name="required"
-                      control={fieldForm.control}
-                      render={({ field: { value, onChange } }) => {
-                        return (
-                          <BooleanToggleGroupField
-                            data-testid="field-required"
-                            disabled={fieldForm.getValues("editable") === "system"}
-                            value={value}
-                            onValueChange={(val) => {
-                              onChange(val);
-                            }}
-                            label={t("required")}
-                          />
-                        );
-                      }}
-                    /> */}
+                    {fieldForm.getValues("type") === "html" && (
+                      <>
+                        <TextAreaField
+                          {...fieldForm.register("content")}
+                          // System fields have a defaultLabel, so there a label is not required
+                          required={
+                            !["system", "system-but-optional"].includes(fieldForm.getValues("editable") || "")
+                          }
+                          containerClassName="mt-6"
+                          placeholder={t(fieldForm.getValues("defaultLabel") || "")}
+                          label={t("content")}
+                        />
+                        {fieldForm.watch("content") &&
+                          !isValidHTML(fieldForm.getValues("content")) &&
+                          fieldForm.getValues("type") === "html" && (
+                            <p className="text-sm text-red-600">HTML incorrecto</p>
+                          )}
+                      </>
+                    )}
                   </>
                 );
               }
@@ -529,7 +535,13 @@ function FieldEditDialog({
 
           <DialogFooter className="relative rounded px-8" showDivider>
             <DialogClose color="secondary">{t("cancel")}</DialogClose>
-            <Button data-testid="field-add-save" type="submit">
+            <Button
+              data-testid="field-add-save"
+              disabled={
+                (!isValidUrl(fieldForm.getValues("content")) && fieldForm.getValues("type") === "button") ||
+                (fieldForm.getValues("type") === "html" && !isValidHTML(fieldForm.getValues("content")))
+              }
+              type="submit">
               {isFieldEditMode ? t("save") : t("add")}
             </Button>
           </DialogFooter>
