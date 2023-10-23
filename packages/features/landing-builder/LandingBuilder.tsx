@@ -497,7 +497,7 @@ function FieldEditDialog({
                         {fieldForm.getValues("content") &&
                           !isValidUrl(fieldForm.getValues("content")) &&
                           fieldForm.getValues("type") === "button" && (
-                            <p className="text-danger">URL incorrecta</p>
+                            <p className="text-danger text-sm">URL incorrecta</p>
                           )}
                       </>
                     )}
@@ -517,7 +517,7 @@ function FieldEditDialog({
                         {fieldForm.getValues("content") &&
                           !isValidHTML(fieldForm.getValues("content")) &&
                           fieldForm.getValues("type") === "button" && (
-                            <p className="text-danger">HTML incorrecto</p>
+                            <p className="text-danger text-sm">HTML incorrecto</p>
                           )}
                       </>
                     )}
