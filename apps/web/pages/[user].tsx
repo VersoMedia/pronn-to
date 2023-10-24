@@ -72,7 +72,7 @@ export function UserPage(props: InferGetServerSidePropsType<typeof getServerSide
     );
   }
 
-  const isEventListEmpty = eventTypes.length === 0;
+  const isEventListEmpty = eventTypes.length === 0 && user?.landingFields && user?.landingFields.length === 0;
 
   return (
     <>
@@ -140,7 +140,7 @@ export function UserPage(props: InferGetServerSidePropsType<typeof getServerSide
                         <Link
                           prefetch={false}
                           href={{
-                            pathname: `/${user.username}/${type.slug}`,
+                            pathname: `/${user.username}/${type?.slug}`,
                             query,
                           }}
                           passHref
@@ -189,7 +189,11 @@ export function UserPage(props: InferGetServerSidePropsType<typeof getServerSide
                     );
                   }
 
-                  if (landing.type === "service" && !landing.hidden) {
+                  if (
+                    landing.type === "service" &&
+                    !landing.hidden &&
+                    eventTypes.find((e) => e.slug === landing.name)
+                  ) {
                     const type = eventTypes.find((e) => e.slug === landing.name);
                     return (
                       <div
@@ -202,7 +206,7 @@ export function UserPage(props: InferGetServerSidePropsType<typeof getServerSide
                           <Link
                             prefetch={false}
                             href={{
-                              pathname: `/${user.username}/${type.slug}`,
+                              pathname: `/${user.username}/${type?.slug}`,
                               query,
                             }}
                             passHref
@@ -400,7 +404,7 @@ export const getServerSideProps: GetServerSideProps<UserPageProps> = async (cont
   if (context.query.log === "1") {
     context.res.setHeader("X-Data-Fetch-Time", `${dataFetchEnd - dataFetchStart}ms`);
   }
-  const eventTypesRaw = eventTypesWithHidden.filter((evt) => !evt.hidden);
+  const eventTypesRaw = eventTypesWithHidden;
 
   const eventTypes = eventTypesRaw.map((eventType) => ({
     ...eventType,
