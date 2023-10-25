@@ -14,7 +14,7 @@ const DeploymentUsersListPage = () => {
           <div className="mt-4 space-x-5 sm:ml-16 sm:mt-0 sm:flex-none">
             {/* TODO: Add import users functionality */}
             {/* <Button disabled>Import users</Button> */}
-            <Button href="/settings/admin/users/add">Add user</Button>
+            <Button href="/settings/console/users/add">Add user</Button>
           </div>
         }
       />

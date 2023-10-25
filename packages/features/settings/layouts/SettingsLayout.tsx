@@ -109,19 +109,25 @@ const tabs: VerticalTabItemProps[] = [
   },
   {
     name: "console",
-    href: "/settings/admin",
+    href: "/settings/console",
     icon: Lock,
-    children: [
-      //
-      { name: "features", href: "/settings/admin/flags" },
-      // { name: "license", href: "/auth/setup?step=1" },
-      { name: "impersonation", href: "/settings/admin/impersonation" },
-      { name: "apps", href: "/settings/admin/apps/calendar" },
-      { name: "users", href: "/settings/admin/users" },
-      { name: "organizations", href: "/settings/admin/organizations" },
-      // { name: "kyc_verification", href: "/settings/admin/kycVerification" },
-    ],
+    children: [{ name: "users", href: "/settings/console/users" }],
   },
+  // {
+  //   name: "console",
+  //   href: "/settings/admin",
+  //   icon: Lock,
+  //   children: [
+  //     //
+  //     { name: "features", href: "/settings/admin/flags" },
+  //     // { name: "license", href: "/auth/setup?step=1" },
+  //     { name: "impersonation", href: "/settings/admin/impersonation" },
+  //     { name: "apps", href: "/settings/admin/apps/calendar" },
+  //     { name: "users", href: "/settings/admin/users" },
+  //     { name: "organizations", href: "/settings/admin/organizations" },
+  //     // { name: "kyc_verification", href: "/settings/admin/kycVerification" },
+  //   ],
+  // },
 ];
 
 // tabs.find((tab) => {
