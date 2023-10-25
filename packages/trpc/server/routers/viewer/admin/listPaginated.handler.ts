@@ -40,12 +40,14 @@ export const listPaginatedHandler = async ({ ctx, input }: GetOptions) => {
     take: limit + 1, // We take +1 as itll be used for the next cursor
     where: searchFilters,
     orderBy: {
-      id: "asc",
+      id: "desc",
     },
     select: {
       id: true,
       email: true,
       username: true,
+      createdDate: true,
+      phone: true,
       name: true,
       timeZone: true,
       role: true,
