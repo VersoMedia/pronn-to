@@ -108,7 +108,7 @@ const tabs: VerticalTabItemProps[] = [
     children: [],
   },
   {
-    name: "admin",
+    name: "console",
     href: "/settings/admin",
     icon: Lock,
     children: [
@@ -157,12 +157,14 @@ const useTabs = () => {
     }
     return tab;
   });
+  console.log(isAdmin, "is admin", session.data?.user.role);
 
   // check if name is in adminRequiredKeys
   return tabs.filter((tab) => {
     if (organizationRequiredKeys.includes(tab.name)) return !!session.data?.user?.organizationId;
 
     if (isAdmin) return true;
+    if (!isAdmin && tab.name === "console") return false;
     return !adminRequiredKeys.includes(tab.name);
   });
 };

@@ -460,7 +460,7 @@ export const AUTH_OPTIONS: AuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      const hasValidLicense = await checkLicense(prisma);
+      const hasValidLicense = checkLicense(prisma);
       const calendsoSession: Session = {
         ...session,
         hasValidLicense,
