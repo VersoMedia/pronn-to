@@ -1,7 +1,6 @@
-import { useState, useRef, useMemo, useCallback, useEffect } from "react";
+import { useState, useRef, useMemo } from "react";
 
 import dayjs from "@calcom/dayjs";
-import { WEBAPP_URL } from "@calcom/lib/constants";
 import { useDebounce } from "@calcom/lib/hooks/useDebounce";
 import { trpc } from "@calcom/trpc/react";
 import {
@@ -12,7 +11,6 @@ import {
   showToast,
   Table,
   TextField,
-  Avatar,
 } from "@calcom/ui";
 import { Edit, Trash, Lock } from "@calcom/ui/components/icon";
 
@@ -20,7 +18,7 @@ import { withLicenseRequired } from "../../common/components/LicenseRequired";
 
 const { Cell, ColumnTitle, Header, Row } = Table;
 
-const FETCH_LIMIT = 100;
+const FETCH_LIMIT = 10;
 
 function UsersTableBare() {
   const tableContainerRef = useRef<HTMLDivElement>(null);
@@ -59,17 +57,18 @@ function UsersTableBare() {
     },
   });
 
-  const { data, fetchNextPage, isFetching } = trpc.viewer.admin.listPaginated.useInfiniteQuery(
-    {
-      limit: FETCH_LIMIT,
-      searchTerm: debouncedSearchTerm,
-    },
-    {
-      getNextPageParam: (lastPage) => lastPage.nextCursor,
-      keepPreviousData: true,
-      refetchOnWindowFocus: false,
-    }
-  );
+  const { data, fetchNextPage, fetchPreviousPage, hasNextPage, hasPreviousPage, isFetching } =
+    trpc.viewer.admin.listPaginated.useInfiniteQuery(
+      {
+        limit: FETCH_LIMIT,
+        searchTerm: debouncedSearchTerm,
+      },
+      {
+        getNextPageParam: (lastPage) => lastPage.nextCursor,
+        keepPreviousData: true,
+        refetchOnWindowFocus: false,
+      }
+    );
 
   const sendPasswordResetEmail = trpc.viewer.admin.sendPasswordReset.useMutation({
     onSuccess: () => {
@@ -83,22 +82,22 @@ function UsersTableBare() {
   const totalFetched = flatData.length;
 
   //called on scroll and possibly on mount to fetch more data as the user scrolls and reaches bottom of table
-  const fetchMoreOnBottomReached = useCallback(
-    (containerRefElement?: HTMLDivElement | null) => {
-      if (containerRefElement) {
-        const { scrollHeight, scrollTop, clientHeight } = containerRefElement;
-        //once the user has scrolled within 300px of the bottom of the table, fetch more data if there is any
-        if (scrollHeight - scrollTop - clientHeight < 300 && !isFetching && totalFetched < totalDBRowCount) {
-          fetchNextPage();
-        }
-      }
-    },
-    [fetchNextPage, isFetching, totalFetched, totalDBRowCount]
-  );
+  // const fetchMoreOnBottomReached = useCallback(
+  //   (containerRefElement?: HTMLDivElement | null) => {
+  //     if (containerRefElement) {
+  //       const { scrollHeight, scrollTop, clientHeight } = containerRefElement;
+  //       //once the user has scrolled within 300px of the bottom of the table, fetch more data if there is any
+  //       if (scrollHeight - scrollTop - clientHeight < 300 && !isFetching && totalFetched < totalDBRowCount) {
+  //         fetchNextPage();
+  //       }
+  //     }
+  //   },
+  //   [fetchNextPage, isFetching, totalFetched, totalDBRowCount]
+  // );
 
-  useEffect(() => {
-    fetchMoreOnBottomReached(tableContainerRef.current);
-  }, [fetchMoreOnBottomReached]);
+  // useEffect(() => {
+  //   fetchMoreOnBottomReached(tableContainerRef.current);
+  // }, [fetchMoreOnBottomReached]);
 
   const [userToDelete, setUserToDelete] = useState<number | null>(null);
 
@@ -109,14 +108,7 @@ function UsersTableBare() {
         label="Search"
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      <div
-        className="border-subtle rounded-md border"
-        ref={tableContainerRef}
-        onScroll={() => fetchMoreOnBottomReached()}
-        style={{
-          height: "calc(100vh - 30vh)",
-          overflow: "auto",
-        }}>
+      <div className="border-subtle rounded-md">
         <Table>
           <Header>
             <ColumnTitle widthClassNames="w-auto">User</ColumnTitle>
@@ -133,14 +125,14 @@ function UsersTableBare() {
               <Row key={user.email}>
                 <Cell widthClassNames="w-auto">
                   <div className="min-h-10 flex ">
-                    <Avatar
+                    {/* <Avatar
                       size="md"
                       alt={`Avatar of ${user.username || "Nameless"}`}
                       gravatarFallbackMd5=""
                       imageSrc={`${WEBAPP_URL}/${user.username}/avatar.png?orgId=${user.organizationId}`}
-                    />
+                    /> */}
 
-                    <div className="text-subtle ml-4 font-medium">
+                    <div className="text-subtle font-medium">
                       <span className="text-default">{user.name}</span>
                       <br />
                       <span>/{user.username}</span>
@@ -165,7 +157,7 @@ function UsersTableBare() {
                         {
                           id: "edit",
                           label: "Edit",
-                          href: `/settings/admin/users/${user.id}/edit`,
+                          href: `/settings/console/users/${user.id}/edit`,
                           icon: Edit,
                         },
                         {
@@ -189,6 +181,21 @@ function UsersTableBare() {
             ))}
           </tbody>
         </Table>
+        <div className="w-full">
+          <div className="flex flex-row items-center justify-center gap-x-2 p-2">
+            <button className="flex h-8 items-center justify-center rounded-l bg-gray-800 px-3 text-sm font-medium text-white hover:bg-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+              Atrás
+            </button>
+            <span className="text-sm text-gray-700 dark:text-gray-400">
+              Viendo <span className="font-semibold text-gray-900 dark:text-white">1</span> de{" "}
+              <span className="font-semibold text-gray-900 dark:text-white">10</span> de{" "}
+              <span className="font-semibold text-gray-900 dark:text-white">100</span> Registros
+            </span>
+            <button className="flex h-8 items-center justify-center rounded-r border-0 border-l border-gray-700 bg-gray-800 px-3 text-sm font-medium text-white hover:bg-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+              Siguiente
+            </button>
+          </div>
+        </div>
         <DeleteUserDialog
           user={userToDelete}
           onClose={() => setUserToDelete(null)}
