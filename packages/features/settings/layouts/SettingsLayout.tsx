@@ -108,7 +108,7 @@ const tabs: VerticalTabItemProps[] = [
     children: [],
   },
   {
-    name: "console_admin",
+    name: "console",
     href: "/settings/admin",
     icon: Lock,
     children: [

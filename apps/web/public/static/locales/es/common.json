@@ -568,6 +568,7 @@
   "owner": "Propietario",
   "admin": "Administrador",
   "console_admin": "Consola administrador",
+  "console": "Console",
   "administrator_user": "Usuario administrador",
   "lets_create_first_administrator_user": "Vamos a crear el primer usuario administrador.",
   "admin_user_created": "Configuración del usuario administrador",
