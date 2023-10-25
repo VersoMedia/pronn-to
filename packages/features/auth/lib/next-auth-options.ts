@@ -13,7 +13,6 @@ import { checkRateLimitAndThrowError } from "@calcom/lib/checkRateLimitAndThrowE
 import { IS_TEAM_BILLING_ENABLED, WEBAPP_URL } from "@calcom/lib/constants";
 import { symmetricDecrypt } from "@calcom/lib/crypto";
 import { defaultCookies } from "@calcom/lib/default-cookies";
-import { isENVDev } from "@calcom/lib/env";
 import { randomString } from "@calcom/lib/random";
 import slugify from "@calcom/lib/slugify";
 import prisma from "@calcom/prisma";
@@ -168,9 +167,9 @@ const providers: Provider[] = [
         // User's password is valid and two-factor authentication is enabled
         if (isPasswordValid(credentials.password, false, true) && user.twoFactorEnabled) return role;
         // Code is running in a development environment
-        if (isENVDev) return role;
+        return role;
         // By this point it is an ADMIN without valid security conditions
-        return "INACTIVE_ADMIN";
+        //return "INACTIVE_ADMIN";
       };
 
       return {
