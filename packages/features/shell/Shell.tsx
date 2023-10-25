@@ -19,7 +19,6 @@ import { TeamsUpgradeBanner } from "@calcom/features/ee/teams/components";
 import { useFlagMap } from "@calcom/features/flags/context/provider";
 import { KBarContent, KBarRoot, KBarTrigger } from "@calcom/features/kbar/Kbar";
 import TimezoneChangeDialog from "@calcom/features/settings/TimezoneChangeDialog";
-import AdminPasswordBanner from "@calcom/features/users/components/AdminPasswordBanner";
 import VerifyEmailBanner from "@calcom/features/users/components/VerifyEmailBanner";
 import classNames from "@calcom/lib/classNames";
 import { APP_NAME, CAL_URL, TRIAL_LIMIT_DAYS, WEBAPP_URL } from "@calcom/lib/constants";
@@ -153,7 +152,7 @@ function AppTop({ setBannersHeight }: { setBannersHeight: Dispatch<SetStateActio
       <TeamsUpgradeBanner />
       <OrgUpgradeBanner />
       <ImpersonatingBanner />
-      <AdminPasswordBanner />
+      {/* <AdminPasswordBanner /> */}
       <VerifyEmailBanner />
     </div>
   );
