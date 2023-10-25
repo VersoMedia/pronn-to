@@ -1,13 +1,8 @@
-import DOMPurify from "dompurify";
 import { useSession } from "next-auth/react";
-import { Trans } from "next-i18next";
 import type { AriaRole, ComponentType } from "react";
-import React, { Fragment, useEffect } from "react";
+import React, { Fragment } from "react";
 
-import { APP_NAME, CONSOLE_URL, SUPPORT_MAIL_ADDRESS, WEBAPP_URL } from "@calcom/lib/constants";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
-import { EmptyScreen, TopBanner } from "@calcom/ui";
-import { AlertTriangle } from "@calcom/ui/components/icon";
 
 type LicenseRequiredProps = {
   as?: keyof JSX.IntrinsicElements | "";
@@ -22,21 +17,21 @@ const LicenseRequired = ({ children, as = "", ...rest }: LicenseRequiredProps) =
   const Component = as || Fragment;
   const hasValidLicense = session.data ? session.data.hasValidLicense : null;
 
-  useEffect(() => {
-    if (process.env.NODE_ENV === "development" && hasValidLicense === false) {
-      // Very few people will see this, so we don't need to translate it
-      console.info(
-        `You're using a feature that requires a valid license. Please go to ${WEBAPP_URL}/auth/setup to enter a license key.`
-      );
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (process.env.NODE_ENV === "development" && hasValidLicense === false) {
+  //     // Very few people will see this, so we don't need to translate it
+  //     console.info(
+  //       `You're using a feature that requires a valid license. Please go to ${WEBAPP_URL}/auth/setup to enter a license key.`
+  //     );
+  //   }
+  // }, []);
 
   return (
     <Component {...rest}>
-      {hasValidLicense === null || hasValidLicense ? (
-        children
-      ) : process.env.NODE_ENV === "development" ? (
-        /** We only show a warning in development mode, but allow the feature to be displayed for development/testing purposes */
+      {/* {hasValidLicense === null || hasValidLicense ? ( */}
+      {children}
+      {/* ) : process.env.NODE_ENV === "development" ? (
+        /** We only show a warning in development mode, but allow the feature to be displayed for development/testing purposes *
         <>
           <TopBanner
             text=""
@@ -78,7 +73,7 @@ const LicenseRequired = ({ children, as = "", ...rest }: LicenseRequiredProps) =
             />
           }
         />
-      )}
+      )} */}
     </Component>
   );
 };

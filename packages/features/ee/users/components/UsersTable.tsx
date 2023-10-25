@@ -1,5 +1,6 @@
 import { useState, useRef, useMemo, useCallback, useEffect } from "react";
 
+import dayjs from "@calcom/dayjs";
 import { WEBAPP_URL } from "@calcom/lib/constants";
 import { useDebounce } from "@calcom/lib/hooks/useDebounce";
 import { trpc } from "@calcom/trpc/react";
@@ -19,7 +20,7 @@ import { withLicenseRequired } from "../../common/components/LicenseRequired";
 
 const { Cell, ColumnTitle, Header, Row } = Table;
 
-const FETCH_LIMIT = 25;
+const FETCH_LIMIT = 100;
 
 function UsersTableBare() {
   const tableContainerRef = useRef<HTMLDivElement>(null);
@@ -119,6 +120,7 @@ function UsersTableBare() {
         <Table>
           <Header>
             <ColumnTitle widthClassNames="w-auto">User</ColumnTitle>
+            <ColumnTitle>Create date</ColumnTitle>
             <ColumnTitle>Timezone</ColumnTitle>
             <ColumnTitle>Role</ColumnTitle>
             <ColumnTitle widthClassNames="w-auto">
@@ -140,12 +142,16 @@ function UsersTableBare() {
 
                     <div className="text-subtle ml-4 font-medium">
                       <span className="text-default">{user.name}</span>
-                      <span className="ml-3">/{user.username}</span>
+                      <br />
+                      <span>/{user.username}</span>
                       <br />
                       <span className="break-all">{user.email}</span>
+                      <br />
+                      <span className="break-all">{user.phone}</span>
                     </div>
                   </div>
                 </Cell>
+                <Cell>{dayjs(user.createdDate).format("ddd. DD [of] MMM, YYYY hh:mmA")}</Cell>
                 <Cell>{user.timeZone}</Cell>
                 <Cell>
                   <Badge className="capitalize" variant={user.role === "ADMIN" ? "red" : "gray"}>
