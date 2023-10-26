@@ -2,9 +2,11 @@ import { useState, useRef, useMemo } from "react";
 
 import dayjs from "@calcom/dayjs";
 import { useDebounce } from "@calcom/lib/hooks/useDebounce";
+import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { trpc } from "@calcom/trpc/react";
 import {
   Badge,
+  Button,
   ConfirmationDialogContent,
   Dialog,
   DropdownActions,
@@ -18,10 +20,11 @@ import { withLicenseRequired } from "../../common/components/LicenseRequired";
 
 const { Cell, ColumnTitle, Header, Row } = Table;
 
-const FETCH_LIMIT = 10;
+const FETCH_LIMIT = 20;
 
 function UsersTableBare() {
   const tableContainerRef = useRef<HTMLDivElement>(null);
+  const { t } = useLocale();
   const utils = trpc.useContext();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
@@ -57,7 +60,7 @@ function UsersTableBare() {
     },
   });
 
-  const { data, fetchNextPage, fetchPreviousPage, hasNextPage, hasPreviousPage, isFetching } =
+  const { data, fetchNextPage, isFetchingNextPage, hasNextPage } =
     trpc.viewer.admin.listPaginated.useInfiniteQuery(
       {
         limit: FETCH_LIMIT,
@@ -181,20 +184,14 @@ function UsersTableBare() {
             ))}
           </tbody>
         </Table>
-        <div className="w-full">
-          <div className="flex flex-row items-center justify-center gap-x-2 p-2">
-            <button className="flex h-8 items-center justify-center rounded-l bg-gray-800 px-3 text-sm font-medium text-white hover:bg-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
-              Atrás
-            </button>
-            <span className="text-sm text-gray-700 dark:text-gray-400">
-              Viendo <span className="font-semibold text-gray-900 dark:text-white">1</span> de{" "}
-              <span className="font-semibold text-gray-900 dark:text-white">10</span> de{" "}
-              <span className="font-semibold text-gray-900 dark:text-white">100</span> Registros
-            </span>
-            <button className="flex h-8 items-center justify-center rounded-r border-0 border-l border-gray-700 bg-gray-800 px-3 text-sm font-medium text-white hover:bg-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
-              Siguiente
-            </button>
-          </div>
+        <div className="text-default p-4 text-center">
+          <Button
+            color="minimal"
+            loading={isFetchingNextPage}
+            disabled={!hasNextPage}
+            onClick={() => fetchNextPage()}>
+            {hasNextPage ? t("load_more_results") : t("no_more_results")}
+          </Button>
         </div>
         <DeleteUserDialog
           user={userToDelete}
