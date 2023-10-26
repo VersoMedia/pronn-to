@@ -111,7 +111,10 @@ const tabs: VerticalTabItemProps[] = [
     name: "console",
     href: "/settings/console",
     icon: Lock,
-    children: [{ name: "users", href: "/settings/console/users" }],
+    children: [
+      { name: "users", href: "/settings/console/users" },
+      { name: "bookings", href: "/settings/console/bookings" },
+    ],
   },
   // {
   //   name: "console",
