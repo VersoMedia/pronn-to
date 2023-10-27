@@ -7,7 +7,7 @@ import type { EventTypeAppsList } from "@calcom/app-store/utils";
 import useLockedFieldsManager from "@calcom/features/ee/managed-event-types/hooks/useLockedFieldsManager";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { trpc } from "@calcom/trpc/react";
-import { Alert, SettingsToggle, TextField } from "@calcom/ui";
+import { Alert, SettingsToggle, TextField, Select } from "@calcom/ui";
 
 export const EventPaymentTab = ({ eventType }: Pick<EventTypeSetupProps, "eventType">) => {
   return (
@@ -20,6 +20,11 @@ export const EventPaymentTab = ({ eventType }: Pick<EventTypeSetupProps, "eventT
 type RecurringEventControllerProps = {
   eventType: EventTypeSetup;
 };
+
+const currencies = [
+  { label: "Pesos MX", value: "MXN" },
+  { label: "Dolar US", value: "USD" },
+];
 
 export default function RecurringEventController({ eventType }: RecurringEventControllerProps) {
   const { t } = useLocale();
@@ -163,29 +168,45 @@ export default function RecurringEventController({ eventType }: RecurringEventCo
             />
           ))}
           <hr className="border-subtle my-4" />
-          <TextField
-            label=""
-            className="h-[38px]"
-            addOnLeading={
-              <>
-                {formMethods.getValues("currency")
-                  ? getCurrencySymbol("en", formMethods.getValues("currency"))
-                  : ""}
-              </>
-            }
-            addOnClassname="h-[38px]"
-            step="0.01"
-            min="0.5"
-            type="number"
-            required
-            placeholder="Price"
-            onChange={(e) => {
-              formMethods.setValue("price", Number(e.target.value) * 100);
-            }}
-            defaultValue={
-              formMethods.getValues("price") > 0 ? formMethods.getValues("price") / 100 : undefined
-            }
-          />
+          <div className="flex w-full flex-row gap-x-2">
+            <Select
+              isSearchable={true}
+              onChange={(val) => {
+                if (val) formMethods.setValue("currency", val.value);
+              }}
+              defaultValue={
+                currencies.find((option) => option.value === formMethods.getValues("currency")) ||
+                currencies[1]
+              }
+              className="min-w-[20%]"
+              options={currencies}
+            />
+            <div className="w-full">
+              <TextField
+                label=""
+                className="h-[38px]"
+                addOnLeading={
+                  <>
+                    {formMethods.watch("currency")
+                      ? getCurrencySymbol("en", formMethods.getValues("currency"))
+                      : ""}
+                  </>
+                }
+                addOnClassname="h-[38px]"
+                step="0.01"
+                min="0.5"
+                type="number"
+                required
+                placeholder="Price"
+                onChange={(e) => {
+                  formMethods.setValue("price", Number(e.target.value) * 100);
+                }}
+                defaultValue={
+                  formMethods.getValues("price") > 0 ? formMethods.getValues("price") / 100 : undefined
+                }
+              />
+            </div>
+          </div>
         </>
       </div>
     </div>

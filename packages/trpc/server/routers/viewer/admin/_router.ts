@@ -7,6 +7,7 @@ import { ZAdminPasswordResetSchema } from "./sendPasswordReset.schema";
 
 type AdminRouterHandlerCache = {
   listPaginated?: typeof import("./listPaginated.handler").listPaginatedHandler;
+  bookingsPaginated?: typeof import("./bookingsPaginated.handler").bookingsPaginatedHandler;
   sendPasswordReset?: typeof import("./sendPasswordReset.handler").sendPasswordResetHandler;
 };
 
@@ -26,6 +27,23 @@ export const adminRouter = router({
     }
 
     return UNSTABLE_HANDLER_CACHE.listPaginated({
+      ctx,
+      input,
+    });
+  }),
+  bookingsPaginated: authedAdminProcedure.input(ZListMembersSchema).query(async ({ ctx, input }) => {
+    if (!UNSTABLE_HANDLER_CACHE.bookingsPaginated) {
+      UNSTABLE_HANDLER_CACHE.bookingsPaginated = await import("./bookingsPaginated.handler").then(
+        (mod) => mod.bookingsPaginatedHandler
+      );
+    }
+
+    // Unreachable code but required for type safety
+    if (!UNSTABLE_HANDLER_CACHE.bookingsPaginated) {
+      throw new Error("Failed to load handler");
+    }
+
+    return UNSTABLE_HANDLER_CACHE.bookingsPaginated({
       ctx,
       input,
     });
