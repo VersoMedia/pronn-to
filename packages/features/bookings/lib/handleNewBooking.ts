@@ -2192,9 +2192,10 @@ async function handler(
     }
     // If it's not a reschedule, doesn't require confirmation and there's no price,
     // Create a booking
-  } else if (!requiresConfirmation && !paymentAppData.price) {
+  } else {
+    // if (!requiresConfirmation && !paymentAppData.price)
     // Use EventManager to conditionally use all needed integrations.
-    const createManager = await eventManager.create(evt);
+    const createManager = await eventManager.create({ ...evt, title: `${evt.title} 🟡` });
 
     // This gets overridden when creating the event - to check if notes have been hidden or not. We just reset this back
     // to the default description when we are sending the emails.
