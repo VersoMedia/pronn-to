@@ -256,7 +256,7 @@ export const updateHandler = async ({ ctx, input }: UpdateOptions) => {
       },
     });
 
-    if (paymentCredential?.type === "stripe_payment") {
+    if (paymentCredential?.type === "stripe_payment" && !data.currency) {
       const { default_currency } = stripeDataSchema.parse(paymentCredential.key);
       data.currency = default_currency;
     }
