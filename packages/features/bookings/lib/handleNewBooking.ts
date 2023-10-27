@@ -2132,7 +2132,10 @@ async function handler(
 
     // Use EventManager to conditionally use all needed integrations.
     addVideoCallDataToEvt(originalRescheduledBooking.references);
-    const updateManager = await eventManager.reschedule(evt, originalRescheduledBooking.uid);
+    const updateManager = await eventManager.reschedule(
+      { ...evt, title: `${evt.title} 🟢` },
+      originalRescheduledBooking.uid
+    );
 
     //update original rescheduled booking (no seats event)
     if (!eventType.seatsPerTimeSlot) {
