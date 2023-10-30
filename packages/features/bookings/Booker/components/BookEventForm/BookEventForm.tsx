@@ -26,6 +26,7 @@ import getBookingResponsesSchema, {
 } from "@calcom/features/bookings/lib/getBookingResponsesSchema";
 import { getFullName } from "@calcom/features/form-builder/utils";
 import { useBookingSuccessRedirect } from "@calcom/lib/bookingSuccessRedirect";
+import { CAL_URL } from "@calcom/lib/constants";
 import { MINUTES_TO_BOOK } from "@calcom/lib/constants";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { useRouterQuery } from "@calcom/lib/hooks/useRouterQuery";
@@ -195,6 +196,7 @@ export const BookEventFormChild = ({
         member_financial_name: eventType?.owner?.transferCredentials?.name || "",
         bank: eventType?.owner?.transferCredentials?.bank || "",
         clabe: eventType?.owner?.transferCredentials?.clabe || "",
+        paymentLink: responseData.paymentLink ? paymentLink : "",
       };
 
       if (types[i].includes("MEMBER")) {
@@ -226,19 +228,23 @@ export const BookEventFormChild = ({
       const fullName = getFullName(bookingForm.getValues("responses.name"));
       if (paymentUid) {
         const types = ["SERVICE_BOOKING_STRIPE_MEMBER", "SERVICE_BOOKING_STRIPE_CUSTOMER"];
+        const paymentLink = createPaymentLink({
+          paymentUid,
+          date: timeslot,
+          name: fullName,
+          email: bookingForm.getValues("responses.email") ?? "",
+          absolute: false,
+        });
+
         (async () => {
-          await sendNotificationWhatsapp(types, responseData, bookingData);
+          await sendNotificationWhatsapp(
+            types,
+            { ...responseData, paymentLink: CAL_URL + paymentLink },
+            bookingData
+          );
         })();
 
-        return router.push(
-          createPaymentLink({
-            paymentUid,
-            date: timeslot,
-            name: fullName,
-            email: bookingForm.getValues("responses.email") ?? "",
-            absolute: false,
-          })
-        );
+        return router.push(paymentLink);
       }
 
       if (!uid) {
@@ -410,7 +416,6 @@ export const BookEventFormChild = ({
   };
 
   if (!eventType) {
-    console.warn("No event type found for event", routerQuery);
     return <Alert severity="warning" message={t("error_booking_event")} />;
   }
 

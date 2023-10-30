@@ -68,6 +68,24 @@ const eventTypeSelect = Prisma.validator<Prisma.EventTypeSelect>()({
       },
     },
   },
+  owner: {
+    select: {
+      weekStart: true,
+      username: true,
+      transferCredentials: true,
+      name: true,
+      theme: true,
+      metadata: true,
+      brandColor: true,
+      darkBrandColor: true,
+      organization: {
+        select: {
+          name: true,
+          slug: true,
+        },
+      },
+    },
+  },
   seatsPerTimeSlot: true,
   ...baseEventTypeSelect,
 });
@@ -153,7 +171,6 @@ export const getByViewerHandler = async ({ ctx, input }: GetByViewerOptions) => 
   if (!user) {
     throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
   }
-  console.log(user);
 
   const mapEventType = (eventType: (typeof user.eventTypes)[number]) => ({
     ...eventType,

@@ -1,18 +1,23 @@
 import { useMutation } from "@tanstack/react-query";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 
+import { createPaymentLink } from "@calcom/app-store/stripepayment/lib/client";
 import dayjs from "@calcom/dayjs";
 import { createBooking } from "@calcom/features/bookings/lib";
 import { sendNotification } from "@calcom/features/bookings/lib";
+import { getFullName } from "@calcom/features/form-builder/utils";
+import { CAL_URL } from "@calcom/lib/constants";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
+import { useRouterQuery } from "@calcom/lib/hooks/useRouterQuery";
 import { useTypedQuery } from "@calcom/lib/hooks/useTypedQuery";
 import { analytics, events_analytics } from "@calcom/lib/segment";
-import { SchedulingType, MembershipRole } from "@calcom/prisma/enums";
+import type { MembershipRole } from "@calcom/prisma/enums";
+import { SchedulingType } from "@calcom/prisma/enums";
 import { trpc } from "@calcom/trpc/react";
 import {
   Button,
@@ -83,14 +88,18 @@ export default function CreateBookingTypeDialog({
   selectedDay: Date;
 }) {
   const { t } = useLocale();
+  const searchParams = useSearchParams();
+  const routerQuery = useRouterQuery();
   const [addNewClient, setAddNewClient] = useState(false);
   const [options, setOptions] = useState(false);
+  const [selectEventMethodPayment, setSelectEventMethodPayment] = useState([]);
+  const [eventTypeSelect, setEventTypeSelect] = useState({});
   const router = useRouter();
 
   const {
     data: { teamId },
   } = useTypedQuery(querySchema);
-  const teamProfile = profileOptions.find((profile) => profile.teamId === teamId);
+  // const teamProfile = profileOptions.find((profile) => profile.teamId === teamId);
 
   const form = useForm({
     defaultValues: {
@@ -108,13 +117,33 @@ export default function CreateBookingTypeDialog({
       let types = ["GENERAL_BOOKING_MEMBER", "GENERAL_BOOKING_CUSTOMER"];
 
       const { paymentUid } = responseData;
-      if (paymentUid) types = ["SERVICE_BOOKING_STRIPE_MEMBER", "SERVICE_BOOKING_STRIPE_CUSTOMER"];
+      let paymentLink = "";
+
+      if (paymentUid) {
+        types = ["SERVICE_BOOKING_STRIPE_MEMBER", "SERVICE_BOOKING_STRIPE_CUSTOMER"];
+        const fullName = getFullName(responseData.responses?.name);
+
+        paymentLink =
+          CAL_URL +
+          createPaymentLink({
+            paymentUid,
+            date: form.getValues("startTime").toISOString(),
+            name: fullName,
+            email: responseData.responses?.email ? responseData.responses?.email : "Sin correo",
+            absolute: false,
+          });
+      }
 
       analytics.track(events_analytics.CREATE_APPOINTMENT, {
         id: responseData.user?.id,
         email: responseData.user?.email,
         name: responseData.user?.name,
       });
+
+      if (form.getValues()?.responses?.payments?.value === "cash")
+        types = ["SERVICE_BOOKING_CASH_MEMBER", "SERVICE_BOOKING_CASH_CUSTOMER"];
+      else if (form.getValues()?.responses?.payments?.value === "transfer")
+        types = ["SERVICE_BOOKING_TRANSFER_MEMBER", "SERVICE_BOOKING_TRANSFER_CUSTOMER"];
 
       for (let i = 0; i < types.length; i++) {
         const payload = {
@@ -128,8 +157,14 @@ export default function CreateBookingTypeDialog({
           type_: types[i],
           date: dayjs(responseData.startTime).format("DD-MM-YYYY"),
           hour: dayjs(responseData.startTime).format("hh:mm A"),
+          service_price: `$ ${eventTypeSelect?.price / 100}`,
+          member_financial_name: eventTypeSelect?.owner?.transferCredentials?.name || "",
+          bank: eventTypeSelect?.owner?.transferCredentials?.bank || "",
+          clabe: eventTypeSelect?.owner?.transferCredentials?.clabe || "",
+          paymentLink,
         };
 
+        console.log(payload);
         (async () => {
           await sendNotification(payload);
         })();
@@ -143,15 +178,13 @@ export default function CreateBookingTypeDialog({
     onError: (err) => {
       const message = `${err.message}`;
       showToast(message, "error");
-
-      //   errorRef && errorRef.current?.scrollIntoView({ behavior: "smooth" });
     },
   });
 
-  const isAdmin =
-    teamId !== undefined &&
-    (teamProfile?.membershipRole === MembershipRole.OWNER ||
-      teamProfile?.membershipRole === MembershipRole.ADMIN);
+  // const isAdmin =
+  //   teamId !== undefined &&
+  //   (teamProfile?.membershipRole === MembershipRole.OWNER ||
+  //     teamProfile?.membershipRole === MembershipRole.ADMIN);
 
   const attendeesDecode =
     attendees?.data?.attendees && attendees?.data?.attendees.length > 0
@@ -164,11 +197,6 @@ export default function CreateBookingTypeDialog({
         }))
       : [];
 
-  // const attendeesList = attendeesDecode.filter(
-  //   (obj, index) =>
-  //     attendeesDecode.findIndex((item) => item.email === obj.email || item.phone === obj.phone) === index
-  // );
-
   const eventTypes =
     events?.eventTypeGroups.length > 0
       ? events?.eventTypeGroups[0].eventTypes.map((ev) => ({
@@ -176,8 +204,39 @@ export default function CreateBookingTypeDialog({
           label: ev.title,
           duration: ev.length,
           eventTypeSlug: ev.slug,
+          metadata: ev.metadata,
+          paymentCash: ev.paymentCash,
+          paymentTransfer: ev.paymentTransfer,
+          price: ev.price,
+          currency: ev.currency,
+          owner: ev.owner,
         }))
       : [];
+
+  const getEventTypeObject = (value: string): void => {
+    if (value && eventTypes.length) {
+      const event = value;
+      const eventType = eventTypes.find((es) => es?.value === event) || {};
+      const options = [];
+
+      if (eventType.paymentCash) {
+        options.push({ value: "cash", label: "Pago en efectivo" });
+      }
+
+      if (eventType.paymentTransfer) {
+        options.push({ value: "transfer", label: "Pago por transferencia" });
+      }
+
+      if (eventType?.metadata?.apps?.stripe?.enabled) {
+        options.push({ value: "stripe", label: "Pago con Stripe" });
+      }
+      setEventTypeSelect(eventType);
+      setSelectEventMethodPayment(options);
+    } else {
+      setEventTypeSelect({});
+      setSelectEventMethodPayment([]);
+    }
+  };
 
   return (
     <Dialog
@@ -215,6 +274,10 @@ export default function CreateBookingTypeDialog({
               responses: {
                 ...attendee,
                 guests: [],
+                payments: {
+                  optionValue: "",
+                  value: form.getValues()?.responses?.payments?.value || null,
+                },
               },
               user: events?.eventTypeGroups[0].profile?.slug,
               start: dayjs(values.startTime).tz(values.timeZone).format(),
@@ -223,7 +286,15 @@ export default function CreateBookingTypeDialog({
               eventTypeSlug: event.eventTypeSlug,
               timeZone: values.timeZone,
               language: "es",
-              metadata: {},
+              metadata: Object.keys(routerQuery)
+                .filter((key) => key.startsWith("metadata"))
+                .reduce(
+                  (metadata, key) => ({
+                    ...metadata,
+                    [key.substring("metadata[".length, key.length - 1)]: searchParams?.get(key),
+                  }),
+                  {}
+                ),
               hasHashedBookingLink: false,
               internal: true,
             };
@@ -240,10 +311,27 @@ export default function CreateBookingTypeDialog({
                 options={eventTypes}
                 {...register("event_type")}
                 onChange={(e) => {
+                  getEventTypeObject(e?.value);
                   form.setValue("event_type", e?.value);
                 }}
               />
             </div>
+
+            {selectEventMethodPayment.length > 0 && (
+              <div>
+                <Label className="mb-2">Selecciona un método de pago</Label>
+                <Select
+                  isSearchable
+                  placeholder="Selecciona un método de pago"
+                  className="mt-0 w-full capitalize"
+                  options={selectEventMethodPayment}
+                  {...register("responses.payments.value")}
+                  onChange={(e) => {
+                    form.setValue("responses.payments.value", e?.value);
+                  }}
+                />
+              </div>
+            )}
 
             <div>
               <Label>Selecciona una fecha y hora</Label>
