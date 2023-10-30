@@ -94,7 +94,7 @@ const NotificationView = ({ user }: NotificationViewProps) => {
       textTwelveHours: user.notificationSettings?.textTwelveHours ?? "",
       textSixHours: user.notificationSettings?.textSixHours ?? "",
       textOneHours: user.notificationSettings?.textOneHours ?? "",
-      textThityMinutes: user.notificationSettings?.textThityMinutes ?? "",
+      textThirtyMinutes: user.notificationSettings?.textThirtyMinutes ?? "",
     },
   });
   const {
@@ -192,19 +192,19 @@ const NotificationView = ({ user }: NotificationViewProps) => {
         </div>
         <div className="mt-6">
           <Controller
-            name="oneDays"
+            name="oneDay"
             control={formMethods.control}
             render={() => (
               <SettingsToggle
                 title={t("reminder_time_whatsapp", { day: "1 day" })}
-                checked={formMethods.getValues("oneDays")}
+                checked={formMethods.getValues("oneDay")}
                 onCheckedChange={(checked) => {
-                  formMethods.setValue("oneDays", checked, { shouldDirty: true });
+                  formMethods.setValue("oneDay", checked, { shouldDirty: true });
                 }}
               />
             )}
           />
-          {formMethods.watch("oneDays") && (
+          {formMethods.watch("oneDay") && (
             <TextField
               label={null}
               placeholder={t("custom_text_reminder", { day: "1 day" })}

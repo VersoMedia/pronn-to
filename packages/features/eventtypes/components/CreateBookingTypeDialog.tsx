@@ -105,13 +105,16 @@ export default function CreateBookingTypeDialog({
 
   const createBookingMutation = useMutation(createBooking, {
     onSuccess: async (responseData) => {
+      let types = ["GENERAL_BOOKING_MEMBER", "GENERAL_BOOKING_CUSTOMER"];
+
+      const { paymentUid } = responseData;
+      if (paymentUid) types = ["SERVICE_BOOKING_STRIPE_MEMBER", "SERVICE_BOOKING_STRIPE_CUSTOMER"];
+
       analytics.track(events_analytics.CREATE_APPOINTMENT, {
         id: responseData.user?.id,
         email: responseData.user?.email,
         name: responseData.user?.name,
       });
-
-      const types = ["GENERAL_BOOKING_MEMBER", "GENERAL_BOOKING_CUSTOMER"];
 
       for (let i = 0; i < types.length; i++) {
         const payload = {
@@ -258,6 +261,11 @@ export default function CreateBookingTypeDialog({
               />
             </div>
 
+            {/**
+             * medios de pagos generaré un select con los metodo de pagos disponibles
+             * ademas de poder enviar el link de stripe al whatsapp en caso de ser de pago
+             * no siempre enviar notificacion de 0 pesos
+             */}
             <div>
               {!addNewClient ? (
                 <>

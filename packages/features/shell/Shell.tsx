@@ -74,6 +74,7 @@ import {
 
 import { useOrgBranding } from "../ee/organizations/context/provider";
 import FreshChatProvider from "../ee/support/lib/freshchat/FreshChatProvider";
+import useIntercom from "../ee/support/lib/intercom/useIntercom";
 import { TeamInviteBadge } from "./TeamInviteBadge";
 
 // need to import without ssr to prevent hydration errors
@@ -289,6 +290,7 @@ export default function Shell(props: LayoutProps) {
   const [status, setStatus] = useState(false);
   const [modal, setModal] = useState(true);
   const [modalWelcome, setModalWelcome] = useState(false);
+  const { open } = useIntercom();
 
   useEffect(() => {
     if (!user || pathname === "/settings/membership") setStatus(false);
@@ -300,6 +302,10 @@ export default function Shell(props: LayoutProps) {
     )
       setStatus(true);
   }, [user, pathname]);
+
+  useEffect(() => {
+    open();
+  }, []);
 
   useEffect(() => {
     if (search.get("welcome") === "1") {
