@@ -147,6 +147,7 @@ export default function CreateBookingTypeDialog({
 
       for (let i = 0; i < types.length; i++) {
         const payload = {
+          booking_id: responseData.id,
           member_email: responseData.user?.email ? responseData.user?.email : "Sin correo",
           member_phone: responseData.user?.phone,
           member_name: responseData.user?.name,
@@ -164,7 +165,6 @@ export default function CreateBookingTypeDialog({
           paymentLink,
         };
 
-        console.log(payload);
         (async () => {
           await sendNotification(payload);
         })();
