@@ -167,8 +167,13 @@ const StatusBg = {
   PENDING: "#FFF6DE",
 };
 
-const CustomCardAppointment = ({ title, event }: { title: string; event: any }) => {
+const CustomCardAppointment = ({ title, event, views }: { title: string; event: any; views: string }) => {
   const status = event.resource.status;
+  const isMobile = useMediaQuery("(max-width: 768px)");
+
+  if (isMobile && views === "month")
+    return <div className="h-[10px] w-[10px] rounded-md bg-indigo-300" style={{ touchAction: "none" }} />;
+
   return (
     <div
       className="flex h-full w-full flex-row items-center justify-between divide-x divide-gray-400 rounded-[4px] border px-1"
@@ -209,7 +214,7 @@ export default function Bookings() {
   const [loading, setLoading] = useState(false);
   const [selectedDay, setSelectedDay] = useState(new Date());
   const [currentAppointment, setCurrentAppointment] = useState(null);
-  const onView = useCallback((newView) => setViews(newView), [setViews]);
+  const onView = useCallback((newView) => setViews(newView), [setViews, views]);
   const [viewSlots, setViewSlots] = useState(null);
 
   const form = useForm({
@@ -617,15 +622,9 @@ export default function Bookings() {
                       );
                   }}
                   components={{
-                    event: ({ event, title }) =>
-                      isMobile && views === "month" ? (
-                        <div
-                          className="h-[10px] w-[10px] rounded-md bg-indigo-300"
-                          style={{ touchAction: "none" }}
-                        />
-                      ) : (
-                        <CustomCardAppointment event={event} title={title} />
-                      ),
+                    event: ({ event, title }) => (
+                      <CustomCardAppointment event={event} title={title} views={views} />
+                    ),
                   }}
                   startAccessor="start"
                   endAccessor="end"
@@ -637,7 +636,7 @@ export default function Bookings() {
                 />
               </div>
             )}
-            {(!typeView || (viewSlots && isMobile)) && (
+            {(!typeView || (viewSlots && isMobile && views === "month")) && (
               <>
                 {!!bookingsToday.length && status === "upcoming" && (
                   <div className="mb-6 pt-2 xl:pt-0">
