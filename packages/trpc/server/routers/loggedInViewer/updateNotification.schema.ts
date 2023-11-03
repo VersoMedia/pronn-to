@@ -16,6 +16,8 @@ export const ZUpdateNotificationInputSchema = z.object({
   textOneHours: z.string().optional(),
   thirtyMinutes: z.boolean().optional(),
   textThirtyMinutes: z.string().optional(),
+  textConfirmationQuote: z.string().optional(),
+  confirmQuote: z.boolean().optional(),
 });
 
 export type TUpdateNotificationInputSchema = z.infer<typeof ZUpdateNotificationInputSchema>;

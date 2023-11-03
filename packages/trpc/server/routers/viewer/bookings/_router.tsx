@@ -1,5 +1,6 @@
 import authedProcedure from "../../../procedures/authedProcedure";
 import { router } from "../../../trpc";
+import { ZChangeStatusInputSchema } from "./changeStatus.schema";
 import { ZConfirmInputSchema } from "./confirm.schema";
 import { ZEditLocationInputSchema } from "./editLocation.schema";
 import { ZGetInputSchema } from "./get.schema";
@@ -11,6 +12,7 @@ type BookingsRouterHandlerCache = {
   get?: typeof import("./get.handler").getHandler;
   requestReschedule?: typeof import("./requestReschedule.handler").requestRescheduleHandler;
   editLocation?: typeof import("./editLocation.handler").editLocationHandler;
+  changeStatus?: typeof import("./changeStatus.handler").changeStatusHandler;
   confirm?: typeof import("./confirm.handler").confirmHandler;
   getBookingAttendees?: typeof import("./getBookingAttendees.handler").getBookingAttendeesHandler;
 };
@@ -65,6 +67,24 @@ export const bookingsRouter = router({
     }
 
     return UNSTABLE_HANDLER_CACHE.editLocation({
+      ctx,
+      input,
+    });
+  }),
+
+  changeStatus: bookingsProcedure.input(ZChangeStatusInputSchema).mutation(async ({ input, ctx }) => {
+    if (!UNSTABLE_HANDLER_CACHE.changeStatus) {
+      UNSTABLE_HANDLER_CACHE.changeStatus = await import("./changeStatus.handler").then(
+        (mod) => mod.changeStatusHandler
+      );
+    }
+
+    // Unreachable code but required for type safety
+    if (!UNSTABLE_HANDLER_CACHE.changeStatus) {
+      throw new Error("Failed to load handler");
+    }
+
+    return UNSTABLE_HANDLER_CACHE.changeStatus({
       ctx,
       input,
     });

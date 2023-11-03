@@ -30,6 +30,8 @@ import { ShellMain } from "@calcom/features/shell/Shell";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import useMediaQuery from "@calcom/lib/hooks/useMediaQuery";
 import { useParamsWithFallback } from "@calcom/lib/hooks/useParamsWithFallback";
+import { HttpError } from "@calcom/lib/http-error";
+import type { BookingStatus } from "@calcom/prisma/enums";
 import type { RouterOutputs } from "@calcom/trpc/react";
 import { trpc } from "@calcom/trpc/react";
 import {
@@ -43,6 +45,7 @@ import {
   DateTimePicker,
   Form,
   Label,
+  Select,
 } from "@calcom/ui";
 import { Button, HorizontalTabs, Switch } from "@calcom/ui";
 import type { VerticalTabItemProps, HorizontalTabItemProps } from "@calcom/ui";
@@ -61,6 +64,17 @@ import { WipeMyCalActionButton } from "../../../../packages/app-store/wipemycalo
 
 type BookingOutput = RouterOutputs["viewer"]["bookings"]["get"]["bookings"][0];
 //type GetByViewerResponse = RouterOutputs["viewer"]["eventTypes"]["getByViewer"] | undefined;
+
+type IOptionStatus = {
+  label: string;
+  value: BookingStatus;
+};
+
+const optionsStatus: IOptionStatus[] = [
+  { label: "Pendiente", value: "PENDING" },
+  { label: "Confirmada", value: "ACCEPTED" },
+  { label: "Cancelada", value: "CANCELLED" },
+];
 
 type RecurringInfo = {
   recurringEventId: string | null;
@@ -167,8 +181,13 @@ const StatusBg = {
   PENDING: "#FFF6DE",
 };
 
-const CustomCardAppointment = ({ title, event }: { title: string; event: any }) => {
+const CustomCardAppointment = ({ title, event, views }: { title: string; event: any; views: string }) => {
   const status = event.resource.status;
+  const isMobile = useMediaQuery("(max-width: 768px)");
+
+  if (isMobile && views === "month")
+    return <div className="h-[10px] w-[10px] rounded-md bg-indigo-300" style={{ touchAction: "none" }} />;
+
   return (
     <div
       className="flex h-full w-full flex-row items-center justify-between divide-x divide-gray-400 rounded-[4px] border px-1"
@@ -204,12 +223,13 @@ export default function Bookings() {
   const [views, setViews] = useState("week");
   const [typeView, setTypeView] = useState(true);
   const [visible, setVisible] = useState(false);
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const [deleteAppModal, setDeleteAppModal] = useState(false);
   const [recheduleModal, setRecheduleModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedDay, setSelectedDay] = useState(new Date());
   const [currentAppointment, setCurrentAppointment] = useState(null);
-  const onView = useCallback((newView) => setViews(newView), [setViews]);
+  const onView = useCallback((newView) => setViews(newView), [setViews, views]);
   const [viewSlots, setViewSlots] = useState(null);
 
   const form = useForm({
@@ -217,7 +237,6 @@ export default function Bookings() {
       startTime: selectedDay,
     },
   });
-  const isMobile = useMediaQuery("(max-width: 768px)");
 
   const tabsViewsCalendar = [
     {
@@ -255,6 +274,28 @@ export default function Bookings() {
     }
   );
 
+  const createMutation = trpc.viewer.bookings.changeStatus.useMutation({
+    onSuccess: () => {
+      query.refetch();
+      showToast(t("update_successfully"), "success");
+    },
+    onError: (err) => {
+      if (err instanceof HttpError) {
+        const message = `${err.statusCode}: ${err.message}`;
+        showToast(message, "error");
+      }
+
+      if (err.data?.code === "BAD_REQUEST") {
+        const message = `${err.data.code}: ${t("error_event_type_url_duplicate")}`;
+        showToast(message, "error");
+      }
+
+      if (err.data?.code === "UNAUTHORIZED") {
+        const message = `${err.data.code}: ${t("error_event_type_unauthorized_create")}`;
+        showToast(message, "error");
+      }
+    },
+  });
   // Animate page (tab) tranistions to look smoothing
 
   const buttonInView = useInViewObserver(() => {
@@ -617,15 +658,9 @@ export default function Bookings() {
                       );
                   }}
                   components={{
-                    event: ({ event, title }) =>
-                      isMobile && views === "month" ? (
-                        <div
-                          className="h-[10px] w-[10px] rounded-md bg-indigo-300"
-                          style={{ touchAction: "none" }}
-                        />
-                      ) : (
-                        <CustomCardAppointment event={event} title={title} />
-                      ),
+                    event: ({ event, title }) => (
+                      <CustomCardAppointment event={event} title={title} views={views} />
+                    ),
                   }}
                   startAccessor="start"
                   endAccessor="end"
@@ -637,7 +672,7 @@ export default function Bookings() {
                 />
               </div>
             )}
-            {(!typeView || (viewSlots && isMobile)) && (
+            {(!typeView || (viewSlots && isMobile && views === "month")) && (
               <>
                 {!!bookingsToday.length && status === "upcoming" && (
                   <div className="mb-6 pt-2 xl:pt-0">
@@ -736,6 +771,21 @@ export default function Bookings() {
                   </>
                 )}
               </div>
+            </div>
+            <div className="mt-4">
+              <p className="text-[16px]">{t("change_status")}</p>
+              <Select
+                options={optionsStatus}
+                defaultValue={
+                  optionsStatus.find((op) => op.value === currentAppointment?.event?.resource?.status) || {}
+                }
+                onChange={(value) => {
+                  createMutation.mutate({
+                    bookingId: currentAppointment?.event?.resource?.id,
+                    status: value.value,
+                  });
+                }}
+              />
             </div>
           </div>
 

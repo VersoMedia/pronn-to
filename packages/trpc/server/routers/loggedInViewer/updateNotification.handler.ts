@@ -30,6 +30,9 @@ export const updateNotificationHandler = async ({ ctx, input }: UpdateNotificati
     textOneHours: input.textOneHours,
     thirtyMinutes: input.thirtyMinutes,
     textThirtyMinutes: input.textThirtyMinutes,
+
+    confirmQuote: input.confirmQuote,
+    textConfirmationQuote: input.textConfirmationQuote,
   };
 
   const updatedUser = await prisma.notificationSettings.upsert({
