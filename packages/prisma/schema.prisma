@@ -249,6 +249,7 @@ model NotificationSettings {
   thirtyMinutes         Boolean @default(false)
   confirmationQuote     Boolean @default(false)
   textConfirmationQuote String? @default("")
+  confirmQuote          Boolean @default(true)
   user                  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
