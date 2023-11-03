@@ -6,8 +6,8 @@ generator client {
 generator zod {
   provider      = "zod-prisma"
   output        = "./zod"
-  imports       = "./zod-utils"
   relationModel = "default"
+  imports       = "./zod-utils"
 }
 
 generator enums {
@@ -249,6 +249,7 @@ model NotificationSettings {
   thirtyMinutes         Boolean @default(false)
   confirmationQuote     Boolean @default(false)
   textConfirmationQuote String? @default("")
+  confirmQuote          Boolean @default(true)
   user                  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
