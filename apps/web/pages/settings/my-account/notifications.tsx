@@ -95,6 +95,9 @@ const NotificationView = ({ user }: NotificationViewProps) => {
       textSixHours: user.notificationSettings?.textSixHours ?? "",
       textOneHours: user.notificationSettings?.textOneHours ?? "",
       textThirtyMinutes: user.notificationSettings?.textThirtyMinutes ?? "",
+
+      textConfirmationQuote: user.notificationSettings?.textConfirmationQuote ?? "",
+      confirmQuote: user.notificationSettings?.confirmQuote ?? "",
     },
   });
   const {
@@ -164,6 +167,29 @@ const NotificationView = ({ user }: NotificationViewProps) => {
               />
             )}
           />
+        </div>
+        <Label className="mt-8 pb-[32px] text-[16px]">{t("confirm_to_quote")}</Label>
+        <div className="mt-2">
+          <Controller
+            name="confirmQuote"
+            control={formMethods.control}
+            render={() => (
+              <SettingsToggle
+                title={t("confirmation_quote")}
+                checked={formMethods.getValues("confirmQuote")}
+                onCheckedChange={(checked) => {
+                  formMethods.setValue("confirmQuote", checked, { shouldDirty: true });
+                }}
+              />
+            )}
+          />
+          {formMethods.watch("confirmQuote") && (
+            <TextField
+              label={null}
+              placeholder={t("custom_text_confirmation_quote")}
+              {...formMethods.register("textConfirmationQuote")}
+            />
+          )}
         </div>
 
         <Label className="mt-8 pb-[32px] text-[16px]">{t("reminder_whatsapp")}</Label>

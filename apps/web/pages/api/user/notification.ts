@@ -14,6 +14,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     select: {
       memberWhats: true,
       customerWhats: true,
+      confirmQuote: true,
+      textConfirmationQuote: true,
     },
   });
 
