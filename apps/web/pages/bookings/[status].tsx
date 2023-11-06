@@ -31,7 +31,7 @@ import { useLocale } from "@calcom/lib/hooks/useLocale";
 import useMediaQuery from "@calcom/lib/hooks/useMediaQuery";
 import { useParamsWithFallback } from "@calcom/lib/hooks/useParamsWithFallback";
 import { HttpError } from "@calcom/lib/http-error";
-import type { BookingStatus } from "@calcom/prisma/enums";
+import { BookingStatus } from "@calcom/prisma/enums";
 import type { RouterOutputs } from "@calcom/trpc/react";
 import { trpc } from "@calcom/trpc/react";
 import {
@@ -519,6 +519,15 @@ export default function Bookings() {
     ];
   };
 
+  const [statusAppointment, setStatusAppointment] = useState("");
+
+  const onSubmitChangeStatus = () => {
+    createMutation.mutate({
+      bookingId: currentAppointment?.event?.resource?.id,
+      status: statusAppointment,
+    });
+  };
+
   return (
     <ShellMain
       hideHeadingOnMobile
@@ -780,10 +789,7 @@ export default function Bookings() {
                   optionsStatus.find((op) => op.value === currentAppointment?.event?.resource?.status) || {}
                 }
                 onChange={(value) => {
-                  createMutation.mutate({
-                    bookingId: currentAppointment?.event?.resource?.id,
-                    status: value.value,
-                  });
+                  setStatusAppointment(value.value);
                 }}
               />
             </div>
@@ -794,13 +800,29 @@ export default function Bookings() {
               <Button
                 data-testid="rechedule-booking"
                 className="w-full text-center"
+                disabled={createMutation.isLoading}
+                onClick={() => {
+                  if (statusAppointment === BookingStatus.CANCELLED) {
+                    setDeleteAppModal(true);
+                    return;
+                  }
+
+                  onSubmitChangeStatus();
+
+                  setVisible(false);
+                }}>
+                {t("save")}
+              </Button>
+              <Button
+                data-testid="rechedule-booking"
+                className="w-full text-center"
                 onClick={() => {
                   setVisible(false);
                   setRecheduleModal(true);
                 }}>
                 {t("reschedule")}
               </Button>
-              <Button
+              {/*<Button
                 data-testid="cancel-booking"
                 className="w-full text-center"
                 onClick={() => {
@@ -808,7 +830,7 @@ export default function Bookings() {
                   setDeleteAppModal(true);
                 }}>
                 {t("cancel")}
-              </Button>
+              </Button>*/}
               <DialogClose color="secondary" className="w-full text-center" />
             </div>
           </DialogFooter>
