@@ -6,8 +6,8 @@ generator client {
 generator zod {
   provider      = "zod-prisma"
   output        = "./zod"
-  imports       = "./zod-utils"
   relationModel = "default"
+  imports       = "./zod-utils"
 }
 
 generator enums {
