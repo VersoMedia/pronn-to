@@ -53,7 +53,6 @@ export const useIntercom = () => {
         is_logged_in: !!data,
       },
     });
-    hookData.show();
   };
   return { ...hookData, open };
 };
