@@ -437,6 +437,7 @@ model BookingNotifications {
   whatsMemberHourReminderAnswered    Boolean @default(false)
   whatsMemberHourReminderSent        Boolean @default(false)
   whatsMemberHourReminderTrackId     String?
+  answeredResponse                   Boolean @default(false)
   booking                            Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 }
 
